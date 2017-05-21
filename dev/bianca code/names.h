@@ -16,7 +16,7 @@ class names{
 
   /* put stuff that the class uses internally here */
   namestring table[maxnames];
-  int length_of_table = 0;
+  int length_of_table;
 
 public:
   name lookup (namestring str);

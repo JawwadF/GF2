@@ -11,6 +11,7 @@ using namespace std;
 names::names(void)  /* the constructor */
 {
   /* over to you */
+  length_of_table = 0;
 }
 
 name names::lookup (namestring str)
@@ -42,7 +43,7 @@ name names::lookup (namestring str)
 name names::cvtname (namestring str)
 {
   name t=blankname;
-  for (int i=0, i<length_of_table; i++)
+  for (int i=0; i<length_of_table; i++)
     if (table[i]==str)
       t = i;
   return t;
