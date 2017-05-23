@@ -12,19 +12,20 @@ scanner::scanner(names* names_mod, const char* defname)  /* the constructor */
   inf.open(defname);
   if (!inf) 
     {
-      cout << "Error: cannot open file " << argv[1] << " for reading" << endl;
+      cout << "Error: cannot open file " << defname<< " for reading" << endl;
       exit(1);
     }
-  getch()
+  getch();
+  
 }
 
 
 //scanner::~scanner(names* names_mod, const char* defname)  /* the destructor */
 
-//void skipcomments(void)
+//void scanner::skipcomments(void)
 
 
-void getnumber(int& num)
+void scanner::getnumber(int& num)
 {
   string numstr;
   while (!eofile) {
@@ -36,13 +37,13 @@ void getnumber(int& num)
   num = atoi(numstr.c_str());
 }
 
-void getch(void)
+void scanner::getch(void)
 {
    eofile = !inf.get(curch);
 }
 
 
-void getname(name &id)
+void scanner:: getname(name &id)
 {
   namestring vari = "";
   namestring str;
@@ -52,7 +53,7 @@ void getname(name &id)
       getch();
     }
   str = vari;
-  if (vari.length() > nmz->maxlength)
+  if (vari.length() > maxlength)
     {
       str.resize(maxlength);
       cout<<"Warning: the name '"<<vari<<"' was truncated to "<<str <<endl;
@@ -61,7 +62,7 @@ void getname(name &id)
 }
 
 
-void skipspaces(void)
+void scanner::skipspaces(void)
 {
   while (isspace(curch) and !eofile)
     getch();
@@ -89,53 +90,49 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	  if (isalpha(curch)) //name
 	    { 
 	      getname(id);
-	      switch (id)
-		{
-		case nmz->cvtname("DEVICE"): s = devsym; break;
-	        case nmz->cvtname("CONNECT"): s = consym; break;
-		case nmz->cvtname("XOR"): s = xorsym; break;
-		case nmz->cvtname("CLOCK"): s = clksym; break;
-		case nmz->cvtname("SWITCH"): s = swisym; break;
-		case nmz->cvtname("DTYPE"): s = dtypesym; break;
-		case nmz->cvtname("CIRCUIT"): s = cirsym; break;
-		case nmz->cvtname("MONITOR"): s = monsym; break;
+	      if (id == nmz->cvtname("DEVICE")) s = devsym;
+	      else if (id == nmz->cvtname("CONNECT")) s = consym;
+	      else if (id == nmz->cvtname("XOR")) s = xorsym;
+	      else if (id == nmz->cvtname("CLOCK")) s = clksym;
+	      else if (id == nmz->cvtname("SWITCH")) s = swisym;
+	      else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
+	      else if (id == nmz->cvtname("CIRCUIT")) s = cirsym;
+	      else if (id == nmz->cvtname("MONITOR")) s = monsym;
 
-		case nmz->cvtname("AND"): s = gatesym; break;
-		case nmz->cvtname("NAND"): s = gatesym; break; 
-		case nmz->cvtname("OR"): s = gatesym; break;
-		case nmz->cvtname("NOR"): s = gatesym; break;
+	      else if (id == nmz->cvtname("AND")) s = gatesym;
+	      else if (id == nmz->cvtname("NAND")) s = gatesym;
+	      else if (id == nmz->cvtname("OR")) s = gatesym;
+	      else if (id == nmz->cvtname("NOR")) s = gatesym;
 
-		case nmz->cvtname("INPUTS"): s = keysym; break;
-		case nmz->cvtname("VALUE"): s = keysym; break;
-		case nmz->cvtname("QVAL"): s = keysym; break;
-		case nmz->cvtname("NAME"): s = keysym; break;
-		case nmz->cvtname("CYCLES"): s = keysym; break;
-		case nmz->cvtname("START"): s = keysym; break;
-		case nmz->cvtname("INCLUDES"): s = keysym; break;
-		case nmz->cvtname("RECORDS"): s = keysym; break;
+	      else if (id == nmz->cvtname("INPUTS")) s = keysym;
+	      else if (id == nmz->cvtname("VALUE")) s = keysym;
+	      else if (id == nmz->cvtname("QVAL")) s = keysym;
+	      else if (id == nmz->cvtname("NAME")) s = keysym;
+	      else if (id == nmz->cvtname("CYCLES")) s = keysym;
+	      else if (id == nmz->cvtname("START")) s = keysym;
+	      else if (id == nmz->cvtname("INCLUDES")) s = keysym;
+	      else if (id == nmz->cvtname("RECORDS")) s = keysym;
 
-		case nmz->cvtname("Q"): s = outsym; break;
-		case nmz->cvtname("QVAL"): s = outsym; break;
+	      else if (id == nmz->cvtname("Q")) s = outsym;
+	      else if (id == nmz->cvtname("QBAR")) s = outsym;
 
-		case nmz->cvtname("I1"): s = insym; break;
-		case nmz->cvtname("I2"): s = insym; break;
-		case nmz->cvtname("I3"): s = insym; break;
-		case nmz->cvtname("I4"): s = insym; break;
-		case nmz->cvtname("I5"): s = insym; break;
-		case nmz->cvtname("I6"): s = insym; break;
-		case nmz->cvtname("I7"): s = insym; break;
-		case nmz->cvtname("I8"): s = insym; break;
-		case nmz->cvtname("I9"): s = insym; break;
-		case nmz->cvtname("I10"): s = insym; break;
-		case nmz->cvtname("I11"): s = insym; break;
-		case nmz->cvtname("I12"): s = insym; break;
-		case nmz->cvtname("I13"): s = insym; break;
-		case nmz->cvtname("I14"): s = insym; break;
-		case nmz->cvtname("I15"): s = insym; break;
-		case nmz->cvtname("I16"): s = insym; break;
-
-		default: s = namesym; break;
-		}
+	      else if (id == nmz->cvtname("I1")) s = insym;
+	      else if (id == nmz->cvtname("I2")) s = insym;
+	      else if (id == nmz->cvtname("I3")) s = insym;
+	      else if (id == nmz->cvtname("I4")) s = insym;
+	      else if (id == nmz->cvtname("I5")) s = insym;
+	      else if (id == nmz->cvtname("I6")) s = insym;
+	      else if (id == nmz->cvtname("I7")) s = insym;
+	      else if (id == nmz->cvtname("I8")) s = insym;
+	      else if (id == nmz->cvtname("I9")) s = insym;
+	      else if (id == nmz->cvtname("I10")) s = insym;
+	      else if (id == nmz->cvtname("I11")) s = insym;
+	      else if (id == nmz->cvtname("I12")) s = insym;
+	      else if (id == nmz->cvtname("I13")) s = insym;
+	      else if (id == nmz->cvtname("I14")) s = insym;
+	      else if (id == nmz->cvtname("I15")) s = insym;
+	      else if (id == nmz->cvtname("I16")) s = insym;
+	      else s = namesym;
 	    }
 	  else 
 	    {
