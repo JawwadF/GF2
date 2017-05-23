@@ -23,13 +23,9 @@ dtype = "DTYPE", "Q", bit;
 
 monitor = "CONNECTEDTO", identifier, [".", output]; 
 
-<<<<<<< HEAD
 circuit = "INCLUDES", {identifier};
 
 identifier = letter,{letter|digit};
-=======
-circuit = "CIRCUIT", "INCLUDES", {identifier};
->>>>>>> Osman
 
 expression = connection | (device | monitor | circuit), "NAME", identifier;
 type = "DEVICE"|"CONNECTION"|"MONITOR"|"CIRCUIT";
