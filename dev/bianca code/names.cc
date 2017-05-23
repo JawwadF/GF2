@@ -10,7 +10,6 @@ using namespace std;
 
 names::names(void)  /* the constructor */
 {
-  /* over to you */
   length_of_table = 0;
 }
 
