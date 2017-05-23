@@ -25,14 +25,7 @@ monitor = "RECORDS", identifier, [".", output];
 
 circuit = "INCLUDES", {identifier};
 
-<<<<<<< HEAD
-identifier = letter,{letter|digit};
-<<<<<<< HEAD
-=======
-=======
 identifier = letter, {letter|digit};
->>>>>>> origin/bianca
->>>>>>> master
 
 expression = connection | (device | monitor | circuit), "NAME", identifier;
 type = "DEVICE"|"CONNECT"|"MONITOR"|"CIRCUIT";
