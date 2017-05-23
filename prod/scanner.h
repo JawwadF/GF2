@@ -7,7 +7,7 @@
 
 //using namespace std;
 
-typedef enum {namesym, numsym, devsym, xorsym,gatesym,keysym,clksym,swisym,dtypesym,cirsym,outsym,insym,monsym,equals,semicol,dot,connect,badsym,eofsym} symbol;
+typedef enum {namesym, numsym, devsym, xorsym,gatesym,keysym,clksym,swisym,consym,dtypesym,cirsym,outsym,insym,monsym,equals,semicol,dot,connect,badsym,eofsym} symbol;
 
 class scanner{
 
@@ -21,7 +21,7 @@ class scanner{
   void skipspaces(void);
   void getnumber(int& num);
   //void skipcomments(void);
-  void getname(name& id)
+  void getname(name& id);
 
 
 public:

@@ -1,4 +1,4 @@
-connection = identifier,[".", output] ,"->", identifier, ".", input;
+connection = identifier,[".", output] ,">", identifier, ".", input;
 
 output = "Q"|"QBAR";
 
