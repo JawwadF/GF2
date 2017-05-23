@@ -23,7 +23,7 @@ dtype = "DTYPE", "Q", bit;
 
 monitor = "CONNECTEDTO", identifier, [".", output]; 
 
-circuit = "CIRCUIT", "INCLUDES", {identifier};
+circuit = "INCLUDES", {identifier};
 
 identifier = letter,{letter|digit};
 
