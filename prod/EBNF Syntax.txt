@@ -25,6 +25,8 @@ monitor = "CONNECTEDTO", identifier, [".", output];
 
 circuit = "CIRCUIT", "INCLUDES", {identifier};
 
+identifier = letter,{letter|digit};
+
 expression = connection | (device | monitor | circuit), "NAME", identifier;
 type = "DEVICE"|"CONNECTION"|"MONITOR"|"CIRCUIT";
 rule = type, "=", expression, ";" ;
