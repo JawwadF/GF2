@@ -20,7 +20,7 @@ class scanner{
   void getch(void);
   void skipspaces(void);
   void getnumber(int& num);
-  //void skipcomments(void);
+  bool skipcomments(void);
   void getname(name& id);
 
 
@@ -31,7 +31,7 @@ public:
     /* id = return the name id here if it is a name */
     /* num = return the value here if it is a number */
 
-  //  ~scanner(); //destructor of the class, closes input file
+   ~scanner(void); //destructor of the class, closes input file
 
   scanner (names* names_mod, const char* defname);
     /* names initialises the name table.  This procedure is called at      */
