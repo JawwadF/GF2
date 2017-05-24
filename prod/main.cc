@@ -14,7 +14,9 @@ int main(void) {
 	pmz->readin();
 	cout << "The content of the lookup table is " << endl;
 	for (int i = 0; i < nmz->length_of_table; i++) {
-	cout << "id "<< i << " name: "<< nmz->table[i] << endl;
+	  cout << "id "<< i << " name: ";
+	  nmz->writename(i) ;
+	  cout<<endl;
 	}
 	return 0;
 }
