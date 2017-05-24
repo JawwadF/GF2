@@ -16,9 +16,10 @@ class names{
 
   /* put stuff that the class uses internally here */
   namestring table[maxnames];
-  int length_of_table;
+
 
 public:
+  int length_of_table;
   name lookup (namestring str);
     /* Returns the internal representation of the name given in character  */
     /* form.  If the name is not already in the name table, it is          */
