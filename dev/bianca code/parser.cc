@@ -122,8 +122,12 @@ void parser::device(void) {
 	  {
 	        switch_();
 	  }
+	else if (cursym == dtypesym)
+	  {
+	        dtype();
+	  }
 	else {
-		cout << "ERROR expecting a device. Recieved " << cursym << endl;
+		cout << "ERROR expecting a device. Received " << cursym << endl;
 	}
 }
 void parser::xor_(void) {
@@ -218,14 +222,27 @@ void parser::switch_(void)
       else  cout<<endl<<"ERROR: expected initial value of switch, 0/1 "<<endl;
     }
   else  cout<<endl<<"ERROR: expecting keyword 'VALUE'"<<endl;
-
-
-
-
 }
+
 void parser::dtype(void) {
-
+  cout<< "Creating a DTYPE";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym) //here we should check the keyword is QVAL
+    {
+      cout<<" starting with Q value ";
+      smz->getsymbol(cursym, id, num);
+      if (cursym == numsym)
+	{
+	  if (num == 0 || num == 1)
+	    cout<<num<<" ";
+	  else cout<<endl<<"ERROR: initial value of Q can be eiher 0 or 1 "<<endl; 
+	}
+      else  cout<<endl<<"ERROR: expected initial value of Q, 0/1 "<<endl;
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'QVAL'"<<endl;
 }
+
+
 void _(void) {
 
 }

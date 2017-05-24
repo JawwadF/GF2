@@ -32,6 +32,7 @@ class parser {
   void clock(void);
   void switch_(void);
   void dtype(void);
+  //void monitor(void);
   parser (network* network_mod, devices* devices_mod,
 	  monitor* monitor_mod, scanner* scanner_mod);
     /* the constructor takes pointers to various other classes as parameters */
