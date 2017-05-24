@@ -87,6 +87,7 @@ void scanner::skipspaces(void)
 void scanner::getsymbol(symbol &s, name &id, int &num)
 {
   bool i = 0;
+  skipspaces();
   i = skipcomments();
   if (i == 1)
     {
