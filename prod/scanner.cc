@@ -47,7 +47,7 @@ void scanner:: getname(name &id)
 {
   namestring vari = "";
   namestring str;
-  while (!eofile and (isalpha(curch) or isdigit(curch)))
+  while (!eofile && (isalpha(curch) || isdigit(curch)))
     {
       vari += curch;
       getch();
@@ -64,7 +64,7 @@ void scanner:: getname(name &id)
 
 void scanner::skipspaces(void)
 {
-  while (isspace(curch) and !eofile)
+  while (isspace(curch) && !eofile)
     getch();
 }
 
@@ -137,13 +137,14 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	  else 
 	    {
 	      switch (curch) 
-		{
-		case '=': s = equals; break;
-		case ';': s = semicol; break;
-		case '.': s = dot; break;
-		case '>': s = connect; break;
-		default: s = badsym; break;
-		}
+			{
+				case '=': s = equals; break;
+				case ';': s = semicol; break;
+				case '.': s = dot; break;
+				case '>': s = connect; break;
+				default: s = badsym; break;
+			}
+		  getch();
 	    }
 	}
     }
