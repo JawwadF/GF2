@@ -114,9 +114,14 @@ void parser::device(void) {
 	else if (cursym == gatesym) {
 		gate();
 	}
-	else if (cursym = clksym) {
+	else if (cursym == clksym) 
+	  {
 	        clock();
-	}
+	  }
+	else if (cursym == swisym)
+	  {
+	        switch_();
+	  }
 	else {
 		cout << "ERROR expecting a device. Recieved " << cursym << endl;
 	}
@@ -196,7 +201,26 @@ void parser::clock(void) {
 
 
 
-void parser::switch_(void) {
+void parser::switch_(void) 
+{
+  cout<< "Creating a SWITCH";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym) //here we should check the keyword is VALUE
+    {
+      cout<<" starting with value ";
+      smz->getsymbol(cursym, id, num);
+      if (cursym == numsym)
+	{
+	  if (num == 0 || num == 1)
+	    cout<<num<<" ";
+	  else cout<<endl<<"ERROR: initial value of switch can be eiher 0 or 1 "<<endl; 
+	}
+      else  cout<<endl<<"ERROR: expected initial value of switch, 0/1 "<<endl;
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'VALUE'"<<endl;
+
+
+
 
 }
 void parser::dtype(void) {
