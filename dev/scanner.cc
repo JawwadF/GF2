@@ -25,7 +25,7 @@ scanner::~scanner(void)  /* the destructor */
   inf.close();
 }
 
-bool scanner::skipcomments(void)
+bool scanner::skipcomments(void) 
 { 
   bool i = 0;
   if (curch == '/')
@@ -88,8 +88,8 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 {
   bool i = 0;
   skipspaces();
-  i = skipcomments();
-  if (i == 1)
+  i = skipcomments(); //skips the comments
+  if (i == 1) //if it found just a back slash instead of 2 it returns an error
     {
       id = -1;
       num = -1;
@@ -97,7 +97,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
     }
   else
     {    
-      skipspaces();
+      skipspaces(); //skips spaces
       if (eofile)
 	{
 	  s = eofsym;
@@ -106,7 +106,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	}
       else 
 	{
-	  if (isdigit(curch)) //number 
+	  if (isdigit(curch)) // if the first character is a number, it reads a number into num
 	    {
 	      s = numsym;
 	      getnumber(num);
@@ -115,7 +115,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	  else 
 	    {
 	      num = -1;
-	      if (isalpha(curch)) //name
+	      if (isalpha(curch)) // if the first character is a letter, it reads a name and returns its id
 		{ 
 		  getname(id);
 		  if (id == nmz->cvtname("DEVICE")) s = devsym;
@@ -165,7 +165,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	      else 
 		{
 		  id = -1;
-		  switch (curch) 
+		  switch (curch) //symbols
 		    {
 		    case '=': s = equals; break;
 		    case ';': s = semicol; break;
