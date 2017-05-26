@@ -462,4 +462,37 @@ devices::devices (names* names_mod, network* net_mod)
   clrpin  = nmz->lookup("CLEAR");
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
+
+  //and here to complete the names table, new code
+  temp = nmz->lookup("DEVICE");
+  temp = nmz->lookup("CONNECT");
+  temp = nmz->lookup("CIRCUIT");
+  temp = nmz->lookup("MONITOR");
+  temp = nmz->lookup("INPUTS");
+  temp = nmz->lookup("VALUE");
+  temp = nmz->lookup("QVAL");
+
+  temp = nmz->lookup("I1");
+  temp = nmz->lookup("I2");
+  temp = nmz->lookup("I3");
+  temp = nmz->lookup("I4");
+  temp = nmz->lookup("I5");
+  temp = nmz->lookup("I6");
+  temp = nmz->lookup("I7");
+  temp = nmz->lookup("I8");
+  temp = nmz->lookup("I9");
+  temp = nmz->lookup("I10");
+  temp = nmz->lookup("I11");
+  temp = nmz->lookup("I12");
+  temp = nmz->lookup("I13");
+  temp = nmz->lookup("I14");
+  temp = nmz->lookup("I15");
+  temp = nmz->lookup("I16");
+
+  temp = nmz->lookup("NAME");
+  temp = nmz->lookup("CYCLES");
+  temp = nmz->lookup("START");
+  temp = nmz->lookup("INCLUDES");
+  temp = nmz->lookup("RECORDS");
+
 }
