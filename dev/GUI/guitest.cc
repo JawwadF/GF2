@@ -3,7 +3,7 @@
 #include <GL/glut.h>
 
 IMPLEMENT_APP(MyApp)
-  
+
 bool MyApp::OnInit()
   // This function is automatically called when the application starts
 {
@@ -12,7 +12,9 @@ bool MyApp::OnInit()
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
-
+  smz = new scanner(nmz, wxString(argv[1]).mb_str());
+  pmz = new parser(netz, dmz, mmz, smz);
+  pmz->readin();
   // glutInit cannot cope with Unicode command line arguments, so we pass
   // it some fake ASCII ones instead
   char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
@@ -21,5 +23,5 @@ bool MyApp::OnInit()
   frame->Show(true);
   return(true); // enter the GUI event loop
 
- 
+
 }

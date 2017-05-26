@@ -6,6 +6,8 @@
 #include "devices.h"
 #include "monitor.h"
 #include "network.h"
+#include "parser.h"
+#include "scanner.h"
 
 class MyApp: public wxApp
 {
@@ -16,6 +18,8 @@ class MyApp: public wxApp
   network *netz; // pointer to the network class
   devices *dmz;  // pointer to the devices class
   monitor *mmz;  // pointer to the monitor class
+  scanner *smz;  // pointer to the scanner class
+  parser *pmz;   // pointer to the parser class
 };
 
 #endif /* guitest_h */
