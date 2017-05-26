@@ -43,7 +43,7 @@ bool parser::readin (void)
 		if (tempsym != consym){
 
 		  smz->getsymbol(cursym, id, num);
-		  if (cursym != keysym) { //here we shold check that the word is actually 'NAME'
+		  if (cursym != keysym || id != 37) {
 		    cout << "ERROR: expecting the keyword 'NAME'" << endl;
 		    return false;
 		  }
