@@ -115,6 +115,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 	  else 
 	    {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	      switch (curch) 
 			{
 				case '=': s = equals; break;
@@ -187,6 +188,69 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 		  getch();
 		    }
 >>>>>>> origin/bianca
+=======
+	      num = -1;
+	      if (isalpha(curch)) //name
+		{ 
+		  getname(id);
+		  if (id == nmz->cvtname("DEVICE")) s = devsym;
+		  else if (id == nmz->cvtname("CONNECT")) s = consym;
+		  else if (id == nmz->cvtname("XOR")) s = xorsym;
+		  else if (id == nmz->cvtname("CLOCK")) s = clksym;
+		  else if (id == nmz->cvtname("SWITCH")) s = swisym;
+		  else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
+		  else if (id == nmz->cvtname("CIRCUIT")) s = cirsym;
+		  else if (id == nmz->cvtname("MONITOR")) s = monsym;
+
+		  else if (id == nmz->cvtname("AND")) s = gatesym;
+		  else if (id == nmz->cvtname("NAND")) s = gatesym;
+		  else if (id == nmz->cvtname("OR")) s = gatesym;
+		  else if (id == nmz->cvtname("NOR")) s = gatesym;
+
+		  else if (id == nmz->cvtname("INPUTS")) s = keysym;
+		  else if (id == nmz->cvtname("VALUE")) s = keysym;
+		  else if (id == nmz->cvtname("QVAL")) s = keysym;
+		  else if (id == nmz->cvtname("NAME")) s = keysym;
+		  else if (id == nmz->cvtname("CYCLES")) s = keysym;
+		  else if (id == nmz->cvtname("START")) s = keysym;
+		  else if (id == nmz->cvtname("INCLUDES")) s = keysym;
+		  else if (id == nmz->cvtname("RECORDS")) s = keysym;
+
+		  else if (id == nmz->cvtname("Q")) s = outsym;
+		  else if (id == nmz->cvtname("QBAR")) s = outsym;
+
+		  else if (id == nmz->cvtname("I1")) s = insym;
+		  else if (id == nmz->cvtname("I2")) s = insym;
+		  else if (id == nmz->cvtname("I3")) s = insym;
+		  else if (id == nmz->cvtname("I4")) s = insym;
+		  else if (id == nmz->cvtname("I5")) s = insym;
+		  else if (id == nmz->cvtname("I6")) s = insym;
+		  else if (id == nmz->cvtname("I7")) s = insym;
+		  else if (id == nmz->cvtname("I8")) s = insym;
+		  else if (id == nmz->cvtname("I9")) s = insym;
+		  else if (id == nmz->cvtname("I10")) s = insym;
+		  else if (id == nmz->cvtname("I11")) s = insym;
+		  else if (id == nmz->cvtname("I12")) s = insym;
+		  else if (id == nmz->cvtname("I13")) s = insym;
+		  else if (id == nmz->cvtname("I14")) s = insym;
+		  else if (id == nmz->cvtname("I15")) s = insym;
+		  else if (id == nmz->cvtname("I16")) s = insym;
+		  else s = namesym;
+		}
+	      else 
+		{
+		  id = -1;
+		  switch (curch) 
+		    {
+		    case '=': s = equals; break;
+		    case ';': s = semicol; break;
+		    case '.': s = dot; break;
+		    case '>': s = connect; break;
+		    default: s = badsym; break;
+		    }
+		  getch();
+		    }
+>>>>>>> 3fdbb80d5fbd9ab04929e250e13a63e2a265b576
 	    }
 	}
     }

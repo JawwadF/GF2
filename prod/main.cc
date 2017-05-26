@@ -15,6 +15,7 @@ int main(void) {
 	cout << "The content of the lookup table is " << endl;
 	for (int i = 0; i < nmz->length_of_table; i++) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	cout << "id "<< i << " name: "<< nmz->table[i] << endl;
 	}
 	return 0;
@@ -27,3 +28,11 @@ int main(void) {
 	return 0;
 }
 >>>>>>> origin/bianca
+=======
+	  cout << "id "<< i << " name: ";
+	  nmz->writename(i) ;
+	  cout<<endl;
+	}
+	return 0;
+}
+>>>>>>> 3fdbb80d5fbd9ab04929e250e13a63e2a265b576

@@ -144,10 +144,14 @@ void parser::device(void) {
 	smz->getsymbol(cursym, id, num);
 	if (cursym == xorsym) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		xor ();
 =======
 		xor_ ();
 >>>>>>> origin/bianca
+=======
+		xor_ ();
+>>>>>>> 3fdbb80d5fbd9ab04929e250e13a63e2a265b576
 	}
 	else if (cursym == gatesym) {
 		gate();
@@ -157,6 +161,7 @@ void parser::device(void) {
 		cout << "ERROR expecting a logic gate. Recieved " << cursym << endl;
 	}
 }
+<<<<<<< HEAD
 void parser::xor(void) {
 =======
 	else if (cursym == clksym) 
@@ -177,6 +182,9 @@ void parser::xor(void) {
 }
 void parser::xor_(void) {
 >>>>>>> origin/bianca
+=======
+void parser::xor_(void) {
+>>>>>>> 3fdbb80d5fbd9ab04929e250e13a63e2a265b576
 	cout << "Creating a XOR gate ";
 }
 void parser::gate(void) {
