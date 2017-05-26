@@ -27,10 +27,10 @@ bool parser::readin (void)
 			device();
 			break;
 		case monsym:
-			//monitor_();
+			monitor_();
 			break;
 		case cirsym:
-		        //circuit();
+		        circuit();
 			break;
 		case consym:
 			connection();
@@ -40,26 +40,27 @@ bool parser::readin (void)
 		}
 
 
-		if (tempsym != consym){
-
-		  smz->getsymbol(cursym, id, num);
-		  if (cursym != keysym || id != 37) {
-		    cout << "ERROR: expecting the keyword 'NAME'" << endl;
-		    return false;
+		if (tempsym != consym)
+		  {
+		    if (tempsym != cirsym && tempsym != monsym)
+		      smz->getsymbol(cursym, id, num);
+		    if (cursym != keysym || id != 37) {
+		      cout << "ERROR: expecting the keyword 'NAME'" << endl;
+		      return false;
+		    }
+		    //cout << "["<< id << "] ";
+		    cout << "assigned to a variable ";
+		    smz->getsymbol(cursym, id, num);
+		    if (cursym != namesym ) {
+		      cout << "ERROR: expecting name" << cursym << endl;
+		      return false;
+		    }
+		    cout << "[" << id << "] ";
 		  }
-		  //cout << "["<< id << "] ";
-		  cout << "assigned to a variable ";
-		  smz->getsymbol(cursym, id, num);
-		  if (cursym != namesym ) {
-		    cout << "ERROR: expecting name" << cursym << endl;
-		    return false;
-		  }
-		  cout << "[" << id << "] ";
-		}
 		smz->getsymbol(cursym, id, num);
 		if (cursym != semicol) {
-			cout << "ERROR missing semicolon" << id << endl;
-			return false;
+		  cout << "ERROR missing semicolon" << id << endl;
+		  return false;
 		}
 		smz->getsymbol(cursym, id, num);
 		cout << endl;
@@ -157,25 +158,30 @@ void parser::gate(void) {
 		break;
 	}
 	smz->getsymbol(cursym, id, num);
-	if (cursym == keysym || id == 6) {
+	if (cursym == keysym && id == 18) {
 		//cout << id << " ";
 		cout << "That has ";
 		smz->getsymbol(cursym, id, num);
-		if (num == -1) {
-			cout << "ERROR expecting the number of inputs" << endl;
+		if (cursym != numsym) {
+		  cout << endl<<"ERROR expecting the number of inputs" << endl;
 		}
-		cout << num << " inputs ";
+		else
+		  {
+		    if (num > 1)
+		      cout << num << " inputs ";
+		    else cout<<endl<<"ERROR: number of inputs has to be integer greater than 1"<<endl;
+		  }
 	}
 	else {
-		cout << "ERROR expecting keyword INPUTS" << endl;
+	  cout <<endl<< "ERROR expecting keyword INPUTS" << endl;
 	}
 
 }
 void parser::clock(void) {
   cout<< "Creating a Clock";
   smz->getsymbol(cursym, id, num);
-  if (cursym == keysym ) //here we should check that the keywok is cycles
-    {
+  if (cursym == keysym && id == 38)
+	{
       cout<< " that changes state every ";
       smz->getsymbol(cursym, id, num);
       if (cursym == numsym)
@@ -184,7 +190,7 @@ void parser::clock(void) {
   	    {
   	      cout<<num<<" cyles";
   	      smz->getsymbol(cursym, id, num);
-  	      if (cursym == keysym) //here we should check that the keywod is start
+  	      if (cursym == keysym && id == 39)
   		{
   		  cout<<" starting with value ";
   		  smz->getsymbol(cursym, id, num);
@@ -212,7 +218,7 @@ void parser::switch_(void)
 {
   cout<< "Creating a SWITCH";
   smz->getsymbol(cursym, id, num);
-  if (cursym == keysym) //here we should check the keyword is VALUE
+  if (cursym == keysym && id == 19) 
     {
       cout<<" starting with value ";
       smz->getsymbol(cursym, id, num);
@@ -230,7 +236,7 @@ void parser::switch_(void)
 void parser::dtype(void) {
   cout<< "Creating a DTYPE";
   smz->getsymbol(cursym, id, num);
-  if (cursym == keysym) //here we should check the keyword is QVAL
+  if (cursym == keysym && id == 20)
     {
       cout<<" starting with Q value ";
       smz->getsymbol(cursym, id, num);
@@ -246,9 +252,53 @@ void parser::dtype(void) {
 }
 
 
-void _(void) {
+void parser::circuit(void) {
+  cout<< "Creating a CIRCUIT";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym && id == 40)
+    {
+      cout<< " that includes devices "; 
+      smz->getsymbol(cursym, id, num);
+      while (cursym == namesym)
+	{
+	  cout<<id<<", ";
+	  smz->getsymbol(cursym, id, num);
+	}
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'INCLUDES'"<<endl;
 
 }
+
+void parser::monitor_(void){
+  cout<< "Creating a MONITOR";
+  smz->getsymbol(cursym, id, num);
+
+  if (cursym == keysym && id == 41)
+    {
+      cout<< " that records the output of "; 
+      smz->getsymbol(cursym, id, num);
+      if (cursym == namesym)
+	{
+	  cout<<id<<" ";
+	  smz->getsymbol(cursym, id, num);
+	  if (cursym == dot) //here we should check if we expect a dot
+	    {
+		cout << "output ";
+		smz->getsymbol(cursym, id, num);
+		if (cursym != outsym) {
+			cout << "ERROR: expected output" << endl;
+		}
+		else cout << id << " ";
+		smz->getsymbol(cursym, id, num);
+	    }
+	}
+      else cout<<endl<<"ERROR: expecting a name"<<endl;
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'RECORDS'"<<endl;
+
+
+}
+
 
 
 parser::parser (network* network_mod, devices* devices_mod,
