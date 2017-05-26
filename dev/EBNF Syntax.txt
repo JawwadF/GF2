@@ -9,7 +9,7 @@ device = "XOR" | gate | clock | switch | dtype ;
 
 gate = "AND"|"OR"|"NAND"|"NOR", "INPUTS",number;
 
-number = "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10"|"11"|"12"|"13"|"14"|"15"|"16";CLOCK
+number = "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10"|"11"|"12"|"13"|"14"|"15"|"16";
 
 clock = "CLOCK", "CYCLES", {non_zero_digit}, "START", bit;
 
@@ -19,14 +19,16 @@ bit = "0"|"1";
 
 switch = "SWITCH", "VALUE", bit;
 
-dtype = "DTYPE", "Q", bit;
+dtype = "DTYPE", "QVAL", bit;
 
-monitor = "CONNECTEDTO", identifier, [".", output]; 
+monitor = "RECORDS", identifier, [".", output]; 
 
-circuit = "CIRCUIT", "INCLUDES", {identifier};
+circuit = "INCLUDES", {identifier};
+
+identifier = letter, {letter|digit};
 
 expression = connection | (device | monitor | circuit), "NAME", identifier;
-type = "DEVICE"|"CONNECTION"|"MONITOR"|"CIRCUIT";
+type = "DEVICE"|"CONNECT"|"MONITOR"|"CIRCUIT";
 rule = type, "=", expression, ";" ;
 
 EBNFgrammar = {rule};
