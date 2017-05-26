@@ -30,7 +30,7 @@ bool parser::readin (void)
 			//monitor_();
 			break;
 		case cirsym:
-			//circuit();
+		        //circuit();
 			break;
 		case consym:
 			connection();
@@ -40,20 +40,22 @@ bool parser::readin (void)
 		}
 
 
-		// here it should be checked if there is a connection, because after connection no "NAME" has to appear, just ;
-		smz->getsymbol(cursym, id, num);
-		if (cursym != keysym) {
-			cout << "ERROR expecting the keyword 'NAME'" << endl;
-			return false;
+		if (tempsym != consym){
+
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != keysym) { //here we shold check that the word is actually 'NAME'
+		    cout << "ERROR: expecting the keyword 'NAME'" << endl;
+		    return false;
+		  }
+		  //cout << "["<< id << "] ";
+		  cout << "assigned to a variable ";
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != namesym ) {
+		    cout << "ERROR: expecting name" << cursym << endl;
+		    return false;
+		  }
+		  cout << "[" << id << "] ";
 		}
-		//cout << "["<< id << "] ";
-		cout << "assigned to a variable ";
-		smz->getsymbol(cursym, id, num);
-		if (cursym != namesym ) {
-			cout << "ERROR expecting name" << cursym << endl;
-			return false;
-		}
-		cout << "[" << id << "] ";
 		smz->getsymbol(cursym, id, num);
 		if (cursym != semicol) {
 			cout << "ERROR missing semicolon" << id << endl;
@@ -72,17 +74,18 @@ void parser:: connection(void) {
 		cout << "ERROR in the name" << endl;
 		return;
 	}
-	cout << "There is a connection from " + id << " ";
+	cout << "There is a connection from " << id << " ";
 	smz->getsymbol(cursym, id, num);
-	if (cursym == dot) {
+
+	if (cursym == dot) { //here we should check if we expect a dot
 		cout << "output ";
 		smz->getsymbol(cursym, id, num);
 		if (cursym != outsym) {
 			cout << "ERROR in the output" << endl;
 		}
 		cout << id << " ";
+		smz->getsymbol(cursym, id, num);
 	}
-	smz->getsymbol(cursym, id, num);
 	if (cursym != connect) {
 		cout << "ERROR missing >" << endl;
 	}
