@@ -30,7 +30,11 @@ bool parser::readin (void)
 			//monitor_();
 			break;
 		case cirsym:
+<<<<<<< HEAD
 			//circuit();
+=======
+		        //circuit();
+>>>>>>> origin/bianca
 			break;
 		case consym:
 			connection();
@@ -38,6 +42,7 @@ bool parser::readin (void)
 		default:
 			break;
 		}
+<<<<<<< HEAD
 		smz->getsymbol(cursym, id, num);
 		if (cursym != keysym) {
 			cout << "ERROR expecting the keyword name" << endl;
@@ -51,6 +56,26 @@ bool parser::readin (void)
 			return false;
 		}
 		cout << "[" << id << "] ";
+=======
+
+
+		if (tempsym != consym){
+
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != keysym) { //here we shold check that the word is actually 'NAME'
+		    cout << "ERROR: expecting the keyword 'NAME'" << endl;
+		    return false;
+		  }
+		  //cout << "["<< id << "] ";
+		  cout << "assigned to a variable ";
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != namesym ) {
+		    cout << "ERROR: expecting name" << cursym << endl;
+		    return false;
+		  }
+		  cout << "[" << id << "] ";
+		}
+>>>>>>> origin/bianca
 		smz->getsymbol(cursym, id, num);
 		if (cursym != semicol) {
 			cout << "ERROR missing semicolon" << id << endl;
@@ -69,17 +94,29 @@ void parser:: connection(void) {
 		cout << "ERROR in the name" << endl;
 		return;
 	}
+<<<<<<< HEAD
 	cout << "There is a connection from " + id << " ";
 	smz->getsymbol(cursym, id, num);
 	if (cursym == dot) {
+=======
+	cout << "There is a connection from " << id << " ";
+	smz->getsymbol(cursym, id, num);
+
+	if (cursym == dot) { //here we should check if we expect a dot
+>>>>>>> origin/bianca
 		cout << "output ";
 		smz->getsymbol(cursym, id, num);
 		if (cursym != outsym) {
 			cout << "ERROR in the output" << endl;
 		}
 		cout << id << " ";
+<<<<<<< HEAD
 	}
 	smz->getsymbol(cursym, id, num);
+=======
+		smz->getsymbol(cursym, id, num);
+	}
+>>>>>>> origin/bianca
 	if (cursym != connect) {
 		cout << "ERROR missing >" << endl;
 	}
@@ -106,16 +143,40 @@ void parser:: connection(void) {
 void parser::device(void) {
 	smz->getsymbol(cursym, id, num);
 	if (cursym == xorsym) {
+<<<<<<< HEAD
 		xor ();
+=======
+		xor_ ();
+>>>>>>> origin/bianca
 	}
 	else if (cursym == gatesym) {
 		gate();
 	}
+<<<<<<< HEAD
 	else {
 		cout << "ERROR expecting a logic gate. Recieved " << cursym << endl;
 	}
 }
 void parser::xor(void) {
+=======
+	else if (cursym == clksym) 
+	  {
+	        clock();
+	  }
+	else if (cursym == swisym)
+	  {
+	        switch_();
+	  }
+	else if (cursym == dtypesym)
+	  {
+	        dtype();
+	  }
+	else {
+		cout << "ERROR expecting a device. Received " << cursym << endl;
+	}
+}
+void parser::xor_(void) {
+>>>>>>> origin/bianca
 	cout << "Creating a XOR gate ";
 }
 void parser::gate(void) {
@@ -154,6 +215,7 @@ void parser::gate(void) {
 
 }
 void parser::clock(void) {
+<<<<<<< HEAD
 
 }
 void parser::switch_(void) {
@@ -162,6 +224,82 @@ void parser::switch_(void) {
 void parser::dtype(void) {
 
 }
+=======
+  cout<< "Creating a Clock";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym ) //here we should check that the keywok is cycles
+    {
+      cout<< " that changes state every ";
+      smz->getsymbol(cursym, id, num);
+      if (cursym == numsym)
+  	{
+  	  if (num > 0)
+  	    {
+  	      cout<<num<<" cyles";
+  	      smz->getsymbol(cursym, id, num);
+  	      if (cursym == keysym) //here we should check that the keywod is start
+  		{
+  		  cout<<" starting with value ";
+  		  smz->getsymbol(cursym, id, num);
+  		  if (cursym == numsym)
+  		    {
+  		      if (num == 0 || num == 1)
+  			cout<<num<<" ";
+  		      else cout<<endl<<"ERROR: initial value of clock can be eiher 0 or 1 "<<endl;
+
+  		    }
+  		  else  cout<<endl<<"ERROR: expected initial value of clock, 0/1 "<<endl;
+  		}
+  	      else  cout<<endl<<"ERROR: expecting keyword 'START'"<<endl;
+  	    }
+  	  else  cout<<endl<<"ERROR: number of cycles has to be integer greater than 0";
+  	}
+      else  cout<<endl<<"ERROR: expected number of cycles";
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'CYCLES'"<<endl;
+}
+
+
+
+void parser::switch_(void) 
+{
+  cout<< "Creating a SWITCH";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym) //here we should check the keyword is VALUE
+    {
+      cout<<" starting with value ";
+      smz->getsymbol(cursym, id, num);
+      if (cursym == numsym)
+	{
+	  if (num == 0 || num == 1)
+	    cout<<num<<" ";
+	  else cout<<endl<<"ERROR: initial value of switch can be eiher 0 or 1 "<<endl; 
+	}
+      else  cout<<endl<<"ERROR: expected initial value of switch, 0/1 "<<endl;
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'VALUE'"<<endl;
+}
+
+void parser::dtype(void) {
+  cout<< "Creating a DTYPE";
+  smz->getsymbol(cursym, id, num);
+  if (cursym == keysym) //here we should check the keyword is QVAL
+    {
+      cout<<" starting with Q value ";
+      smz->getsymbol(cursym, id, num);
+      if (cursym == numsym)
+	{
+	  if (num == 0 || num == 1)
+	    cout<<num<<" ";
+	  else cout<<endl<<"ERROR: initial value of Q can be eiher 0 or 1 "<<endl; 
+	}
+      else  cout<<endl<<"ERROR: expected initial value of Q, 0/1 "<<endl;
+    }
+  else  cout<<endl<<"ERROR: expecting keyword 'QVAL'"<<endl;
+}
+
+
+>>>>>>> origin/bianca
 void _(void) {
 
 }
