@@ -12,10 +12,10 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
   EVT_PAINT(MyGLCanvas::OnPaint)
   EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
-  
+
 int wxglcanvas_attrib_list[5] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos, 
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
 		       const wxSize& size, long style, const wxString& name, const wxPalette& palette):
   wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette)
   // Constructor - initialises private variables
@@ -57,7 +57,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
       if (mmz->getsignaltrace(0, i, s)) {
 	if (s==low) y = 10.0;
 	if (s==high) y = 30.0;
-	glVertex2f(20*i+10.0, y); 
+	glVertex2f(20*i+10.0, y);
 	glVertex2f(20*i+30.0, y);
       }
     }
@@ -70,11 +70,11 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
     for (i=0; i<5; i++) {
       if (i%2) y = 10.0;
       else y = 30.0;
-      glVertex2f(20*i+10.0, y); 
+      glVertex2f(20*i+10.0, y);
       glVertex2f(20*i+30.0, y);
     }
     glEnd();
-    
+
   }
 
   // Example of how to use GLUT to draw text on the canvas
@@ -99,7 +99,7 @@ void MyGLCanvas::InitGL()
   glViewport(0, 0, (GLint) w, (GLint) h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0, w, 0, h, -1, 1); 
+  glOrtho(0, w, 0, h, -1, 1);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslated(pan_x, pan_y, 0.0);
@@ -177,7 +177,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
   EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
-  
+
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
 		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
@@ -234,9 +234,23 @@ void MyFrame::OnExit(wxCommandEvent &event)
 }
 
 void MyFrame::OnOpen(wxCommandEvent &event)
-  // Event handler for the exit menu item
+  // Event handler for the open menu item
 {
-  Close(true);
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
+		_("Text files (*.txt)|*.txt|C++ Source Files (*.cpp, *.cxx)|*.cpp;*.cxx"),
+		wxFD_OPEN, wxDefaultPosition);
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+		CurrentDocPath = OpenDialog->GetPath();
+		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
+	}
+
+//    if (!input_stream.IsOk())
+//    {
+//        wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
+//        return;
+//    }
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)

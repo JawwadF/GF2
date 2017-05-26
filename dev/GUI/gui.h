@@ -9,7 +9,7 @@
 #include "devices.h"
 #include "monitor.h"
 
-enum { 
+enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
   MY_BUTTON_ID,
@@ -24,8 +24,8 @@ class MyGLCanvas;
 class MyFrame: public wxFrame
 {
  public:
-  MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
-	  names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
+  MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
+	  names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL,
 	  long style = wxDEFAULT_FRAME_STYLE); // constructor
  private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
@@ -42,9 +42,12 @@ class MyFrame: public wxFrame
   void OnButton(wxCommandEvent& event);   // event handler for push button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
-  DECLARE_EVENT_TABLE()
+
+  // The Path to the file we have open
+    wxString CurrentDocPath;
+    DECLARE_EVENT_TABLE()
 };
-    
+
 class MyGLCanvas: public wxGLCanvas
 {
  public:
@@ -67,5 +70,5 @@ class MyGLCanvas: public wxGLCanvas
   void OnMouse(wxMouseEvent& event); // event handler for mouse events inside canvas
   DECLARE_EVENT_TABLE()
 };
-    
+
 #endif /* gui_h */
