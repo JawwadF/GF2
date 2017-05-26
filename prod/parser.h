@@ -27,6 +27,8 @@ class parser {
     /* module and the 'Devices' module.                                    */
   void connection(void);
   void device(void);
+  void circuit(void);
+  void monitor_(void);
   void xor_(void);
   void gate(void);
   void clock(void);
