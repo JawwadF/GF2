@@ -160,6 +160,12 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 		  else if (id == nmz->cvtname("I14")) s = insym;
 		  else if (id == nmz->cvtname("I15")) s = insym;
 		  else if (id == nmz->cvtname("I16")) s = insym;
+
+		  else if (id == nmz->cvtname("DATA")) s = insym;
+		  else if (id == nmz->cvtname("SET")) s = insym;
+		  else if (id == nmz->cvtname("CLEAR")) s = insym;
+		  else if (id == nmz->cvtname("CLK")) s = insym;
+
 		  else s = namesym;
 		}
 	      else 
