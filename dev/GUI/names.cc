@@ -50,18 +50,29 @@ name names::cvtname (namestring str)
 
 void names::writename (name id)
 {
-  if (id<length_of_table)
+  if (id >= 0 && id<length_of_table)
     cout<<table[id];
   else
-    cout<<"Warning, this id does not exist";
+  {
+	  if (id = -1) {
+		  cout << "No about Name specified (Has only one output)";
+		  return ;
+	  }
+	  cout << "Warning, this id does not exist";
+	  return;
+  }
 }
 
 int names::namelength (name id)
 {
-  if (id<length_of_table)
+  if (id >= 0 && id<length_of_table)
     return table[id].length();
   else
     {
+	  if (id = -1) {
+		  cout << "No about Name specified (Has only one output)";
+		  return 0;
+	  }
       cout<<"Warning, this id does not exist";
       return 0;
     }
