@@ -328,15 +328,15 @@ void MyFrame::OnButton(wxCommandEvent &event)
 void MyFrame::OnContinue(wxCommandEvent &event)
   // Event handler for the push button
 {
-/*  int ncycles;
+  int ncycles;
   ncycles = spin->GetValue();
   if (cyclescompleted > 0) {
     if ((ncycles + cyclescompleted) > maxcycles)
-  ncycles = maxcycles - cyclescompleted;
-    cout << "Continuing for " << ncycles << " cycles" << endl;
-    runnetwork (ncycles);
+      ncycles = maxcycles - cyclescompleted;
+      cout << "Continuing for " << ncycles << " cycles" << endl;
+      runnetwork (ncycles);
   } else
-    cout << "Error: nothing to continue!" << endl;*/
+    cout << "Error: nothing to continue!" << endl;
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
