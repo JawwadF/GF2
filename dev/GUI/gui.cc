@@ -171,8 +171,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_MENU(wxID_OPEN, MyFrame::OnOpen)
   EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
   EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
-  EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnButton) //added by me
-  EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
+  EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
+  EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
   EVT_BUTTON(REMOVEMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
   EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
   EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
@@ -256,6 +256,61 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 //    }
 }
 
+void MyFrame::OnSwitch(wxCommandEvent &event)
+  // Event handler for the switch button
+{
+
+  const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
+
+    wxSingleChoiceDialog dialog(this,
+                                wxT("This is a small sample\n")
+                                wxT("A single-choice convenience dialog"),
+                                wxT("Please select a value"),
+                                WXSIZEOF(choices), choices);
+
+    dialog.SetSelection(2);
+
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        wxMessageDialog dialog2(this, dialog.GetStringSelection(), wxT("Got string"));
+        dialog2.ShowModal();
+    }
+}
+
+void MyFrame::OnSetMon(wxCommandEvent &event)
+  // Event handler for the set monitor button
+{
+
+  wxArrayString choices;
+  choices.Add(wxT("One"));
+  choices.Add(wxT("Two"));
+  choices.Add(wxT("Three"));
+  choices.Add(wxT("Four"));
+  choices.Add(wxT("Five"));
+
+  wxMultiChoiceDialog dialog(this,
+  wxT("A multi-choice convenience dialog"),
+  wxT("Please select several values"),
+  choices);
+
+  if (dialog.ShowModal() == wxID_OK)
+  {
+    wxArrayInt selections = dialog.GetSelections();
+    wxString msg;
+    msg.Printf(wxT("You selected %i items:\n"),
+    int(selections.GetCount()));
+
+    for ( size_t n = 0; n < selections.GetCount(); n++ )
+    {
+    msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+    int(n), int(selections[n]),
+    choices[selections[n]].c_str());
+    }
+
+    wxMessageBox(msg, wxT("Got selections"));
+  }
+}
+
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Event handler for the about menu item
 {
@@ -326,7 +381,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 }
 
 void MyFrame::OnContinue(wxCommandEvent &event)
-  // Event handler for the push button
+  // Event handler for continue button
 {
   int ncycles;
   ncycles = spin->GetValue();

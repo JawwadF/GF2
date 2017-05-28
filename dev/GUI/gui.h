@@ -5,6 +5,8 @@
 #include <wx/glcanvas.h>
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
+#include <wx/choicdlg.h>
+#include <wx/arrstr.h>
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
@@ -47,6 +49,8 @@ class MyFrame: public wxFrame
   void OnHelp(wxCommandEvent& event); //added by me
   void OnButton(wxCommandEvent& event);   // event handler for push button
   void OnContinue(wxCommandEvent& event); //added by me - for continue button
+  void OnSwitch(wxCommandEvent& event); //added by me - for set switch button
+  void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
 
