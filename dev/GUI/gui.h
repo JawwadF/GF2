@@ -46,6 +46,7 @@ class MyFrame: public wxFrame
   void OnOpen(wxCommandEvent& event); //added by me
   void OnHelp(wxCommandEvent& event); //added by me
   void OnButton(wxCommandEvent& event);   // event handler for push button
+  void OnContinue(wxCommandEvent& event); //added by me - for continue button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
 

@@ -170,7 +170,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_MENU(wxID_HELP, MyFrame::OnHelp)
   EVT_MENU(wxID_OPEN, MyFrame::OnOpen)
   EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
-  EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnButton) //added by me
+  EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
   EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnButton) //added by me
   EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
   EVT_BUTTON(REMOVEMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
@@ -274,29 +274,30 @@ void MyFrame::OnHelp(wxCommandEvent &event) //added by me
 void MyFrame::OnButton(wxCommandEvent &event)
   // Event handler for the push button
 {
+  pmz->readin();
+  bool ok = false;
+  devlink devices = netz->devicelist();
+  netz->checknetwork(ok);
   int n, ncycles;
-
   cyclescompleted = 0;
-  mmz->resetmonitor ();
-  runnetwork(spin->GetValue());
   ncycles = spin->GetValue();
   wxString text;
   text.Printf("Run button pressed: Running for %d cycles", ncycles);
   canvas->Render(text, cyclescompleted);
-  pmz->readin();
-  bool ok = false;
-  bool ok2 = false;
-  //dmz->debug(true);
-  devlink devices = netz->devicelist();
-  netz->checknetwork(ok);
+  mmz->resetmonitor ();
+  cout << "Running for " << ncycles << " cycles" << endl;
+  runnetwork(ncycles);
 
-    if (ok) {
+  
+
+
+/*    if (ok) {
     mmz->resetmonitor();
     dmz->executedevices(ok2);
     cout << "The network is successful? " << (ok && ok2) << endl;
     mmz->recordsignals();
     //dmz->setswitch(43, high, ok);
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
       dmz->executedevices(ok2);
       mmz->recordsignals();
       dmz->executedevices(ok2);
@@ -312,7 +313,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
     
     mmz->displaysignals();
     
-  }
+  }*/
   
   cout << "The content of the lookup table is " << endl;
   for (int i = 0; i < nmz->length_of_table; i++) {
@@ -322,6 +323,20 @@ void MyFrame::OnButton(wxCommandEvent &event)
   }
   return;
 
+}
+
+void MyFrame::OnContinue(wxCommandEvent &event)
+  // Event handler for the push button
+{
+/*  int ncycles;
+  ncycles = spin->GetValue();
+  if (cyclescompleted > 0) {
+    if ((ncycles + cyclescompleted) > maxcycles)
+  ncycles = maxcycles - cyclescompleted;
+    cout << "Continuing for " << ncycles << " cycles" << endl;
+    runnetwork (ncycles);
+  } else
+    cout << "Error: nothing to continue!" << endl;*/
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -356,6 +371,9 @@ void MyFrame::runnetwork(int ncycles)
     } else
       cout << "Error: network is oscillating" << endl;
   }
-  if (ok) cyclescompleted = cyclescompleted + ncycles;
+  if (ok) {
+    mmz->displaysignals ();
+    cyclescompleted = cyclescompleted + ncycles;
+  }
   else cyclescompleted = 0;
 }
