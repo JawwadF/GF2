@@ -179,7 +179,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
+		 names *names_mod, devices *devices_mod, monitor *monitor_mod, parser *parser_mod, scanner *scanner_mod, network *network_mod, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
@@ -190,6 +190,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   nmz = names_mod;
   dmz = devices_mod;
   mmz = monitor_mod;
+  pmz = parser_mod;
+  smz = scanner_mod;
+  netz = network_mod;
   if (nmz == NULL || dmz == NULL || mmz == NULL) {
     cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
     exit(1);
@@ -276,7 +279,49 @@ void MyFrame::OnButton(wxCommandEvent &event)
   cyclescompleted = 0;
   mmz->resetmonitor ();
   runnetwork(spin->GetValue());
-  canvas->Render("Run button pressed", cyclescompleted);
+  ncycles = spin->GetValue();
+  wxString text;
+  text.Printf("Run button pressed: Running for %d cycles", ncycles);
+  canvas->Render(text, cyclescompleted);
+  pmz->readin();
+  bool ok = false;
+  bool ok2 = false;
+  //dmz->debug(true);
+  devlink devices = netz->devicelist();
+  netz->checknetwork(ok);
+
+    if (ok) {
+    mmz->resetmonitor();
+    dmz->executedevices(ok2);
+    cout << "The network is successful? " << (ok && ok2) << endl;
+    mmz->recordsignals();
+    //dmz->setswitch(43, high, ok);
+    for (int i = 0; i < 20; i++) {
+      dmz->executedevices(ok2);
+      mmz->recordsignals();
+      dmz->executedevices(ok2);
+      mmz->recordsignals();
+      dmz->executedevices(ok2);
+      mmz->recordsignals();
+      dmz->executedevices(ok2);
+      mmz->recordsignals();
+      dmz->executedevices(ok2);
+      mmz->recordsignals();
+
+    }
+    
+    mmz->displaysignals();
+    
+  }
+  
+  cout << "The content of the lookup table is " << endl;
+  for (int i = 0; i < nmz->length_of_table; i++) {
+    cout << "id "<< i << " name: ";
+    nmz->writename(i) ;
+    cout<<endl;
+  }
+  return;
+
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)

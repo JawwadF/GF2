@@ -12,16 +12,15 @@ bool MyApp::OnInit()
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
-  smz = new scanner(nmz, wxString(argv[1]).mb_str());
+  smz = new scanner(nmz, "file.txt"); // second arg wxString(argv[1]).mb_str()
   pmz = new parser(netz, dmz, mmz, smz);
-  pmz->readin();
+  //pmz->readin();
   // glutInit cannot cope with Unicode command line arguments, so we pass
   // it some fake ASCII ones instead
   char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
   // Construct the GUI
-  MyFrame *frame = new MyFrame(NULL, "Logic simulator", wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
+  MyFrame *frame = new MyFrame(NULL, "Logic simulator", wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, pmz, smz, netz);
   frame->Show(true);
   return(true); // enter the GUI event loop
-
 
 }
