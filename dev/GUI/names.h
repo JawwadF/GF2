@@ -33,6 +33,9 @@ public:
   void writename (name id);
     /* Prints out the given name on the console                            */
 
+  namestring get_str (name id);
+    /* Returns the stored namestring for a given id                        */
+
   int namelength (name id);
     /* Returns length ie number of characters in given name                */
 
