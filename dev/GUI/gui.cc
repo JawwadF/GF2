@@ -386,11 +386,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
   ncycles = spin->GetValue();
   wxString text;
   text.Printf("Run button pressed: Running for %d cycles", ncycles);
-  canvas->Render(text, cyclescompleted);
   mmz->resetmonitor ();
   cout << "Running for " << ncycles << " cycles" << endl;
   runnetwork(ncycles);
-
+  canvas->Render(text, cyclescompleted);
   
 
 
@@ -437,7 +436,10 @@ void MyFrame::OnContinue(wxCommandEvent &event)
     if ((ncycles + cyclescompleted) > maxcycles)
       ncycles = maxcycles - cyclescompleted;
       cout << "Continuing for " << ncycles << " cycles" << endl;
+      wxString text;
+      text.Printf("Continuing for %d cycles", ncycles);
       runnetwork (ncycles);
+      canvas->Render(text, cyclescompleted);
   } else
     cout << "Error: nothing to continue!" << endl;
 }
