@@ -260,6 +260,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
   // Event handler for the switch button
 {
 
+  
   wxArrayString choices;
   choices.Add(wxT("One"));
   choices.Add(wxT("Two"));
@@ -267,10 +268,14 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
   choices.Add(wxT("Four"));
   choices.Add(wxT("Five"));
 
+  // for(int i = 0; i < StringArray.size(); i++){
+  //   wxStringArray.Add(wxT(StringArray[i]));
+  // }
+
   wxMultiChoiceDialog dialog(this,
   wxT("A multi-choice convenience dialog"),
   wxT("Please select several values"),
-  choices);
+  wxStringArray);
 
   if (dialog.ShowModal() == wxID_OK)
   {
@@ -283,7 +288,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
     {
     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
     int(n), int(selections[n]),
-    choices[selections[n]].c_str());
+    wxStringArray[selections[n]].c_str());
     }
 
     wxMessageBox(msg, wxT("Got selections"));
@@ -372,13 +377,14 @@ void MyFrame::OnButton(wxCommandEvent &event)
   int i = 0;
   while(devices->next != NULL){
     if(devices->kind == aswitch){
-      cout << "Found a switch" << endl;
       int ID = devices->id;
-      nmz->writename(ID);
+      namestring SwitchName = nmz->get_str(ID);
+      wxStringArray.push_back(wxString(SwitchName));
     }
     devices = devices->next;
     i++;
   }
+
 
   netz->checknetwork(ok);
   int n, ncycles;
