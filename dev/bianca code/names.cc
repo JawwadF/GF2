@@ -39,6 +39,19 @@ name names::lookup (namestring str)
     }
 }
 
+namestring names::get_str (name id)
+{
+  if (id == -1)
+    return "Blankname";
+  else if (id>=0 && id<length_of_table)
+    return table[id];
+  else 
+    {
+      cout<<"Warning, this id does not exist";
+      return "";
+    }
+}
+
 name names::cvtname (namestring str)
 {
   name t=blankname;
@@ -50,20 +63,35 @@ name names::cvtname (namestring str)
 
 void names::writename (name id)
 {
-  if (id<length_of_table)
+  if (id >= 0 && id<length_of_table)
     cout<<table[id];
   else
-    cout<<"Warning, this id does not exist";
+  {
+	  if (id == -1) {
+		  cout << "Blankname";
+		  return ;
+	  }
+	  cout << "Warning, this id does not exist";
+	  return;
+  }
 }
 
 int names::namelength (name id)
 {
-  if (id<length_of_table)
+  if (id >= 0 && id<length_of_table)
     return table[id].length();
   else
     {
+	  if (id == -1) {
+		  cout << "Blankname";
+		  return 0;
+	  }
       cout<<"Warning, this id does not exist";
       return 0;
     }
 
 }
+
+
+
+
