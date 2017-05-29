@@ -25,15 +25,15 @@ class parser {
     /* Reads the definition of the logic system and builds the             */
     /* corresponding internal representation via calls to the 'Network'    */
     /* module and the 'Devices' module.                                    */
-  void connection(void);
-  void device(void);
-  void circuit(void);
-  void monitor_(void);
-  void xor_(void);
-  void gate(void);
-  void clock(void);
-  void switch_(void);
-  void dtype(void);
+  bool connection(void);
+  bool device(void);
+  bool circuit(void);
+  bool monitor_(void);
+  bool xor_(void);
+  bool gate(void);
+  bool clock(void);
+  bool switch_(void);
+  bool dtype_(void);
   //void monitor(void);
   parser (network* network_mod, devices* devices_mod,
 	  monitor* monitor_mod, scanner* scanner_mod);
