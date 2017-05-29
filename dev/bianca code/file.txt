@@ -7,3 +7,4 @@ CONNECT = S1 > dtype1.CLEAR;
 CONNECT = dtype1.QBAR > dtype1.DATA;
 CONNECT = clock1 > dtype1.CLK;
 MONITOR = RECORDS dtype1.Q NAME monitor1;
+MONITOR = RECORDS clock1 NAME monitor3;

@@ -2,15 +2,19 @@
 #include <GL/glut.h>
 #include "wx_icon.xpm"
 #include <iostream>
+#include <string>
+#include <sstream>
+
+
 
 using namespace std;
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
-  EVT_SIZE(MyGLCanvas::OnSize)
-  EVT_PAINT(MyGLCanvas::OnPaint)
-  EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
+EVT_SIZE(MyGLCanvas::OnSize)
+EVT_PAINT(MyGLCanvas::OnPaint)
+EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
 
 int wxglcanvas_attrib_list[5] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
@@ -31,37 +35,85 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles)
-  // Draws canvas contents - the following example writes the string "example text" onto the canvas
-  // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
-  // When the simulator is run, the number of cycles is passed as a parameter and the first monitor
-  // trace is displayed.
+// Draws canvas contents - the following example writes the string "example text" onto the canvas
+// and draws a signal trace. The trace is artificial if the simulator has not yet been run.
+// When the simulator is run, the number of cycles is passed as a parameter and the first monitor
+// trace is displayed.
 {
   float y;
   unsigned int i;
   asignal s;
-
+  
   if (cycles >= 0) cyclesdisplayed = cycles;
-
+  
   SetCurrent(*context);
-  if (!init) {
-    InitGL();
-    init = true;
-  }
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
-
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINE_STRIP);
-    for (i=0; i<cyclesdisplayed; i++) {
-      if (mmz->getsignaltrace(0, i, s)) {
-	if (s==low) y = 10.0;
-	if (s==high) y = 30.0;
-	glVertex2f(20*i+10.0, y);
-	glVertex2f(20*i+30.0, y);
-      }
+  if (!init) 
+    {
+      InitGL();
+      init = true;
     }
-    glEnd();
+  glClear(GL_COLOR_BUFFER_BIT);
+  
+  // here create the big square trace
+  int w, h;
+  GetClientSize (&w ,&h);
+  glLineWidth(1.0);
+  glColor3f(0.0, 0.0, 1.0); //blue
+  for (i=0; i< mmz->moncount(); i++) //horizontal lines
+    {
+      glBegin(GL_LINE_STRIP);
+      glVertex2f(50, h-50-i*20);
+      glVertex2f(maxcycles*10+50, h-50-i*20);
+      glEnd();
+      glBegin(GL_LINE_STRIP);
+      glVertex2f(50, h-60-i*20);
+      glVertex2f(maxcycles*10+50, h-60-i*20);
+      glEnd();
+    } 
+
+  for (i=0; i< maxcycles+1; i++) //vertical lines
+    {
+      string mystr;
+      stringstream iout;
+      iout << i;
+      mystr = iout.str();
+
+
+      glRasterPos2f(49+i*10, h-25);
+
+      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+
+      for (int j=0; j<= mmz->moncount() + 1; j++)
+        {
+          glBegin(GL_LINE_STRIP);
+          glVertex2f(50+i*10, h-30-j*20);
+          glVertex2f(50+i*10, h-40-j*20);
+          glEnd(); 
+        }
+      glRasterPos2f(49+i*10, h-60-(mmz->moncount()+1)*20);
+
+      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+    }
+  
+  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
+
+    glLineWidth(2.0);
+    for (int j=0; j<mmz->moncount(); j++)
+      {
+	glBegin(GL_LINE_STRIP);
+         for (i=0; i<cyclesdisplayed; i++) {
+             if (mmz->getsignaltrace(j, i, s)) {
+                if (s==low) {y = h-60-j*20;   glColor3f(1.0, 0.0, 0.0);} //red 
+                if (s==high) {y = h-50-j*20;   glColor3f(1.0, 0.0, 0.0);} //red
+                if (s==rising) {y = h-55-j*20;   glColor3f(1.0, 0.8, 0.8);} //pink
+                if (s==falling) {y = h-55-j*20;   glColor3f(1.0, 0.8, 0.8);} //pink
+	        glVertex2f(50+i*10, y);
+	        glVertex2f(60+i*10, y);
+         }
+    }
+      	glEnd();
+}
+
 
   } else { // draw an artificial trace
 
@@ -224,7 +276,7 @@ fileMenu->Append(wxID_OPEN, "&Open");
   button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
   topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
-  SetSizeHints(400, 400);
+  SetSizeHints(750, 500);
   SetSizer(topsizer);
 }
 
