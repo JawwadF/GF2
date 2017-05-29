@@ -260,21 +260,50 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
   // Event handler for the switch button
 {
 
-  const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
+  wxArrayString choices;
+  choices.Add(wxT("One"));
+  choices.Add(wxT("Two"));
+  choices.Add(wxT("Three"));
+  choices.Add(wxT("Four"));
+  choices.Add(wxT("Five"));
 
-    wxSingleChoiceDialog dialog(this,
-                                wxT("This is a small sample\n")
-                                wxT("A single-choice convenience dialog"),
-                                wxT("Please select a value"),
-                                WXSIZEOF(choices), choices);
+  wxMultiChoiceDialog dialog(this,
+  wxT("A multi-choice convenience dialog"),
+  wxT("Please select several values"),
+  choices);
 
-    dialog.SetSelection(2);
+  if (dialog.ShowModal() == wxID_OK)
+  {
+    wxArrayInt selections = dialog.GetSelections();
+    wxString msg;
+    msg.Printf(wxT("You selected %i items:\n"),
+    int(selections.GetCount()));
 
-    if (dialog.ShowModal() == wxID_OK)
+    for ( size_t n = 0; n < selections.GetCount(); n++ )
     {
-        wxMessageDialog dialog2(this, dialog.GetStringSelection(), wxT("Got string"));
-        dialog2.ShowModal();
+    msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+    int(n), int(selections[n]),
+    choices[selections[n]].c_str());
     }
+
+    wxMessageBox(msg, wxT("Got selections"));
+  }
+  //SINGLE CHOICE STUFF
+  // const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
+
+  //   wxSingleChoiceDialog dialog(this,
+  //                               wxT("This is a small sample\n")
+  //                               wxT("A single-choice convenience dialog"),
+  //                               wxT("Please select a value"),
+  //                               WXSIZEOF(choices), choices);
+
+  //   dialog.SetSelection(2);
+
+  //   if (dialog.ShowModal() == wxID_OK)
+  //   {
+  //       wxMessageDialog dialog2(this, dialog.GetStringSelection(), wxT("Got string"));
+  //       dialog2.ShowModal();
+  //   }
 }
 
 void MyFrame::OnSetMon(wxCommandEvent &event)
@@ -332,6 +361,25 @@ void MyFrame::OnButton(wxCommandEvent &event)
   pmz->readin();
   bool ok = false;
   devlink devices = netz->devicelist();
+
+  // for(int i = 0; i < 5; i++){
+  //   cout << "i" << endl; 
+  //   if(devices->kind == aswitch){
+  //     cout << "Found a switch" << endl;
+  //   }
+  //   devices = devices->next;
+  // }
+  int i = 0;
+  while(devices->next != NULL){
+    if(devices->kind == aswitch){
+      cout << "Found a switch" << endl;
+      int ID = devices->id;
+      nmz->writename(ID);
+    }
+    devices = devices->next;
+    i++;
+  }
+
   netz->checknetwork(ok);
   int n, ncycles;
   cyclescompleted = 0;
