@@ -1,6 +1,7 @@
 #ifndef gui_h
 #define gui_h
 
+
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <wx/spinctrl.h>
