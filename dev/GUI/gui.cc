@@ -261,12 +261,12 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 {
 
   
-  wxArrayString choices;
-  choices.Add(wxT("One"));
-  choices.Add(wxT("Two"));
-  choices.Add(wxT("Three"));
-  choices.Add(wxT("Four"));
-  choices.Add(wxT("Five"));
+  // wxArrayString choices;
+  // choices.Add(wxT("One"));
+  // choices.Add(wxT("Two"));
+  // choices.Add(wxT("Three"));
+  // choices.Add(wxT("Four"));
+  // choices.Add(wxT("Five"));
 
   // for(int i = 0; i < StringArray.size(); i++){
   //   wxStringArray.Add(wxT(StringArray[i]));
@@ -279,20 +279,32 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 
   if (dialog.ShowModal() == wxID_OK)
   {
+    bool cmdok = true;
     wxArrayInt selections = dialog.GetSelections();
     wxString msg;
     msg.Printf(wxT("You selected %i items:\n"),
     int(selections.GetCount()));
-
+    for(int i = 0; i<wxStringArray.size(); i++){
+      dmz->setswitch (SwitchIDArray[i], low, cmdok);
+    }
     for ( size_t n = 0; n < selections.GetCount(); n++ )
     {
     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
     int(n), int(selections[n]),
     wxStringArray[selections[n]].c_str());
+    dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
     }
-
     wxMessageBox(msg, wxT("Got selections"));
   }
+
+  //TODO: Check that switches have been correctly set
+  // for(int i = 0; i<wxStringArray.size(); i++){
+
+  // }
+  
+
+
+
   //SINGLE CHOICE STUFF
   // const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
 
@@ -380,6 +392,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
       int ID = devices->id;
       namestring SwitchName = nmz->get_str(ID);
       wxStringArray.push_back(wxString(SwitchName));
+      SwitchIDArray[i] = ID;
     }
     devices = devices->next;
     i++;
