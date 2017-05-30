@@ -26,7 +26,7 @@ void MyGLCanvas::reset(monitor* mm, names* nm) {
 
 int wxglcanvas_attrib_list[5] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, devices* devices_mod, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
 	const wxSize& size, long style, const wxString& name, const wxPalette& palette) :
 	wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette)
 	// Constructor - initialises private variables
@@ -34,7 +34,6 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, devices* devices_mod, mo
 	context = new wxGLContext(this);
 	mmz = monitor_mod;
 	nmz = names_mod;
-	dmz = devices_mod;
 	init = false;
 	pan_x = 0;
 	pan_y = 0;
@@ -291,7 +290,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	SetMenuBar(menuBar);
 
 	wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
-	canvas = new MyGLCanvas(this, wxID_ANY,devices_mod, monitor_mod, names_mod);
+	canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
