@@ -39,6 +39,8 @@ class parser {
 >>>>>>> 3fdbb80d5fbd9ab04929e250e13a63e2a265b576
   void connection(void);
   void device(void);
+  void circuit(void);
+  void monitor_(void);
   void xor_(void);
   void gate(void);
   void clock(void);
