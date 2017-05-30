@@ -381,23 +381,6 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		// }
 	}
 
-
-	//SINGLE CHOICE STUFF
-	// const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
-
-	//   wxSingleChoiceDialog dialog(this,
-	//                               wxT("This is a small sample\n")
-	//                               wxT("A single-choice convenience dialog"),
-	//                               wxT("Please select a value"),
-	//                               WXSIZEOF(choices), choices);
-
-	//   dialog.SetSelection(2);
-
-	//   if (dialog.ShowModal() == wxID_OK)
-	//   {
-	//       wxMessageDialog dialog2(this, dialog.GetStringSelection(), wxT("Got string"));
-	//       dialog2.ShowModal();
-	//   }
 }
 
 void MyFrame::OnSetMon(wxCommandEvent &event)
@@ -523,6 +506,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	// }
 
 	//CREATE LIST OF SWITCHES
+  wxSwitchNameArray.clear();
 	int i = 0;
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
