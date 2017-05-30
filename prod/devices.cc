@@ -462,6 +462,8 @@ devices::devices (names* names_mod, network* net_mod)
   clrpin  = nmz->lookup("CLEAR");
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
+<<<<<<< HEAD
+=======
 
   //and here to complete the names table, new code
   temp = nmz->lookup("DEVICE");
@@ -495,4 +497,5 @@ devices::devices (names* names_mod, network* net_mod)
   temp = nmz->lookup("INCLUDES");
   temp = nmz->lookup("RECORDS");
 
+>>>>>>> origin/bianca
 }

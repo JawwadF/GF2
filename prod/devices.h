@@ -11,7 +11,11 @@ class devices{
   typedef name devicetable[baddevice + 1]; 
   devicetable dtab;
   bool        steadystate;
+<<<<<<< HEAD
+  name        clkpin, datapin, setpin;
+=======
   name        clkpin, datapin, setpin, temp;
+>>>>>>> origin/bianca
   name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
   bool        debugging;
 

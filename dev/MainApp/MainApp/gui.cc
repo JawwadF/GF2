@@ -53,7 +53,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   }
   glClear(GL_COLOR_BUFFER_BIT);
 
-  int square_size = 30; //this is the size of one square on the trace
+  int square_size = 40; //this is the size of one square on the trace
   int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
 
@@ -329,7 +329,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
   wxMultiChoiceDialog dialog(this,
   wxT("A multi-choice convenience dialog"),
   wxT("Please select several values"),
-  wxSwitchNameArray);
+  wxStringArray);
 
   if (dialog.ShowModal() == wxID_OK)
   {
@@ -338,31 +338,25 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
     wxString msg;
     msg.Printf(wxT("You selected %i items:\n"),
     int(selections.GetCount()));
-    for(int i = 0; i<wxSwitchNameArray.size(); i++){
+    for(int i = 0; i<wxStringArray.size(); i++){
       dmz->setswitch (SwitchIDArray[i], low, cmdok);
     }
     for ( size_t n = 0; n < selections.GetCount(); n++ )
     {
     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
     int(n), int(selections[n]),
-    wxSwitchNameArray[selections[n]].c_str());
+    wxStringArray[selections[n]].c_str());
     dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
     }
     wxMessageBox(msg, wxT("Got selections"));
-
-    devlink devicesList = firstDevice;
-    
-    //THIS IS FOR CHECKING THE STATES OF THE SWITCHES
-    // int j = 0;
-    // while(devicesList->next != NULL){
-    //   if(devicesList->kind == aswitch){
-    //     asignal SwitchState = devicesList->swstate;
-    //     cout << "SWITCH STATE: " << SwitchState << endl;
-    //   }
-    //   devicesList = devicesList->next;
-    //   j++;
-    // }
   }
+
+  //TODO: Check that switches have been correctly set
+  // for(int i = 0; i<wxStringArray.size(); i++){
+
+  // }
+  
+
 
 
   //SINGLE CHOICE STUFF
@@ -398,24 +392,6 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
   wxT("A multi-choice convenience dialog"),
   wxT("Please select several values"),
   choices);
-
-
-  //PRE-SELECT PRE-EXISTING MONITORS
-  // int i = 0;
-  // devicesList = firstDevice;
-  // while(devicesList->next != NULL){
-  //   if(devicesList->kind == aswitch){
-  //     int ID = devicesList->id;
-  //     namestring SwitchName = nmz->get_str(ID);
-  //     wxSwitchNameArray.push_back(wxString(SwitchName));
-  //     SwitchIDArray[i] = ID;
-  //   }
-  //   devicesList = devicesList->next;
-  //   i++;
-  // }
-  // wxArrayInt AlreadySetMons;
-  // dialog.SetSelections(AlreadySetMons)
-
 
   if (dialog.ShowModal() == wxID_OK)
   {
@@ -455,9 +431,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 {
   pmz->readin();
   bool ok = false;
-  firstDevice = netz->devicelist();
-  //monitortable MonitorTable = mmz->mtab;
-  devlink devicesList = firstDevice;
+  devlink devices = netz->devicelist();
 
   // for(int i = 0; i < 5; i++){
   //   cout << "i" << endl; 
@@ -466,19 +440,18 @@ void MyFrame::OnButton(wxCommandEvent &event)
   //   }
   //   devices = devices->next;
   // }
-
-  //CREATE LIST OF SWITCHES
   int i = 0;
-  while(devicesList->next != NULL){
-    if(devicesList->kind == aswitch){
-      int ID = devicesList->id;
+  while(devices->next != NULL){
+    if(devices->kind == aswitch){
+      int ID = devices->id;
       namestring SwitchName = nmz->get_str(ID);
-      wxSwitchNameArray.push_back(wxString(SwitchName));
+      wxStringArray.push_back(wxString(SwitchName));
       SwitchIDArray[i] = ID;
     }
-    devicesList = devicesList->next;
+    devices = devices->next;
     i++;
   }
+
 
   netz->checknetwork(ok);
   int n, ncycles;
