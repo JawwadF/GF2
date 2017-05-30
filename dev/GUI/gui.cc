@@ -109,15 +109,16 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 		glLineWidth(2.0);
 		for (int j = 0; j < mmz->moncount(); j++)
 		{
-			string stlstring;
-		    stlstring= nmz->get_str(mmz->MonitorTable.sigs[j].devid);//name of device
+			name id1, id2;
+			string out_str = "";
+		    mmz->getmonname(j, id1,id2);
+		    out_str.append(nmz->get_str(id1));
 		    
-		    if (dmz->devkind(mmz->MonitorTable.sigs[j].devid)==dtype){ //check if device is dtype
-				string out_str = "";
-				//out_str = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);//name of output
-				//stlstring.append(out_str);
+		    if (id2 != -1){ //check if device is dtype
+				out_str.append(".");
+				out_str.append(nmz->get_str(id2));
 				}
-			wxString myoutputname(stlstring);
+			wxString myoutputname(out_str);
 			PrintOnCanvas(myoutputname, 10, h - start_corner_y - square_size / 2 - j*square_size * 2);
 			
 			
@@ -499,7 +500,7 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 void MyFrame::OnHelp(wxCommandEvent &event) //added by me
   // Event handler for the help menu item
 {
-	wxMessageDialog help(this, "Help window", "Help window", wxICON_INFORMATION | wxOK);
+	wxMessageDialog help(this, "Logic simulator \nUse 'OPEN' to select the desired definition file - see user manual for correct syntax \n \n'Run' - run the simulation for n cycles \n'Continue' - continue to run the simulation for another n cycles \n'Set Switch' - list of all switches and their current state (low/high), which can be modified \n'Set Monitor Point' - list of all outputs in the system that can be monitored \n'Cycles' - select the number of cycles to run/continue", "Help window", wxICON_INFORMATION | wxOK);
 	help.ShowModal();
 }
 
