@@ -17,6 +17,11 @@ void showError(const char* mess) {
 	wxMessageBox(mess, wxT("Syntactic Error"), wxICON_ERROR);
 }
 
+void MyGLCanvas::reset(monitor* mm, names* nm) {
+	mmz = mm;
+	nmz = nm;
+}
+
 int wxglcanvas_attrib_list[5] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
 
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
@@ -434,13 +439,14 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		showError("Need to select the logic description file first.");
 		return;
 	}
-	smz->setURL(CurrentDocPath.mb_str());
+
 	nmz = new names();
 	netz = new network(nmz);
 	dmz = new devices(nmz, netz);
 	mmz = new monitor(nmz, netz);
+	smz = new scanner(nmz, CurrentDocPath.mb_str());
 	pmz = new parser(netz, dmz, mmz, smz, nmz);
-	smz->initialise(nmz);
+	canvas->reset(mmz, nmz);
 	if (!pmz->readin()) return;
 	//bool ok = false;
 	devlink devices = netz->devicelist();
