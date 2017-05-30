@@ -2,7 +2,7 @@
 #include <GL/glut.h>
 #include "wx_icon.xpm"
 #include <iostream>
-
+#include <sstream>
 using namespace std;
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   // using sizers
 {
   SetIcon(wxIcon(wx_icon));
-
   cyclescompleted = 0;
   nmz = names_mod;
   dmz = devices_mod;
@@ -279,7 +278,7 @@ fileMenu->Append(wxID_OPEN, "&Open");
   button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
   topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
-  SetSizeHints(400, 400);
+  SetSizeHints(750, 500);
   SetSizer(topsizer);
 }
 

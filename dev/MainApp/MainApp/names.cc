@@ -39,6 +39,19 @@ name names::lookup (namestring str)
     }
 }
 
+namestring names::get_str (name id)
+{
+  if (id == -1)
+    return "Blankname";
+  else if (id>=0 && id<length_of_table)
+    return table[id];
+  else 
+    {
+      cout<<"Warning, this id does not exist";
+      return "";
+    }
+}
+
 name names::cvtname (namestring str)
 {
   name t=blankname;
@@ -54,8 +67,8 @@ void names::writename (name id)
     cout<<table[id];
   else
   {
-	  if (id = -1) {
-		  cout << "No about Name specified (Has only one output)";
+	  if (id == -1) {
+		  cout << "Blankname";
 		  return ;
 	  }
 	  cout << "Warning, this id does not exist";
@@ -69,8 +82,8 @@ int names::namelength (name id)
     return table[id].length();
   else
     {
-	  if (id = -1) {
-		  cout << "No about Name specified (Has only one output)";
+	  if (id == -1) {
+		  cout << "Blankname";
 		  return 0;
 	  }
       cout<<"Warning, this id does not exist";
@@ -78,3 +91,7 @@ int names::namelength (name id)
     }
 
 }
+
+
+
+

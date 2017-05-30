@@ -72,7 +72,7 @@ bool parser::readin(void)
 		counter++;
 		noerrors = noerrors && noerror;
 	}
-	showError(errorMessage.c_str());
+	if (!noerrors) showError(errorMessage.c_str());
 	return noerrors;
 
 }

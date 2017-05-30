@@ -1,12 +1,14 @@
 #ifndef gui_h
 #define gui_h
 
+
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
 #include <wx/choicdlg.h>
 #include <wx/arrstr.h>
+#include <vector>
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
@@ -41,7 +43,11 @@ class MyFrame: public wxFrame
   network *netz;
   parser *pmz;
   scanner *smz;
-  int cyclescompleted;                    // how many simulation cycles have been completed
+  int cyclescompleted; // how many simulation cycles have been completed
+  int SwitchIDArray[1000];
+  //std::vector<std::string> StringArray;
+  wxArrayString wxStringArray;
+  
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
