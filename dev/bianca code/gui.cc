@@ -56,6 +56,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   int square_size = 30; //this is the size of one square on the trace
   int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
+  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
   // here create the big square trace
   int w, h;
@@ -76,15 +77,19 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   for (i=0; i< maxcycles+1; i++) //vertical lines
     {
-      string mystr;
-      stringstream iout;
-      iout << i;
-      mystr = iout.str();
+      //string mystr;
+      //stringstream iout;
+      //iout << i;
+      //mystr = iout.str();
 
+      wxString mystring = wxString::Format(wxT("%i"),i);
 
-      glRasterPos2f(start_corner+i*square_size, h-start_corner+square_size*2.5);
+      string stlstring;
+      //stlstring= nmz->get_str(MonitorTable.sigs[i].devid);//name of device
+       //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
+      //wxString mystring(stlstring);
 
-      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+      PrintOnCanvas(mystring, start_corner+i*square_size , h-start_corner+square_size*2.5);
 
       for (int j=0; j<= mmz->moncount() + 1; j++)
         {
@@ -93,12 +98,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
           glVertex2f(start_corner+i*square_size, h-start_corner+square_size-j*square_size*2);
           glEnd(); 
         }
-      glRasterPos2f(start_corner+i*square_size, h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
-
-      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+      PrintOnCanvas(mystring, start_corner+i*square_size , h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
     }
   
-  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
     glLineWidth(2.0);
     for (int j=0; j<mmz->moncount(); j++)
