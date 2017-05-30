@@ -16,6 +16,7 @@
 #include "scanner.h"
 #include "parser.h"
 
+
 enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
@@ -23,7 +24,6 @@ enum {
   CONTINUE_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
-  REMOVEMONITOR_BUTTON_ID, //added by me
 }; // widget identifiers
 
 class MyGLCanvas;
@@ -46,7 +46,7 @@ class MyFrame: public wxFrame
 
   devlink firstDevice;
 
-  monitortable MonitorTable;
+  
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
   wxArrayString wxMonitorArray;
@@ -64,6 +64,7 @@ class MyFrame: public wxFrame
   void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
+  void OnDebug(wxCommandEvent &event); // event handler for the debug button
 
   // The Path to the file we have open
     wxString CurrentDocPath;
