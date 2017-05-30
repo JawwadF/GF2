@@ -331,22 +331,12 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 // Event handler for the switch button
 {
 
-
-	// wxArrayString choices;
-	// choices.Add(wxT("One"));
-	// choices.Add(wxT("Two"));
-	// choices.Add(wxT("Three"));
-	// choices.Add(wxT("Four"));
-	// choices.Add(wxT("Five"));
-
-	// for(int i = 0; i < StringArray.size(); i++){
-	//   wxStringArray.Add(wxT(StringArray[i]));
-	// }
-
 	wxMultiChoiceDialog dialog(this,
 		wxT("A multi-choice convenience dialog"),
 		wxT("Please select several values"),
 		wxSwitchNameArray);
+
+  dialog.SetSelections(selectedSwitchArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -358,12 +348,14 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
+    selectedSwitchArray.clear();
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 				int(n), int(selections[n]),
 				wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
+      selectedSwitchArray.push_back(selections[n]);
 		}
 		wxMessageBox(msg, wxT("Got selections"));
 
@@ -432,31 +424,6 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		}
 		cyclescompleted = 0;
 
-
-		// if (dialog.ShowModal() == wxID_OK)
-		//   {
-		//     bool cmdok = true;
-		//     wxArrayInt selections = dialog.GetSelections();
-		//     wxString msg;
-		//     msg.Printf(wxT("You selected %i items:\n"),
-		//     int(selections.GetCount()));
-		//     for(int i = 0; i<wxSwitchNameArray.size(); i++){
-		//       dmz->setswitch (SwitchIDArray[i], low, cmdok);
-		//     }
-		//     for ( size_t n = 0; n < selections.GetCount(); n++ )
-		//     {
-		//     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-		//     int(n), int(selections[n]),
-		//     wxSwitchNameArray[selections[n]].c_str());
-		//     dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
-		//     }
-		//     wxMessageBox(msg, wxT("Got selections"));
-
-		//     devlink devicesList = firstDevice;
-
-
-
-
 		wxMessageBox(msg, wxT("Got selections"));
 	}
 }
@@ -497,20 +464,17 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	MonitorTable = mmz->getmontable();
 	devlink devicesList = firstDevice;
 
-	// for(int i = 0; i < 5; i++){
-	//   cout << "i" << endl; 
-	//   if(devices->kind == aswitch){
-	//     cout << "Found a switch" << endl;
-	//   }
-	//   devices = devices->next;
-	// }
-
 	//CREATE LIST OF SWITCHES
   wxSwitchNameArray.clear();
+  selectedSwitchArray.clear();
 	int i = 0;
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
+      asignal SwitchState = devicesList->swstate;
+      if(SwitchState == high){
+        selectedSwitchArray.push_back(i);
+      }
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
@@ -534,31 +498,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	runnetwork(ncycles);
 	canvas->Render(text, cyclescompleted);
 
-
-
-	/*    if (ok) {
-		mmz->resetmonitor();
-		dmz->executedevices(ok2);
-		cout << "The network is successful? " << (ok && ok2) << endl;
-		mmz->recordsignals();
-		//dmz->setswitch(43, high, ok);
-		for (int i = 0; i < 10; i++) {
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-
-		}
-
-		mmz->displaysignals();
-
-	  }*/
 
 	cout << "The content of the lookup table is " << endl;
 	for (int i = 0; i < nmz->length_of_table; i++) {

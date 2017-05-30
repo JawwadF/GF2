@@ -53,6 +53,7 @@ private:
   wxArrayString wxMonitorArray;
   int SwitchIDArray[1000];
   wxArrayInt selectedArray;
+  wxArrayInt selectedSwitchArray;
 
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
