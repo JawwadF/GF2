@@ -47,11 +47,6 @@ private:
 
   devlink firstDevice;
 
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> c1cd1dfd64f38fb381a73b0ecc83cc9536c70e09
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
   wxArrayString wxMonitorArray;
