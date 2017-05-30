@@ -8,6 +8,7 @@
 #include <wx/textctrl.h>
 #include <wx/choicdlg.h>
 #include <wx/arrstr.h>
+#include <vector>
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
@@ -42,7 +43,12 @@ class MyFrame: public wxFrame
   network *netz;
   parser *pmz;
   scanner *smz;
-  int cyclescompleted;                    // how many simulation cycles have been completed
+
+  devlink firstDevice;
+  int cyclescompleted; // how many simulation cycles have been completed
+  wxArrayString wxSwitchNameArray;
+  int SwitchIDArray[1000];
+
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item

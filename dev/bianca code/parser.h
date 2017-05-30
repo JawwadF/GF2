@@ -1,13 +1,11 @@
 #ifndef parser_h
 #define parser_h
-
 #include "names.h"
 #include "scanner.h"
 #include "network.h"
 #include "devices.h"
 #include "monitor.h"
-
-
+void showError(const char* mess);
 using namespace std;
 
 class parser {
