@@ -176,7 +176,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 		    case '=': s = equals; break;
 		    case ';': s = semicol; break;
 		    case '.': s = dot; break;
-		    case '>': s = connect; break;
+		    case '>': s = connect_; break;
 		    default: s = badsym; break;
 		    }
 		  getch();
