@@ -394,14 +394,13 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
   choices.Add(wxT("Four"));
   choices.Add(wxT("Five"));
 
-  wxArrayInt selectedArray;
+
   wxMonitorArray.clear();
   for( int i = 0; i<MonitorTable.used; i++){
     namestring MonName = nmz->get_str(MonitorTable.sigs[i].devid);
     namestring MonOutput = nmz->get_str(MonitorTable.sigs[i].op->id);
     string MonListString = MonName + ": " + MonOutput;
     wxMonitorArray.push_back(wxString(MonListString));
-    selectedArray.push_back(i);
   }
 
   wxMultiChoiceDialog dialog(this,
@@ -414,6 +413,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 
   if (dialog.ShowModal() == wxID_OK)
   {
+    selectedArray.clear();
     bool cmdok = true;
     wxArrayInt selections = dialog.GetSelections();
     wxString msg;
@@ -428,6 +428,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
     int(n), int(selections[n]),
     wxMonitorArray[selections[n]].c_str());
     mmz->makemonitor(MonitorTable.sigs[selections[n]].devid, MonitorTable.sigs[selections[n]].op->id, cmdok);
+    selectedArray.push_back(selections[n]);
     }
     cyclescompleted = 0;
 
@@ -503,6 +504,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
     }
     devicesList = devicesList->next;
     i++;
+  }
+
+  for( int i = 0; i<MonitorTable.used; i++){
+      selectedArray.push_back(i);
   }
 
   netz->checknetwork(ok);
