@@ -39,6 +39,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
 	pan_y = 0;
 	zoom = 1.0;
 	cyclesdisplayed = -1;
+	text_to_print = "No file selected, please select input file";
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles)
@@ -151,9 +152,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
    glEnd();*/
 
 	}
-
-	PrintOnCanvas(example_text, 10, 10);
-
+	PrintOnCanvas(example_text,10,10);
 
 	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
@@ -193,12 +192,11 @@ void MyGLCanvas::OnPaint(wxPaintEvent& event)
 // Event handler for when the canvas is exposed
 {
 	int w, h;
-	wxString text;
+
 
 	wxPaintDC dc(this); // required for correct refreshing under MS windows
 	GetClientSize(&w, &h);
-	text.Printf("Canvas redrawn by OnPaint event handler, canvas size is %d by %d", w, h);
-	Render(text);
+	Render(text_to_print);
 }
 
 void MyGLCanvas::OnSize(wxSizeEvent& event)
@@ -206,6 +204,7 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)
 {
 	init = false;; // this will force the viewport and projection matrices to be reconfigured on the next paint
 }
+
 
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
 // Event handler for mouse events inside the GL canvas
@@ -241,7 +240,8 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 		text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
 	}
 
-	if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
+	if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text_to_print);
+
 }
 
 // MyFrame ///////////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +330,10 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 		CurrentDocPath = OpenDialog->GetPath();
 		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
 	}
+	canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
+	canvas->Render(canvas->text_to_print);
 
+	
 	//    if (!input_stream.IsOk())
 	//    {
 	//        wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
@@ -379,6 +382,10 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		wxMessageBox(msg, wxT("Got selections"));
 
 		devlink devicesList = firstDevice;
+
+		canvas->text_to_print.Printf("Switches set");
+		canvas->Render(canvas->text_to_print);
+	
 
 		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
 		// int j = 0;
@@ -509,6 +516,9 @@ void MyFrame::OnButton(wxCommandEvent &event)
 {
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
+		//wxString text;
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
 		return;
 	}
 
@@ -554,12 +564,12 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	int n, ncycles;
 	cyclescompleted = 0;
 	ncycles = spin->GetValue();
-	wxString text;
-	text.Printf("Run button pressed: Running for %d cycles", ncycles);
+
+	canvas->text_to_print.Printf("Run button pressed: Running for %d cycles", ncycles);
 	mmz->resetmonitor();
 	cout << "Running for " << ncycles << " cycles" << endl;
 	runnetwork(ncycles);
-	canvas->Render(text, cyclescompleted);
+	canvas->Render(canvas->text_to_print, cyclescompleted);
 
 
 
@@ -606,31 +616,30 @@ void MyFrame::OnContinue(wxCommandEvent &event)
 		if ((ncycles + cyclescompleted) > maxcycles)
 			ncycles = maxcycles - cyclescompleted;
 		cout << "Continuing for " << ncycles << " cycles" << endl;
-		wxString text;
-		text.Printf("Continuing for %d cycles", ncycles);
+		canvas->text_to_print.Printf("Continuing for %d cycles", ncycles);
 		runnetwork(ncycles);
-		canvas->Render(text, cyclescompleted);
+		canvas->Render(canvas->text_to_print, cyclescompleted);
 	}
 	else
+	{
+		canvas->text_to_print.Printf("Error: nothing to continue!");
+		canvas->Render(canvas->text_to_print);
 		cout << "Error: nothing to continue!" << endl;
+	}	
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
 // Event handler for the spin control
 {
-	wxString text;
-
-	text.Printf("New spinctrl value %d", event.GetPosition());
-	canvas->Render(text);
+	canvas->text_to_print.Printf("Simulation Cycles: %d", event.GetPosition());
+	canvas->Render(canvas->text_to_print);
 }
 
 void MyFrame::OnText(wxCommandEvent &event)
 // Event handler for the text entry field
 {
-	wxString text;
-
-	text.Printf("New text entered %s", event.GetString().c_str());
-	canvas->Render(text);
+	canvas->text_to_print.Printf("New text entered %s", event.GetString().c_str());
+	canvas->Render(canvas->text_to_print);
 }
 
 void MyFrame::runnetwork(int ncycles)
@@ -645,8 +654,11 @@ void MyFrame::runnetwork(int ncycles)
 			n--;
 			mmz->recordsignals();
 		}
-		else
+		else{
 			cout << "Error: network is oscillating" << endl;
+			canvas->text_to_print.Printf("Error: network is oscillating");
+			canvas->Render(canvas->text_to_print);
+		}
 	}
 	if (ok) {
 		mmz->displaysignals();

@@ -81,6 +81,7 @@ class MyGLCanvas: public wxGLCanvas
 	     const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
   void reset(monitor* mmz, names* nmz);
+  wxString text_to_print;
  private:
   wxGLContext *context;              // OpenGL rendering context
   bool init;                         // has the OpenGL context been initialised?
