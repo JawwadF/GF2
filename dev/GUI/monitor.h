@@ -54,12 +54,14 @@ class monitor {
   void recordsignals (void);
     /* Called every clock cycle to record the state of each monitored      */
     /* signal.                                                             */
- 
+  monitortable getmontable(void);
+
   void displaysignals (void);
     /* Displays state of monitored signals.                                */
  
   monitor (names* names_mod, network* network_mod);
     /* Called to initialise the monitor module.                            */
 };
+
 
 #endif /* monitor_h */

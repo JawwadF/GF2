@@ -19,6 +19,21 @@ scanner::scanner(names* names_mod, const char* defname)  /* the constructor */
   
 }
 
+void scanner::setURL(const char* ur) {
+	url = (char*) ur;
+}
+
+void scanner::initialise(names* names_mod) {
+	nmz = names_mod;
+	inf.close();
+	inf.open(url);
+	if (!inf)
+	{
+		cout << "Error: cannot open file " << url << " for reading" << endl;
+		exit(1);
+	}
+	getch();
+}
 
 scanner::~scanner(void)  /* the destructor */
 {

@@ -2,7 +2,9 @@
 #include "monitor.h"
 
 using namespace std;
-
+monitortable monitor::getmontable(void) {
+	return mtab;
+}
 /***********************************************************************
  *
  * Sets a monitor on the 'outp' output of device 'dev' by placing an   
