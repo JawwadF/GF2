@@ -91,9 +91,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			wxString mystring = wxString::Format(wxT("%i"), i);
 
 			string stlstring;
-			//stlstring= nmz->get_str(MonitorTable.sigs[i].devid);//name of device
+			//stlstring= nmz->get_str(MyFrame::MonitorTable.sigs[i].devid);//name of device
 			 //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
-			//wxString mystring(stlstring);
+			// mystring(stlstring);
 
 			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner + square_size*2.5);
 
