@@ -170,8 +170,10 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
  * Checks that all inputs are connected to an output.   
  *
  */
-void network::checknetwork (bool& ok)
+void network::checknetwork (bool& ok, string& mess)
 {
+	
+  mess = "";
   devlink d;
   inplink i;
   ok = true;
@@ -179,11 +181,14 @@ void network::checknetwork (bool& ok)
     for (i = d->ilist; i != NULL; i = i->next)
       if (i->connect == NULL) {
 	cout << "Unconnected Input : ";
+	mess = mess + "Unconnected Input : ";
 	nmz->writename (d->id);
 	if (i->id != blankname) {
 	  cout << ".";
+	  mess = mess + "." + nmz->get_str(i->id);
 	  nmz->writename (i->id);
 	}
+	mess = mess + "\n";
 	cout << endl;
 	ok = false;
       }

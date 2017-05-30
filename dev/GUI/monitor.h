@@ -27,8 +27,6 @@ class monitor {
   signaltrace disp[maxmonitors]; 
 
  public:
-  monitortable getmontable (void);
-
   void makemonitor (name dev, name outp, bool& ok);
     /* Sets a monitor on the 'outp' output of device 'dev' by placing an   */
     /* entry in the monitor table. 'ok' is set true if operation succeeds. */
@@ -56,12 +54,14 @@ class monitor {
   void recordsignals (void);
     /* Called every clock cycle to record the state of each monitored      */
     /* signal.                                                             */
- 
+  monitortable getmontable(void);
+
   void displaysignals (void);
     /* Displays state of monitored signals.                                */
  
   monitor (names* names_mod, network* network_mod);
     /* Called to initialise the monitor module.                            */
 };
+
 
 #endif /* monitor_h */
