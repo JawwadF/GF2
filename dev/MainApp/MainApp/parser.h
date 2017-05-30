@@ -13,7 +13,7 @@ class parser {
   devices* dmz; 
   monitor* mmz;
   scanner* smz;
-
+  names* nmz;
   /* put other stuff that the class uses internally here */
   /* also declare internal functions                     */
 
@@ -34,7 +34,7 @@ class parser {
   bool dtype_(void);
   //void monitor(void);
   parser (network* network_mod, devices* devices_mod,
-	  monitor* monitor_mod, scanner* scanner_mod);
+	  monitor* monitor_mod, scanner* scanner_mod, names* names_mod);
     /* the constructor takes pointers to various other classes as parameters */
 };
 
