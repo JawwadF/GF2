@@ -10,6 +10,7 @@ devlink dev;
 symbol cursym;
 name id;
 string errorMessage = "";
+
 bool noerrors = true;
 int num;
 int counter = 1;
@@ -18,6 +19,8 @@ bool parser::readin(void)
 {
 	symbol tempsym;
 	bool noerror;
+	bool noerrors = true;
+	bool noMonitor = true;
 	errorMessage = "";
 	smz->getsymbol(cursym, id, num);
 	counter = 1;
@@ -31,13 +34,16 @@ bool parser::readin(void)
 			cout << "SYNTATIC ERROR expecting the equal sign" << endl;
 			noerror =  false;
 		}
+		bool hasMonitor;
 		switch (tempsym)
 		{
 		case devsym:
 			noerror = noerror && device();
 			break;
 		case monsym:
-			noerror = noerror && monitor_();
+			hasMonitor = monitor_();
+			noerror = noerror && hasMonitor;
+			noMonitor = noMonitor && !hasMonitor;
 			break;
 		case cirsym:
 			noerror = noerror && circuit();
@@ -71,6 +77,19 @@ bool parser::readin(void)
 		smz->getsymbol(cursym, id, num);
 		counter++;
 		noerrors = noerrors && noerror;
+	}
+	if (noerrors) {
+		string mess;
+		netz->checknetwork(noerror, mess);
+		if (!noerror) {
+			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR \n" + mess;
+			noerrors = false;
+		}
+		else if (noMonitor) {
+			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR " + 
+				"The circuit must have at lease one monitor";
+			noerrors = false;
+		}
 	}
 	if (!noerrors) showError(errorMessage.c_str());
 	return noerrors;
@@ -144,7 +163,29 @@ bool parser::connection(void) {
 	cout << id <<endl;
 	insig = id;
 	bool noerror = false;
-	if (noerrors) netz->makeconnection(indev, insig, outdev, outsig, noerror);
+	if (noerrors) {
+		netz->makeconnection(indev, insig, outdev, outsig, noerror);
+		devlink din = netz->finddevice(indev);
+		devlink dout = netz->finddevice(outdev);
+		if (!noerror) {
+			if (din == NULL) {
+				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device "+
+					nmz->get_str(indev) +  " does not exist\n";
+			}
+			else if (netz->findinput(din, insig) == NULL) {
+				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device " +
+					nmz->get_str(indev) + " does not have the input "+ nmz->get_str(insig)+ "\n";
+			}
+			if (dout == NULL) {
+				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Output device " +
+					nmz->get_str(outdev) + " does not exist\n";
+			} 
+			else if (dout->kind == dtype) {
+				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR The DTYPE " +
+					nmz->get_str(outdev) + " must have a valid output (Q or QBAR)\n";
+			}
+		}
+	}
 	return noerror;
 
 }
@@ -497,7 +538,17 @@ bool parser::monitor_(void) {
 
 	bool noerror;
 	mmz->makemonitor(devicename, output, noerror);
-
+	devlink dout = netz->finddevice(devicename);
+	if (!noerror) {
+		if (dout == NULL) {
+			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Output device " +
+				nmz->get_str(devicename) + " does not exist\n";
+		}
+		else if (dout->kind == dtype) {
+			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR The DTYPE " +
+				nmz->get_str(devicename) + " must have a valid output (Q or QBAR)\n";
+		}
+	}
 	return noerror;
 
 }
@@ -505,13 +556,13 @@ bool parser::monitor_(void) {
 
 
 parser::parser(network* network_mod, devices* devices_mod,
-	monitor* monitor_mod, scanner* scanner_mod)
+	monitor* monitor_mod, scanner* scanner_mod, names* names_mod)
 {
 	netz = network_mod;  /* make internal copies of these class pointers */
 	dmz = devices_mod;   /* so we can call functions from these classes  */
 	mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
 	smz = scanner_mod;   /* class you say:                               */
-						 /* netz->makeconnection (i1, i2, o1, o2, ok);   */
+	nmz = names_mod;					 /* netz->makeconnection (i1, i2, o1, o2, ok);   */
 
 	/* any other initialisation you want to do? */
 

@@ -16,6 +16,7 @@
 #include "scanner.h"
 #include "parser.h"
 
+
 enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
@@ -23,7 +24,6 @@ enum {
   CONTINUE_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
-  REMOVEMONITOR_BUTTON_ID, //added by me
 }; // widget identifiers
 
 class MyGLCanvas;
@@ -43,11 +43,16 @@ class MyFrame: public wxFrame
   network *netz;
   parser *pmz;
   scanner *smz;
-  int cyclescompleted; // how many simulation cycles have been completed
-  int SwitchIDArray[1000];
-  //std::vector<std::string> StringArray;
-  wxArrayString wxStringArray;
+
+  devlink firstDevice;
+
   
+  int cyclescompleted; // how many simulation cycles have been completed
+  wxArrayString wxSwitchNameArray;
+  wxArrayString wxMonitorArray;
+  int SwitchIDArray[1000];
+  wxArrayInt selectedArray;
+
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
@@ -59,6 +64,7 @@ class MyFrame: public wxFrame
   void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
+  void OnDebug(wxCommandEvent &event); // event handler for the debug button
 
   // The Path to the file we have open
     wxString CurrentDocPath;
@@ -72,6 +78,7 @@ class MyGLCanvas: public wxGLCanvas
 	     const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	     const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
+  void reset(monitor* mmz, names* nmz);
  private:
   wxGLContext *context;              // OpenGL rendering context
   bool init;                         // has the OpenGL context been initialised?
@@ -85,6 +92,7 @@ class MyGLCanvas: public wxGLCanvas
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
   void OnPaint(wxPaintEvent& event); // event handler for when canvas is exposed
   void OnMouse(wxMouseEvent& event); // event handler for mouse events inside canvas
+  void PrintOnCanvas(wxString example_text = "", int xaxis = 10, int yaxis = 10); //writes text on canvas at the position x,y
   DECLARE_EVENT_TABLE()
 };
 

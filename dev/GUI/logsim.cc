@@ -21,9 +21,9 @@ bool MyApp::OnInit()
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
   smz = new scanner(nmz, wxString(argv[1]).mb_str());
-  pmz = new parser(netz, dmz, mmz, smz);
+  pmz = new parser(netz, dmz, mmz, smz, nmz);
 
-  if (pmz->readin ()) { // check the logic file parsed correctly
+//  if (pmz->readin ()) { // check the logic file parsed correctly
 #ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
@@ -37,6 +37,6 @@ bool MyApp::OnInit()
     userint umz(nmz, dmz, mmz);
     umz.userinterface();
 #endif /* USE_GUI */
-  }
+//  }
   return(false); // exit the application
 }
