@@ -45,8 +45,10 @@ class MyFrame: public wxFrame
   scanner *smz;
 
   devlink firstDevice;
+  monitortable MonitorTable;
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
+  wxArrayString wxMonitorArray;
   int SwitchIDArray[1000];
 
   void runnetwork(int ncycles);           // function to run the logic network
