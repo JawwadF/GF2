@@ -27,18 +27,28 @@ bool parser::readin (void)
 			device();
 			break;
 		case monsym:
+<<<<<<< HEAD
 			monitor_();
 			break;
 		case cirsym:
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+			//monitor_();
+			break;
+		case cirsym:
+<<<<<<< HEAD
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 			//circuit();
 =======
 		        //circuit();
 >>>>>>> origin/bianca
+<<<<<<< HEAD
 =======
 		        circuit();
 >>>>>>> origin/bianca
+=======
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 			break;
 		case consym:
 			connection();
@@ -63,6 +73,7 @@ bool parser::readin (void)
 =======
 
 
+<<<<<<< HEAD
 		if (tempsym != consym)
 		  {
 		    if (tempsym != cirsym && tempsym != monsym)
@@ -90,6 +101,29 @@ bool parser::readin (void)
 		if (cursym != semicol) {
 		  cout << "ERROR missing semicolon" << id << endl;
 		  return false;
+=======
+		if (tempsym != consym){
+
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != keysym) { //here we shold check that the word is actually 'NAME'
+		    cout << "ERROR: expecting the keyword 'NAME'" << endl;
+		    return false;
+		  }
+		  //cout << "["<< id << "] ";
+		  cout << "assigned to a variable ";
+		  smz->getsymbol(cursym, id, num);
+		  if (cursym != namesym ) {
+		    cout << "ERROR: expecting name" << cursym << endl;
+		    return false;
+		  }
+		  cout << "[" << id << "] ";
+		}
+>>>>>>> origin/bianca
+		smz->getsymbol(cursym, id, num);
+		if (cursym != semicol) {
+			cout << "ERROR missing semicolon" << id << endl;
+			return false;
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 		}
 		smz->getsymbol(cursym, id, num);
 		cout << endl;
@@ -218,6 +252,7 @@ void parser::gate(void) {
 		break;
 	}
 	smz->getsymbol(cursym, id, num);
+<<<<<<< HEAD
 	if (cursym == keysym && id == 18) {
 		//cout << id << " ";
 		cout << "That has ";
@@ -234,6 +269,19 @@ void parser::gate(void) {
 	}
 	else {
 	  cout <<endl<< "ERROR expecting keyword INPUTS" << endl;
+=======
+	if (cursym == keysym || id == 6) {
+		//cout << id << " ";
+		cout << "That has ";
+		smz->getsymbol(cursym, id, num);
+		if (num == -1) {
+			cout << "ERROR expecting the number of inputs" << endl;
+		}
+		cout << num << " inputs ";
+	}
+	else {
+		cout << "ERROR expecting keyword INPUTS" << endl;
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 	}
 
 }
@@ -250,8 +298,13 @@ void parser::dtype(void) {
 =======
   cout<< "Creating a Clock";
   smz->getsymbol(cursym, id, num);
+<<<<<<< HEAD
   if (cursym == keysym && id == 38)
 	{
+=======
+  if (cursym == keysym ) //here we should check that the keywok is cycles
+    {
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
       cout<< " that changes state every ";
       smz->getsymbol(cursym, id, num);
       if (cursym == numsym)
@@ -260,7 +313,11 @@ void parser::dtype(void) {
   	    {
   	      cout<<num<<" cyles";
   	      smz->getsymbol(cursym, id, num);
+<<<<<<< HEAD
   	      if (cursym == keysym && id == 39)
+=======
+  	      if (cursym == keysym) //here we should check that the keywod is start
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
   		{
   		  cout<<" starting with value ";
   		  smz->getsymbol(cursym, id, num);
@@ -288,7 +345,11 @@ void parser::switch_(void)
 {
   cout<< "Creating a SWITCH";
   smz->getsymbol(cursym, id, num);
+<<<<<<< HEAD
   if (cursym == keysym && id == 19) 
+=======
+  if (cursym == keysym) //here we should check the keyword is VALUE
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
     {
       cout<<" starting with value ";
       smz->getsymbol(cursym, id, num);
@@ -306,7 +367,11 @@ void parser::switch_(void)
 void parser::dtype(void) {
   cout<< "Creating a DTYPE";
   smz->getsymbol(cursym, id, num);
+<<<<<<< HEAD
   if (cursym == keysym && id == 20)
+=======
+  if (cursym == keysym) //here we should check the keyword is QVAL
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
     {
       cout<<" starting with Q value ";
       smz->getsymbol(cursym, id, num);
@@ -322,6 +387,7 @@ void parser::dtype(void) {
 }
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> origin/bianca
 void _(void) {
@@ -375,6 +441,13 @@ void parser::monitor_(void){
 }
 
 
+=======
+>>>>>>> origin/bianca
+void _(void) {
+
+}
+
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 
 parser::parser (network* network_mod, devices* devices_mod,
 		monitor* monitor_mod, scanner* scanner_mod)

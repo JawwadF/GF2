@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:dev/GUI/Input/file.txt
+=======
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 DEVICE = AND INPUTS 2 NAME U3;
  //SOME MORE COMMENTS HERE
 DEVICE = NAND INPUTS 3 NAME U4;
@@ -6,6 +9,7 @@ DEVICE = NAND INPUTS 3 NAME U4;
 DEVICE = OR INPUTS 4 NAME U5;
 DEVICE = CLOCK CYCLES 5 START 0 NAME myclock;
 
+<<<<<<< HEAD
 =======
 DEVICE = DTYPE QVAL 1 NAME dtype1;
 DEVICE = SWITCH VALUE 0 NAME S1;
@@ -17,3 +21,5 @@ CONNECT = dtype1.QBAR > dtype1.DATA;
 CONNECT = clock1 > dtype1.CLK;
 MONITOR = RECORDS dtype1.Q NAME monitor1;
 >>>>>>> origin/bianca:dev/bianca code/file.txt
+=======
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
