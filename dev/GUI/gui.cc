@@ -394,6 +394,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
   choices.Add(wxT("Four"));
   choices.Add(wxT("Five"));
 
+<<<<<<< HEAD
   wxMultiChoiceDialog dialog(this,
   wxT("A multi-choice convenience dialog"),
   wxT("Please select several values"),
@@ -415,21 +416,82 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
   // }
   // wxArrayInt AlreadySetMons;
   // dialog.SetSelections(AlreadySetMons)
+=======
+
+  wxMonitorArray.clear();
+  for( int i = 0; i<MonitorTable.used; i++){
+    namestring MonName = nmz->get_str(MonitorTable.sigs[i].devid);
+    namestring MonOutput = nmz->get_str(MonitorTable.sigs[i].op->id);
+    string MonListString = MonName + ": " + MonOutput;
+    wxMonitorArray.push_back(wxString(MonListString));
+  }
+
+  wxMultiChoiceDialog dialog(this,
+  wxT("A multi-choice convenience dialog"),
+  wxT("Please select several values"),
+  wxMonitorArray);
+  
+  dialog.SetSelections(selectedArray);
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 
 
   if (dialog.ShowModal() == wxID_OK)
   {
+<<<<<<< HEAD
+=======
+    selectedArray.clear();
+    bool cmdok = true;
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
     wxArrayInt selections = dialog.GetSelections();
     wxString msg;
     msg.Printf(wxT("You selected %i items:\n"),
     int(selections.GetCount()));
+<<<<<<< HEAD
 
+=======
+    for(int i = 0; i<MonitorTable.used; i++){
+      mmz->remmonitor (MonitorTable.sigs[i].devid, MonitorTable.sigs[i].op->id, cmdok);
+    }
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
     for ( size_t n = 0; n < selections.GetCount(); n++ )
     {
     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
     int(n), int(selections[n]),
+<<<<<<< HEAD
     choices[selections[n]].c_str());
     }
+=======
+    wxMonitorArray[selections[n]].c_str());
+    mmz->makemonitor(MonitorTable.sigs[selections[n]].devid, MonitorTable.sigs[selections[n]].op->id, cmdok);
+    selectedArray.push_back(selections[n]);
+    }
+    cyclescompleted = 0;
+
+
+// if (dialog.ShowModal() == wxID_OK)
+//   {
+//     bool cmdok = true;
+//     wxArrayInt selections = dialog.GetSelections();
+//     wxString msg;
+//     msg.Printf(wxT("You selected %i items:\n"),
+//     int(selections.GetCount()));
+//     for(int i = 0; i<wxSwitchNameArray.size(); i++){
+//       dmz->setswitch (SwitchIDArray[i], low, cmdok);
+//     }
+//     for ( size_t n = 0; n < selections.GetCount(); n++ )
+//     {
+//     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+//     int(n), int(selections[n]),
+//     wxSwitchNameArray[selections[n]].c_str());
+//     dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
+//     }
+//     wxMessageBox(msg, wxT("Got selections"));
+
+//     devlink devicesList = firstDevice;
+
+
+
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 
     wxMessageBox(msg, wxT("Got selections"));
   }
@@ -456,7 +518,11 @@ void MyFrame::OnButton(wxCommandEvent &event)
   pmz->readin();
   bool ok = false;
   firstDevice = netz->devicelist();
+<<<<<<< HEAD
   //monitortable MonitorTable = mmz->mtab;
+=======
+  MonitorTable = mmz->getmontable();
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
   devlink devicesList = firstDevice;
 
   // for(int i = 0; i < 5; i++){
@@ -479,6 +545,13 @@ void MyFrame::OnButton(wxCommandEvent &event)
     devicesList = devicesList->next;
     i++;
   }
+<<<<<<< HEAD
+=======
+
+  for( int i = 0; i<MonitorTable.used; i++){
+      selectedArray.push_back(i);
+  }
+>>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
 
   netz->checknetwork(ok);
   int n, ncycles;
