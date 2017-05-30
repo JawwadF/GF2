@@ -54,6 +54,11 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
     }
   glClear(GL_COLOR_BUFFER_BIT);
   
+
+  int square_size = 40; //this is the size of one square on the trace
+  int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
+
+
   // here create the big square trace
   int w, h;
   GetClientSize (&w ,&h);
@@ -62,12 +67,12 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   for (i=0; i< mmz->moncount(); i++) //horizontal lines
     {
       glBegin(GL_LINE_STRIP);
-      glVertex2f(50, h-50-i*20);
-      glVertex2f(maxcycles*10+50, h-50-i*20);
+      glVertex2f(start_corner, h-start_corner-i*square_size*2);
+      glVertex2f(maxcycles*square_size+start_corner, h-start_corner-i*square_size*2);
       glEnd();
       glBegin(GL_LINE_STRIP);
-      glVertex2f(50, h-60-i*20);
-      glVertex2f(maxcycles*10+50, h-60-i*20);
+      glVertex2f(start_corner, h-start_corner-square_size-i*square_size*2);
+      glVertex2f(maxcycles*square_size+start_corner, h-start_corner-square_size-i*square_size*2);
       glEnd();
     } 
 
@@ -79,18 +84,18 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
       mystr = iout.str();
 
 
-      glRasterPos2f(49+i*10, h-25);
+      glRasterPos2f(start_corner+i*square_size, h-start_corner+square_size*2.5);
 
       for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
 
       for (int j=0; j<= mmz->moncount() + 1; j++)
         {
           glBegin(GL_LINE_STRIP);
-          glVertex2f(50+i*10, h-30-j*20);
-          glVertex2f(50+i*10, h-40-j*20);
+          glVertex2f(start_corner+i*square_size, h-start_corner+square_size*2-j*square_size*2);
+          glVertex2f(start_corner+i*square_size, h-start_corner+square_size-j*square_size*2);
           glEnd(); 
         }
-      glRasterPos2f(49+i*10, h-60-(mmz->moncount()+1)*20);
+      glRasterPos2f(start_corner+i*square_size, h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
 
       for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
     }
@@ -103,12 +108,12 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	glBegin(GL_LINE_STRIP);
          for (i=0; i<cyclesdisplayed; i++) {
              if (mmz->getsignaltrace(j, i, s)) {
-                if (s==low) {y = h-60-j*20;   glColor3f(1.0, 0.0, 0.0);} //red 
-                if (s==high) {y = h-50-j*20;   glColor3f(1.0, 0.0, 0.0);} //red
-                if (s==rising) {y = h-55-j*20;   glColor3f(1.0, 0.8, 0.8);} //pink
-                if (s==falling) {y = h-55-j*20;   glColor3f(1.0, 0.8, 0.8);} //pink
-	        glVertex2f(50+i*10, y);
-	        glVertex2f(60+i*10, y);
+	       if (s==low) {y = h-start_corner-square_size-j*square_size*2;   glColor3f(1.0, 0.0, 0.0);} //red 
+                if (s==high) {y = h-start_corner-j*square_size*2;   glColor3f(1.0, 0.0, 0.0);} //red
+                if (s==rising) {y = h-start_corner-square_size/2-j*square_size*2;   glColor3f(1.0, 0.8, 0.8);} //pink
+                if (s==falling) {y = h-start_corner-square_size/2-j*square_size*2;   glColor3f(1.0, 0.8, 0.8);} //pink
+	        glVertex2f(start_corner+i*square_size, y);
+	        glVertex2f(start_corner+square_size+i*square_size, y);
          }
     }
       	glEnd();
