@@ -46,7 +46,7 @@ class MyFrame: public wxFrame
 
   devlink firstDevice;
   int cyclescompleted; // how many simulation cycles have been completed
-  wxArrayString wxStringArray;
+  wxArrayString wxSwitchNameArray;
   int SwitchIDArray[1000];
 
   void runnetwork(int ncycles);           // function to run the logic network

@@ -53,7 +53,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   }
   glClear(GL_COLOR_BUFFER_BIT);
 
-  int square_size = 40; //this is the size of one square on the trace
+  int square_size = 30; //this is the size of one square on the trace
   int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
 
