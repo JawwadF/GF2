@@ -40,9 +40,6 @@ public:
     /* Returns length ie number of characters in given name                */
 
   names (void);
-    /* names initialises the name table.  This procedure is called at      */
-    /* system initialisation before any of the above procedures/functions  */
-    /* are used.                                                           */
 };
 
 #endif /* names_h */
