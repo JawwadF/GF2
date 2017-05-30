@@ -245,9 +245,9 @@ EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
 EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
-//EVT_BUTTON(REMOVEMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
 END_EVENT_TABLE()
+
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
 	names *names_mod, devices *devices_mod, monitor *monitor_mod, parser *parser_mod, scanner *scanner_mod, network *network_mod, long style) :
@@ -286,7 +286,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
-	//button_sizer->Add(new wxButton(this, REMOVEMONITOR_BUTTON_ID, "Remove Monitor point"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
 	button_sizer->Add(spin, 0, wxALL, 10);
@@ -378,9 +377,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 {
 
 	wxMonitorArray.clear();
-	for (int i = 0; i < MonitorTable.used; i++) {
-		namestring MonName = nmz->get_str(MonitorTable.sigs[i].devid);
-		namestring MonOutput = nmz->get_str(MonitorTable.sigs[i].op->id);
+	for (int i = 0; i < mmz->MonitorTable.used; i++) {
+		namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+		namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
 		string MonListString = MonName + ": " + MonOutput;
 		wxMonitorArray.push_back(wxString(MonListString));
 	}
@@ -402,15 +401,15 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		msg.Printf(wxT("You selected %i items:\n"),
 			int(selections.GetCount()));
 
-		for (int i = 0; i < MonitorTable.used; i++) {
-			mmz->remmonitor(MonitorTable.sigs[i].devid, MonitorTable.sigs[i].op->id, cmdok);
+		for (int i = 0; i < mmz->MonitorTable.used; i++) {
+			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 				int(n), int(selections[n]),
 				wxMonitorArray[selections[n]].c_str());
-			mmz->makemonitor(MonitorTable.sigs[selections[n]].devid, MonitorTable.sigs[selections[n]].op->id, cmdok);
+			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
 			selectedArray.push_back(selections[n]);
 		}
 		cyclescompleted = 0;
@@ -452,7 +451,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	if (!pmz->readin()) return;
 	//bool ok = false;
 	firstDevice = netz->devicelist();
-	MonitorTable = mmz->getmontable();
+	mmz->MonitorTable = mmz->getmontable();
 	devlink devicesList = firstDevice;
 
 	//CREATE LIST OF SWITCHES
@@ -474,7 +473,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		i++;
 	}
 
-	for (int i = 0; i < MonitorTable.used; i++) {
+	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
 
