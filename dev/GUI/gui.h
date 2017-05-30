@@ -86,6 +86,7 @@ class MyGLCanvas: public wxGLCanvas
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
   void OnPaint(wxPaintEvent& event); // event handler for when canvas is exposed
   void OnMouse(wxMouseEvent& event); // event handler for mouse events inside canvas
+  void PrintOnCanvas(wxString example_text = "", int xaxis = 10, int yaxis = 10); //writes text on canvas at the position x,y
   DECLARE_EVENT_TABLE()
 };
 

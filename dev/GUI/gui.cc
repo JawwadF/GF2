@@ -56,6 +56,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   int square_size = 30; //this is the size of one square on the trace
   int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
+  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
   // here create the big square trace
   int w, h;
@@ -76,15 +77,19 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   for (i=0; i< maxcycles+1; i++) //vertical lines
     {
-      string mystr;
-      stringstream iout;
-      iout << i;
-      mystr = iout.str();
+      //string mystr;
+      //stringstream iout;
+      //iout << i;
+      //mystr = iout.str();
 
+      wxString mystring = wxString::Format(wxT("%i"),i);
 
-      glRasterPos2f(start_corner+i*square_size, h-start_corner+square_size*2.5);
+      string stlstring;
+      //stlstring= nmz->get_str(MonitorTable.sigs[i].devid);//name of device
+       //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
+      //wxString mystring(stlstring);
 
-      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+      PrintOnCanvas(mystring, start_corner+i*square_size , h-start_corner+square_size*2.5);
 
       for (int j=0; j<= mmz->moncount() + 1; j++)
         {
@@ -93,12 +98,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
           glVertex2f(start_corner+i*square_size, h-start_corner+square_size-j*square_size*2);
           glEnd(); 
         }
-      glRasterPos2f(start_corner+i*square_size, h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
-
-      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+      PrintOnCanvas(mystring, start_corner+i*square_size , h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
     }
   
-  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
     glLineWidth(2.0);
     for (int j=0; j<mmz->moncount(); j++)
@@ -120,7 +122,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   } else { // draw an artificial trace
 
-    glColor3f(1.0, 1.0, 0.0);
+    /*glColor3f(1.0, 1.0, 0.0);
     glBegin(GL_LINE_STRIP);
     for (i=0; i<5; i++) {
       if (i%2) y = 10.0;
@@ -128,14 +130,12 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
       glVertex2f(20*i+10.0, y);
       glVertex2f(20*i+30.0, y);
     }
-    glEnd();
-
+    glEnd();*/
+    
   }
 
-  // Example of how to use GLUT to draw text on the canvas
-  glColor3f(0.0, 0.0, 1.0);
-  glRasterPos2f(10, 100);
-  for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+  PrintOnCanvas(example_text, 10, 10);
+
 
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
@@ -160,6 +160,16 @@ void MyGLCanvas::InitGL()
   glTranslated(pan_x, pan_y, 0.0);
   glScaled(zoom, zoom, zoom);
 }
+
+void MyGLCanvas::PrintOnCanvas(wxString example_text, int xaxis, int yaxis) //prints text on canvas
+{
+  // Example of how to use GLUT to draw text on the canvas
+  glColor3f(0.0, 0.0, 1.0);
+  glRasterPos2f(xaxis, yaxis);
+  for (int i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+
+}
+
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
   // Event handler for when the canvas is exposed
@@ -438,7 +448,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Event handler for the about menu item
 {
-  wxMessageDialog about(this, "Example wxWidgets GUI\nAndrew Gee\nJune 2014", "About Logsim", wxICON_INFORMATION | wxOK);
+  wxMessageDialog about(this, "Logic simulator GUI written by \nBianca Bilovolschi - bab42 \nJawwad Farid - jmf81 \nOsman Ramadan - oior2 \nMay-June 2017", "About Logsim", wxICON_INFORMATION | wxOK);
   about.ShowModal();
 }
 
