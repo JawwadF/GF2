@@ -43,10 +43,11 @@ class MyFrame: public wxFrame
   network *netz;
   parser *pmz;
   scanner *smz;
+  devlink firstDevice;
   int cyclescompleted;                    // how many simulation cycles have been completed
   //std::vector<std::string> StringArray;
-  wxArrayString wxStringArray;
-  int SwitchIDArray[];
+  wxArrayString wxSwitchNameArray;
+  int SwitchIDArray[1000];
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
