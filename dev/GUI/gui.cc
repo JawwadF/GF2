@@ -53,19 +53,70 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   }
   glClear(GL_COLOR_BUFFER_BIT);
 
-  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
+  int square_size = 40; //this is the size of one square on the trace
+  int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINE_STRIP);
-    for (i=0; i<cyclesdisplayed; i++) {
-      if (mmz->getsignaltrace(0, i, s)) {
-	if (s==low) y = 10.0;
-	if (s==high) y = 30.0;
-	glVertex2f(20*i+10.0, y);
-	glVertex2f(20*i+30.0, y);
-      }
+
+  // here create the big square trace
+  int w, h;
+  GetClientSize (&w ,&h);
+  glLineWidth(1.0);
+  glColor3f(0.0, 0.0, 1.0); //blue
+  for (i=0; i< mmz->moncount(); i++) //horizontal lines
+    {
+      glBegin(GL_LINE_STRIP);
+      glVertex2f(start_corner, h-start_corner-i*square_size*2);
+      glVertex2f(maxcycles*square_size+start_corner, h-start_corner-i*square_size*2);
+      glEnd();
+      glBegin(GL_LINE_STRIP);
+      glVertex2f(start_corner, h-start_corner-square_size-i*square_size*2);
+      glVertex2f(maxcycles*square_size+start_corner, h-start_corner-square_size-i*square_size*2);
+      glEnd();
+    } 
+
+  for (i=0; i< maxcycles+1; i++) //vertical lines
+    {
+      string mystr;
+      stringstream iout;
+      iout << i;
+      mystr = iout.str();
+
+
+      glRasterPos2f(start_corner+i*square_size, h-start_corner+square_size*2.5);
+
+      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
+
+      for (int j=0; j<= mmz->moncount() + 1; j++)
+        {
+          glBegin(GL_LINE_STRIP);
+          glVertex2f(start_corner+i*square_size, h-start_corner+square_size*2-j*square_size*2);
+          glVertex2f(start_corner+i*square_size, h-start_corner+square_size-j*square_size*2);
+          glEnd(); 
+        }
+      glRasterPos2f(start_corner+i*square_size, h-start_corner-(mmz->moncount())*square_size*2-square_size*1.5);
+
+      for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
     }
-    glEnd();
+  
+  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
+
+    glLineWidth(2.0);
+    for (int j=0; j<mmz->moncount(); j++)
+      {
+	glBegin(GL_LINE_STRIP);
+         for (i=0; i<cyclesdisplayed; i++) {
+             if (mmz->getsignaltrace(j, i, s)) {
+	       if (s==low) {y = h-start_corner-square_size-j*square_size*2;   glColor3f(1.0, 0.0, 0.0);} //red 
+                if (s==high) {y = h-start_corner-j*square_size*2;   glColor3f(1.0, 0.0, 0.0);} //red
+                if (s==rising) {y = h-start_corner-square_size/2-j*square_size*2;   glColor3f(1.0, 0.8, 0.8);} //pink
+                if (s==falling) {y = h-start_corner-square_size/2-j*square_size*2;   glColor3f(1.0, 0.8, 0.8);} //pink
+	        glVertex2f(start_corner+i*square_size, y);
+	        glVertex2f(start_corner+square_size+i*square_size, y);
+         }
+    }
+      	glEnd();
+}
+
 
   } else { // draw an artificial trace
 
