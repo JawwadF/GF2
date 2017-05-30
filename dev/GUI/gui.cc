@@ -13,6 +13,7 @@ EVT_PAINT(MyGLCanvas::OnPaint)
 EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
 
+
 void showError(const char* mess) {
 	wxMessageBox(mess, wxT("Syntactic Error"), wxICON_ERROR);
 }
@@ -25,7 +26,7 @@ void MyGLCanvas::reset(monitor* mm, names* nm) {
 
 int wxglcanvas_attrib_list[5] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, devices* devices_mod, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
 	const wxSize& size, long style, const wxString& name, const wxPalette& palette) :
 	wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette)
 	// Constructor - initialises private variables
@@ -33,6 +34,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
 	context = new wxGLContext(this);
 	mmz = monitor_mod;
 	nmz = names_mod;
+	dmz = devices_mod;
 	init = false;
 	pan_x = 0;
 	pan_y = 0;
@@ -60,7 +62,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	int square_size = 30; //this is the size of one square on the trace
-	int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
+	int start_corner_x = 100; //this is the corner size that is left empty on the top left part of the canvas
+	int start_corner_y = 100; //this is the corner size that is left empty on the top left part of the canvas
 
 	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
@@ -72,12 +75,12 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 		for (i = 0; i < mmz->moncount(); i++) //horizontal lines
 		{
 			glBegin(GL_LINE_STRIP);
-			glVertex2f(start_corner, h - start_corner - i*square_size * 2);
-			glVertex2f(maxcycles*square_size + start_corner, h - start_corner - i*square_size * 2);
+			glVertex2f(start_corner_x, h - start_corner_y - i*square_size * 2);
+			glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - i*square_size * 2);
 			glEnd();
 			glBegin(GL_LINE_STRIP);
-			glVertex2f(start_corner, h - start_corner - square_size - i*square_size * 2);
-			glVertex2f(maxcycles*square_size + start_corner, h - start_corner - square_size - i*square_size * 2);
+			glVertex2f(start_corner_x, h - start_corner_y - square_size - i*square_size * 2);
+			glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - square_size - i*square_size * 2);
 			glEnd();
 		}
 
@@ -90,36 +93,44 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
 			wxString mystring = wxString::Format(wxT("%i"), i);
 
-			string stlstring;
-			//stlstring= nmz->get_str(MyFrame::MonitorTable.sigs[i].devid);//name of device
-			 //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
-			// mystring(stlstring);
-
-			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner + square_size*2.5);
+			PrintOnCanvas(mystring, start_corner_x + i*square_size, h - start_corner_y + square_size*2.5);
 
 			for (int j = 0; j <= mmz->moncount() + 1; j++)
-			{
+			{			
 				glBegin(GL_LINE_STRIP);
-				glVertex2f(start_corner + i*square_size, h - start_corner + square_size * 2 - j*square_size * 2);
-				glVertex2f(start_corner + i*square_size, h - start_corner + square_size - j*square_size * 2);
+				glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size * 2 - j*square_size * 2);
+				glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size - j*square_size * 2);
 				glEnd();
 			}
-			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner - (mmz->moncount())*square_size * 2 - square_size*1.5);
+			PrintOnCanvas(mystring, start_corner_x + i*square_size, h - start_corner_y - (mmz->moncount())*square_size * 2 - square_size*1.5);
 		}
 
 
 		glLineWidth(2.0);
 		for (int j = 0; j < mmz->moncount(); j++)
 		{
+			string stlstring;
+		    stlstring= nmz->get_str(mmz->MonitorTable.sigs[j].devid);//name of device
+		    
+		    if (dmz->devkind(mmz->MonitorTable.sigs[j].devid)==dtype){ //check if device is dtype
+				string out_str = "";
+				//out_str = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);//name of output
+				//stlstring.append(out_str);
+				}
+			wxString myoutputname(stlstring);
+			PrintOnCanvas(myoutputname, 10, h - start_corner_y - square_size / 2 - j*square_size * 2);
+			
+			
+			
 			glBegin(GL_LINE_STRIP);
 			for (i = 0; i < cyclesdisplayed; i++) {
 				if (mmz->getsignaltrace(j, i, s)) {
-					if (s == low) { y = h - start_corner - square_size - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red 
-					if (s == high) { y = h - start_corner - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red
-					if (s == rising) { y = h - start_corner - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
-					if (s == falling) { y = h - start_corner - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
-					glVertex2f(start_corner + i*square_size, y);
-					glVertex2f(start_corner + square_size + i*square_size, y);
+					if (s == low) { y = h - start_corner_y - square_size - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red 
+					if (s == high) { y = h - start_corner_y - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red
+					if (s == rising) { y = h - start_corner_y - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
+					if (s == falling) { y = h - start_corner_y - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
+					glVertex2f(start_corner_x + i*square_size, y);
+					glVertex2f(start_corner_x + square_size + i*square_size, y);
 				}
 			}
 			glEnd();
@@ -270,16 +281,16 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	}
 
 	wxMenu *fileMenu = new wxMenu;
+	fileMenu->Append(wxID_OPEN, "&Open");
 	fileMenu->Append(wxID_ABOUT, "&About");
 	fileMenu->Append(wxID_HELP, "&Help");
 	fileMenu->Append(wxID_EXIT, "&Quit");
-	fileMenu->Append(wxID_OPEN, "&Open");
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(fileMenu, "&File");
 	SetMenuBar(menuBar);
 
 	wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
-	canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
+	canvas = new MyGLCanvas(this, wxID_ANY,devices_mod, monitor_mod, names_mod);
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
@@ -412,9 +423,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 	choices.Add(wxT("Five"));
 
 	wxMonitorArray.clear();
-	for (int i = 0; i < MonitorTable.used; i++) {
-		namestring MonName = nmz->get_str(MonitorTable.sigs[i].devid);
-		namestring MonOutput = nmz->get_str(MonitorTable.sigs[i].op->id);
+	for (int i = 0; i < mmz->MonitorTable.used; i++) {
+		namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+		namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
 		string MonListString = MonName + ": " + MonOutput;
 		wxMonitorArray.push_back(wxString(MonListString));
 	}
@@ -436,15 +447,15 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		msg.Printf(wxT("You selected %i items:\n"),
 			int(selections.GetCount()));
 
-		for (int i = 0; i < MonitorTable.used; i++) {
-			mmz->remmonitor(MonitorTable.sigs[i].devid, MonitorTable.sigs[i].op->id, cmdok);
+		for (int i = 0; i < mmz->MonitorTable.used; i++) {
+			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 				int(n), int(selections[n]),
 				wxMonitorArray[selections[n]].c_str());
-			mmz->makemonitor(MonitorTable.sigs[selections[n]].devid, MonitorTable.sigs[selections[n]].op->id, cmdok);
+			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
 			selectedArray.push_back(selections[n]);
 		}
 		cyclescompleted = 0;
@@ -511,7 +522,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	if (!pmz->readin()) return;
 	//bool ok = false;
 	firstDevice = netz->devicelist();
-	MonitorTable = mmz->getmontable();
+	mmz->MonitorTable = mmz->getmontable();
 	devlink devicesList = firstDevice;
 
 	// for(int i = 0; i < 5; i++){
@@ -535,7 +546,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		i++;
 	}
 
-	for (int i = 0; i < MonitorTable.used; i++) {
+	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
 
