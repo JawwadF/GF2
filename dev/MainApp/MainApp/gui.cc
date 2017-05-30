@@ -22,6 +22,7 @@ void MyGLCanvas::reset(monitor* mm, names* nm) {
 	nmz = nm;
 }
 
+
 int wxglcanvas_attrib_list[5] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
 
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
@@ -58,52 +59,54 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	int square_size = 40; //this is the size of one square on the trace
+	int square_size = 30; //this is the size of one square on the trace
 	int start_corner = 100; //this is the corner size that is left empty on the top left part of the canvas
 
+	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
 
 	// here create the big square trace
-	int w, h;
-	GetClientSize(&w, &h);
-	glLineWidth(1.0);
-	glColor3f(0.0, 0.0, 1.0); //blue
-	for (i = 0; i < mmz->moncount(); i++) //horizontal lines
-	{
-		glBegin(GL_LINE_STRIP);
-		glVertex2f(start_corner, h - start_corner - i*square_size * 2);
-		glVertex2f(maxcycles*square_size + start_corner, h - start_corner - i*square_size * 2);
-		glEnd();
-		glBegin(GL_LINE_STRIP);
-		glVertex2f(start_corner, h - start_corner - square_size - i*square_size * 2);
-		glVertex2f(maxcycles*square_size + start_corner, h - start_corner - square_size - i*square_size * 2);
-		glEnd();
-	}
-
-	for (i = 0; i < maxcycles + 1; i++) //vertical lines
-	{
-		string mystr;
-		stringstream iout;
-		iout << i;
-		mystr = iout.str();
-
-
-		glRasterPos2f(start_corner + i*square_size, h - start_corner + square_size*2.5);
-
-		for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
-
-		for (int j = 0; j <= mmz->moncount() + 1; j++)
+		int w, h;
+		GetClientSize(&w, &h);
+		glLineWidth(1.0);
+		glColor3f(0.0, 0.0, 1.0); //blue
+		for (i = 0; i < mmz->moncount(); i++) //horizontal lines
 		{
 			glBegin(GL_LINE_STRIP);
-			glVertex2f(start_corner + i*square_size, h - start_corner + square_size * 2 - j*square_size * 2);
-			glVertex2f(start_corner + i*square_size, h - start_corner + square_size - j*square_size * 2);
+			glVertex2f(start_corner, h - start_corner - i*square_size * 2);
+			glVertex2f(maxcycles*square_size + start_corner, h - start_corner - i*square_size * 2);
+			glEnd();
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(start_corner, h - start_corner - square_size - i*square_size * 2);
+			glVertex2f(maxcycles*square_size + start_corner, h - start_corner - square_size - i*square_size * 2);
 			glEnd();
 		}
-		glRasterPos2f(start_corner + i*square_size, h - start_corner - (mmz->moncount())*square_size * 2 - square_size*1.5);
 
-		for (int ii = 0; ii < mystr.size(); ii++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mystr[ii]);
-	}
+		for (i = 0; i < maxcycles + 1; i++) //vertical lines
+		{
+			//string mystr;
+			//stringstream iout;
+			//iout << i;
+			//mystr = iout.str();
 
-	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
+			wxString mystring = wxString::Format(wxT("%i"), i);
+
+			string stlstring;
+			//stlstring= nmz->get_str(MonitorTable.sigs[i].devid);//name of device
+			 //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
+			//wxString mystring(stlstring);
+
+			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner + square_size*2.5);
+
+			for (int j = 0; j <= mmz->moncount() + 1; j++)
+			{
+				glBegin(GL_LINE_STRIP);
+				glVertex2f(start_corner + i*square_size, h - start_corner + square_size * 2 - j*square_size * 2);
+				glVertex2f(start_corner + i*square_size, h - start_corner + square_size - j*square_size * 2);
+				glEnd();
+			}
+			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner - (mmz->moncount())*square_size * 2 - square_size*1.5);
+		}
+
 
 		glLineWidth(2.0);
 		for (int j = 0; j < mmz->moncount(); j++)
@@ -126,22 +129,20 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	}
 	else { // draw an artificial trace
 
-		glColor3f(1.0, 1.0, 0.0);
-		glBegin(GL_LINE_STRIP);
-		for (i = 0; i < 5; i++) {
-			if (i % 2) y = 10.0;
-			else y = 30.0;
-			glVertex2f(20 * i + 10.0, y);
-			glVertex2f(20 * i + 30.0, y);
-		}
-		glEnd();
+   /*glColor3f(1.0, 1.0, 0.0);
+   glBegin(GL_LINE_STRIP);
+   for (i=0; i<5; i++) {
+	 if (i%2) y = 10.0;
+	 else y = 30.0;
+	 glVertex2f(20*i+10.0, y);
+	 glVertex2f(20*i+30.0, y);
+   }
+   glEnd();*/
 
 	}
 
-	// Example of how to use GLUT to draw text on the canvas
-	glColor3f(0.0, 0.0, 1.0);
-	glRasterPos2f(10, 100);
-	for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+	PrintOnCanvas(example_text, 10, 10);
+
 
 	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
@@ -166,6 +167,16 @@ void MyGLCanvas::InitGL()
 	glTranslated(pan_x, pan_y, 0.0);
 	glScaled(zoom, zoom, zoom);
 }
+
+void MyGLCanvas::PrintOnCanvas(wxString example_text, int xaxis, int yaxis) //prints text on canvas
+{
+	// Example of how to use GLUT to draw text on the canvas
+	glColor3f(0.0, 0.0, 1.0);
+	glRasterPos2f(xaxis, yaxis);
+	for (int i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+
+}
+
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
 // Event handler for when the canvas is exposed
@@ -335,7 +346,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 	wxMultiChoiceDialog dialog(this,
 		wxT("A multi-choice convenience dialog"),
 		wxT("Please select several values"),
-		wxStringArray);
+		wxSwitchNameArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -344,25 +355,31 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		wxString msg;
 		msg.Printf(wxT("You selected %i items:\n"),
 			int(selections.GetCount()));
-		for (int i = 0; i < wxStringArray.size(); i++) {
+		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 				int(n), int(selections[n]),
-				wxStringArray[selections[n]].c_str());
+				wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
 		}
 		wxMessageBox(msg, wxT("Got selections"));
+
+		devlink devicesList = firstDevice;
+
+		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
+		// int j = 0;
+		// while(devicesList->next != NULL){
+		//   if(devicesList->kind == aswitch){
+		//     asignal SwitchState = devicesList->swstate;
+		//     cout << "SWITCH STATE: " << SwitchState << endl;
+		//   }
+		//   devicesList = devicesList->next;
+		//   j++;
+		// }
 	}
-
-	//TODO: Check that switches have been correctly set
-	// for(int i = 0; i<wxStringArray.size(); i++){
-
-	// }
-
-
 
 
 	//SINGLE CHOICE STUFF
@@ -394,24 +411,68 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 	choices.Add(wxT("Four"));
 	choices.Add(wxT("Five"));
 
+	wxMonitorArray.clear();
+	for (int i = 0; i < MonitorTable.used; i++) {
+		namestring MonName = nmz->get_str(MonitorTable.sigs[i].devid);
+		namestring MonOutput = nmz->get_str(MonitorTable.sigs[i].op->id);
+		string MonListString = MonName + ": " + MonOutput;
+		wxMonitorArray.push_back(wxString(MonListString));
+	}
+
 	wxMultiChoiceDialog dialog(this,
 		wxT("A multi-choice convenience dialog"),
 		wxT("Please select several values"),
-		choices);
+		wxMonitorArray);
+
+	dialog.SetSelections(selectedArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
+
+		selectedArray.clear();
+		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
 		wxString msg;
 		msg.Printf(wxT("You selected %i items:\n"),
 			int(selections.GetCount()));
 
+		for (int i = 0; i < MonitorTable.used; i++) {
+			mmz->remmonitor(MonitorTable.sigs[i].devid, MonitorTable.sigs[i].op->id, cmdok);
+		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 				int(n), int(selections[n]),
-				choices[selections[n]].c_str());
+				wxMonitorArray[selections[n]].c_str());
+			mmz->makemonitor(MonitorTable.sigs[selections[n]].devid, MonitorTable.sigs[selections[n]].op->id, cmdok);
+			selectedArray.push_back(selections[n]);
 		}
+		cyclescompleted = 0;
+
+
+		// if (dialog.ShowModal() == wxID_OK)
+		//   {
+		//     bool cmdok = true;
+		//     wxArrayInt selections = dialog.GetSelections();
+		//     wxString msg;
+		//     msg.Printf(wxT("You selected %i items:\n"),
+		//     int(selections.GetCount()));
+		//     for(int i = 0; i<wxSwitchNameArray.size(); i++){
+		//       dmz->setswitch (SwitchIDArray[i], low, cmdok);
+		//     }
+		//     for ( size_t n = 0; n < selections.GetCount(); n++ )
+		//     {
+		//     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+		//     int(n), int(selections[n]),
+		//     wxSwitchNameArray[selections[n]].c_str());
+		//     dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
+		//     }
+		//     wxMessageBox(msg, wxT("Got selections"));
+
+		//     devlink devicesList = firstDevice;
+
+
+
 
 		wxMessageBox(msg, wxT("Got selections"));
 	}
@@ -420,7 +481,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
 // Event handler for the about menu item
 {
-	wxMessageDialog about(this, "Example wxWidgets GUI\nAndrew Gee\nJune 2014", "About Logsim", wxICON_INFORMATION | wxOK);
+	wxMessageDialog about(this, "Logic simulator GUI written by \nBianca Bilovolschi - bab42 \nJawwad Farid - jmf81 \nOsman Ramadan - oior2 \nMay-June 2017", "About Logsim", wxICON_INFORMATION | wxOK);
 	about.ShowModal();
 }
 
@@ -449,7 +510,9 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	canvas->reset(mmz, nmz);
 	if (!pmz->readin()) return;
 	//bool ok = false;
-	devlink devices = netz->devicelist();
+	firstDevice = netz->devicelist();
+	MonitorTable = mmz->getmontable();
+	devlink devicesList = firstDevice;
 
 	// for(int i = 0; i < 5; i++){
 	//   cout << "i" << endl; 
@@ -458,20 +521,25 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	//   }
 	//   devices = devices->next;
 	// }
+
+	//CREATE LIST OF SWITCHES
 	int i = 0;
-	while (devices->next != NULL) {
-		if (devices->kind == aswitch) {
-			int ID = devices->id;
+	while (devicesList->next != NULL) {
+		if (devicesList->kind == aswitch) {
+			int ID = devicesList->id;
 			namestring SwitchName = nmz->get_str(ID);
-			wxStringArray.push_back(wxString(SwitchName));
+			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
 		}
-		devices = devices->next;
+		devicesList = devicesList->next;
 		i++;
 	}
 
+	for (int i = 0; i < MonitorTable.used; i++) {
+		selectedArray.push_back(i);
+	}
 
-	//netz->checknetwork(ok, NULL);
+	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;
 	ncycles = spin->GetValue();
