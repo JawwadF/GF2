@@ -27,8 +27,6 @@ class monitor {
   signaltrace disp[maxmonitors]; 
 
  public:
-  monitortable getmontable();
-    /*returns the monitor table
   void makemonitor (name dev, name outp, bool& ok);
     /* Sets a monitor on the 'outp' output of device 'dev' by placing an   */
     /* entry in the monitor table. 'ok' is set true if operation succeeds. */

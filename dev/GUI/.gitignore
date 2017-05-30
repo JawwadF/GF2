@@ -7,3 +7,5 @@ names.o
 network.o
 parser.o
 scanner.o
+logsim.o
+logsim
