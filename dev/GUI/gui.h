@@ -23,7 +23,7 @@ enum {
   CONTINUE_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
-  REMOVEMONITOR_BUTTON_ID, //added by me
+  //REMOVEMONITOR_BUTTON_ID, //added by me
 }; // widget identifiers
 
 class MyGLCanvas;
@@ -65,7 +65,6 @@ private:
   void OnSwitch(wxCommandEvent& event); //added by me - for set switch button
   void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
-  void OnText(wxCommandEvent& event);     // event handler for text entry field
 
   // The Path to the file we have open
     wxString CurrentDocPath;

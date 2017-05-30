@@ -245,9 +245,8 @@ EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
 EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
-EVT_BUTTON(REMOVEMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
+//EVT_BUTTON(REMOVEMONITOR_BUTTON_ID, MyFrame::OnButton) //added by me
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
-EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
@@ -287,12 +286,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
-	button_sizer->Add(new wxButton(this, REMOVEMONITOR_BUTTON_ID, "Remove Monitor point"), 0, wxALL, 10); //added by me
+	//button_sizer->Add(new wxButton(this, REMOVEMONITOR_BUTTON_ID, "Remove Monitor point"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
 	button_sizer->Add(spin, 0, wxALL, 10);
 
-	button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0, wxALL, 10);
 	topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
 	SetSizeHints(750, 500);
@@ -332,8 +330,8 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 {
 
 	wxMultiChoiceDialog dialog(this,
-		wxT("A multi-choice convenience dialog"),
-		wxT("Please select several values"),
+		wxT("Check the switches you wish to set to high from the list below"),
+		wxT("Set switches"),
 		wxSwitchNameArray);
 
   dialog.SetSelections(selectedSwitchArray);
@@ -342,22 +340,22 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 	{
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		wxString msg;
-		msg.Printf(wxT("You selected %i items:\n"),
-			int(selections.GetCount()));
+		// wxString msg;
+		// msg.Printf(wxT("You selected %i items:\n"),
+		// 	int(selections.GetCount()));
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
     selectedSwitchArray.clear();
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-				int(n), int(selections[n]),
-				wxSwitchNameArray[selections[n]].c_str());
+			// msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+			// 	int(n), int(selections[n]),
+			// 	wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
       selectedSwitchArray.push_back(selections[n]);
 		}
-		wxMessageBox(msg, wxT("Got selections"));
+		//wxMessageBox(msg, wxT("Got selections"));
 
 		devlink devicesList = firstDevice;
 
@@ -378,13 +376,6 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
-
-	wxArrayString choices;
-	choices.Add(wxT("One"));
-	choices.Add(wxT("Two"));
-	choices.Add(wxT("Three"));
-	choices.Add(wxT("Four"));
-	choices.Add(wxT("Five"));
 
 	wxMonitorArray.clear();
 	for (int i = 0; i < MonitorTable.used; i++) {
@@ -536,14 +527,6 @@ void MyFrame::OnSpin(wxSpinEvent &event)
 	canvas->Render(text);
 }
 
-void MyFrame::OnText(wxCommandEvent &event)
-// Event handler for the text entry field
-{
-	wxString text;
-
-	text.Printf("New text entered %s", event.GetString().c_str());
-	canvas->Render(text);
-}
 
 void MyFrame::runnetwork(int ncycles)
 // Function to run the network, derived from corresponding function in userint.cc

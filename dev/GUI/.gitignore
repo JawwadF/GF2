@@ -11,3 +11,5 @@ logsim.o
 logsim
 file.txt
 userint.o
+Input/
+file.txt
