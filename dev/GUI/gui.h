@@ -34,7 +34,8 @@ class MyFrame: public wxFrame
   MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
 	  names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, parser *parser_mod = NULL, scanner *scanner_mod = NULL, network *network_mod = NULL,
 	  long style = wxDEFAULT_FRAME_STYLE); // constructor
- private:
+  monitortable MonitorTable; 
+private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
   wxSpinCtrl *spin;                       // control widget to select the number of cycles
   names *nmz;                             // pointer to names class
@@ -46,7 +47,7 @@ class MyFrame: public wxFrame
 
   devlink firstDevice;
 
-  monitortable MonitorTable;
+
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
   wxArrayString wxMonitorArray;
