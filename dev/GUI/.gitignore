@@ -6,12 +6,8 @@ monitor.o
 names.o
 network.o
 parser.o
-<<<<<<< HEAD
-scanner.o
-=======
 scanner.o
 logsim.o
 logsim
 file.txt
 userint.o
->>>>>>> 892105b984029f00e8b36688e40bdf2a366d6a20
