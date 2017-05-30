@@ -24,10 +24,6 @@ enum {
   CONTINUE_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
-<<<<<<< HEAD
-  //REMOVEMONITOR_BUTTON_ID, //added by me
-=======
->>>>>>> 097493099911b1a8598429d669a79ebfd83a93d2
 }; // widget identifiers
 
 class MyGLCanvas;

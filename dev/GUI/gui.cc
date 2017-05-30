@@ -385,8 +385,8 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 	}
 
 	wxMultiChoiceDialog dialog(this,
-		wxT("A multi-choice convenience dialog"),
-		wxT("Please select several values"),
+		wxT("Check the device outputs you wish to monitor from the list below"),
+		wxT("Set monitor points"),
 		wxMonitorArray);
 
 	dialog.SetSelections(selectedArray);
@@ -397,24 +397,16 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		selectedArray.clear();
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		wxString msg;
-		msg.Printf(wxT("You selected %i items:\n"),
-			int(selections.GetCount()));
 
 		for (int i = 0; i < mmz->MonitorTable.used; i++) {
 			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-				int(n), int(selections[n]),
-				wxMonitorArray[selections[n]].c_str());
 			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
 			selectedArray.push_back(selections[n]);
 		}
 		cyclescompleted = 0;
-
-		wxMessageBox(msg, wxT("Got selections"));
 	}
 }
 
