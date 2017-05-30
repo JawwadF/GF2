@@ -269,10 +269,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	}
 
 	wxMenu *fileMenu = new wxMenu;
+  fileMenu->Append(wxID_OPEN, "&Open");
 	fileMenu->Append(wxID_ABOUT, "&About");
 	fileMenu->Append(wxID_HELP, "&Help");
 	fileMenu->Append(wxID_EXIT, "&Quit");
-	fileMenu->Append(wxID_OPEN, "&Open");
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(fileMenu, "&File");
 	SetMenuBar(menuBar);
