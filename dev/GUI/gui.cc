@@ -502,14 +502,14 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		canvas->Render(canvas->text_to_print);
 		return;
 	}
-
+	canvas->reset(mmz, nmz);
 	nmz = new names();
 	netz = new network(nmz);
 	dmz = new devices(nmz, netz);
 	mmz = new monitor(nmz, netz);
 	smz = new scanner(nmz, CurrentDocPath.mb_str());
 	pmz = new parser(netz, dmz, mmz, smz, nmz);
-	canvas->reset(mmz, nmz);
+	
 	if (!pmz->readin()) return;
 	//bool ok = false;
 	firstDevice = netz->devicelist();
