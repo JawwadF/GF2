@@ -19,7 +19,7 @@ bool parser::readin(void)
 {
 	symbol tempsym;
 	bool noerror;
-	bool noerrors = true;
+	noerrors = true;
 	bool noMonitor = true;
 	errorMessage = "";
 	smz->getsymbol(cursym, id, num);
