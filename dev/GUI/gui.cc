@@ -3,6 +3,7 @@
 #include "wx_icon.xpm"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 using namespace std;
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +178,6 @@ void MyGLCanvas::PrintOnCanvas(wxString example_text, int xaxis, int yaxis) //pr
 
 }
 
-
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
 // Event handler for when the canvas is exposed
 {
@@ -269,7 +269,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	}
 
 	wxMenu *fileMenu = new wxMenu;
-	fileMenu->Append(wxID_OPEN, "&Open");
+  fileMenu->Append(wxID_OPEN, "&Open");
 	fileMenu->Append(wxID_ABOUT, "&About");
 	fileMenu->Append(wxID_HELP, "&Help");
 	fileMenu->Append(wxID_EXIT, "&Quit");
@@ -282,6 +282,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
+
 	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0);
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	button_sizer->Add(switchesList, 0, wxALL, 10);
@@ -336,15 +337,13 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		wxT("Set switches"),
 		wxSwitchNameArray);
 
-	dialog.SetSelections(selectedSwitchArray);
+  dialog.SetSelections(selectedSwitchArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		// wxString msg;
-		// msg.Printf(wxT("You selected %i items:\n"),
-		// 	int(selections.GetCount()));
+
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
@@ -360,6 +359,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		}
 		//wxMessageBox(msg, wxT("Got selections"));
 		updateSwitchList();
+
 		devlink devicesList = firstDevice;
 
 		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
@@ -381,12 +381,43 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 {
 
 	wxMonitorArray.clear();
-	for (int i = 0; i < mmz->MonitorTable.used; i++) {
-		namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
-		namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
-		string MonListString = MonName + ": " + MonOutput;
-		wxMonitorArray.push_back(wxString(MonListString));
-	}
+  for(int i = 0; i < mmz->MonitorTable.used; i++){
+    namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+    namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
+    string MonListString;
+    if(MonOutput == "Blankname"){
+      MonListString = MonName;
+    }
+    else{
+      MonListString = MonName + ": " + MonOutput;
+    }
+    wxMonitorArray.push_back(wxString(MonListString));
+    MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
+    MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
+  }
+
+  devlink devicesList = firstDevice;
+  while (devicesList->next != NULL) {
+    namestring DevName = nmz->get_str(devicesList->id);
+    DeviceNameArray.push_back(DevName);
+    namestring DevOutName = nmz->get_str(devicesList->olist->id);
+    DeviceOutArray.push_back(wxString(DevOutName));
+    string MonListString;
+    if(DevOutName == "Blankname"){
+      MonListString = DevName;
+    }
+    else{
+      MonListString = DevName + ": " + DevOutName;
+    }
+    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
+      devicesList = devicesList->next;
+    }
+    else{
+      wxMonitorArray.push_back(wxString(MonListString));
+      MonitorIDArray.push_back(devicesList->id);
+      MonitorOutIDArray.push_back(devicesList->olist->id);
+    }
+  }
 
 	wxMultiChoiceDialog dialog(this,
 		wxT("Check the device outputs you wish to monitor from the list below"),
@@ -402,15 +433,26 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
 
-		for (int i = 0; i < mmz->MonitorTable.used; i++) {
+		for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
 			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
-			selectedArray.push_back(selections[n]);
+
+			mmz->makemonitor(MonitorIDArray[selections[n]], MonitorOutIDArray[selections[n]], cmdok);
 		}
+    mmz->MonitorTable = mmz->getmontable();
+    for (int i = 0; i < mmz->MonitorTable.used; i++) {
+      selectedArray.push_back(i);
+      cout << "monitor used count " << i << endl; 
+    }
 		cyclescompleted = 0;
+    int ncycles = spin->GetValue();
+    wxString text;
+    text.Printf("Adding new monitors.");
+    mmz->resetmonitor();
+    runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
+    canvas->Render(text, cyclescompleted);
 	}
 }
 
@@ -470,26 +512,29 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	wxSwitchNameArray.clear();
 	selectedSwitchArray.clear();
 	wxArrayString switchListArray;
+
 	int i = 0;
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
-			asignal SwitchState = devicesList->swstate;
-			if (SwitchState == high) {
-				selectedSwitchArray.push_back(i);
-			}
+      asignal SwitchState = devicesList->swstate;
+      if(SwitchState == high){
+        selectedSwitchArray.push_back(i);
+      }
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
-		}
+		}    
 		devicesList = devicesList->next;
 		i++;
 	}
+
 
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
 	updateSwitchList();
+
 	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;

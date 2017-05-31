@@ -51,9 +51,14 @@ private:
   wxArrayString wxSwitchNameArray;
   wxListBox* switchesList;
   wxArrayString wxMonitorArray;
+  wxArrayString DeviceNameArray;
+  wxArrayString DeviceOutArray;
   int SwitchIDArray[1000];
   wxArrayInt selectedArray;
   wxArrayInt selectedSwitchArray;
+  wxArrayInt MonitorIDArray;
+  wxArrayInt MonitorOutIDArray;
+
 
   void updateSwitchList(void);
   void runnetwork(int ncycles);           // function to run the logic network
