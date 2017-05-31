@@ -574,15 +574,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	}
 
 
-
-
-
-
-
-
-
-
-
 	devicesList = firstDevice;
 
 	//CREATE LIST OF SWITCHES
@@ -605,7 +596,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		devicesList = devicesList->next;
 		i++;
 	}
-
+	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
