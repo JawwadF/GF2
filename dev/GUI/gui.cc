@@ -179,7 +179,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	 glVertex2f(20*i+30.0, y);
    }
    glEnd();*/
-
+	  InitGL();
 	}
 
 	PrintOnCanvas(example_text,10,10);
@@ -354,7 +354,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
 	}
 	canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
-	canvas->Render(canvas->text_to_print);
+	canvas->Render(canvas->text_to_print,-1);
 	//    if (!input_stream.IsOk())
 	//    {
 	//        wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
@@ -502,7 +502,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		canvas->Render(canvas->text_to_print);
 		return;
 	}
-
+	
 	nmz = new names();
 	netz = new network(nmz);
 	dmz = new devices(nmz, netz);
@@ -523,6 +523,8 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		mmz->usedMonitors[i] = false;
 	}
 	wxMonitorArray.clear();
+	MonitorIDArray.clear();
+	MonitorOutIDArray.clear();
 	for(int i = 0; i < mmz->MonitorTable.used; i++){
 	namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
 	namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
@@ -537,7 +539,8 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
 	MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
 	}
-
+	DeviceNameArray.clear();
+	DeviceOutArray.clear();
   while (devicesList != NULL) {
     namestring DevName = nmz->get_str(devicesList->id);
     DeviceNameArray.push_back(DevName);
@@ -560,6 +563,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
     	}
   	}
 
+  cout<<"£££££££"<<mmz->MonitorTable.used<<endl;
   	for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
 		mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		mmz->usedMonitors[i] = true;
