@@ -436,6 +436,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		wxMonitorArray);
 
 	dialog.SetSelections(selectedArray);
+	int temp_cyclescompleted = cyclescompleted;
+	
+	
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -457,8 +460,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
       selectedArray.push_back(i);
       cout << "monitor used count " << i << endl; 
     }
-		cyclescompleted = 0;
-    int ncycles = spin->GetValue();
+	cyclescompleted = 0;
+    //int ncycles = spin->GetValue()
+    int ncycles = temp_cyclescompleted;
     wxString text;
     text.Printf("Adding new monitors.");
     mmz->resetmonitor();
