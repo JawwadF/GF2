@@ -74,16 +74,22 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 		GetClientSize(&w, &h);
 		glLineWidth(1.0);
 		glColor3f(0.0, 0.0, 1.0); //blue
+		
+		int ij = 0;
 		for (i = 0; i < mmz->moncount(); i++) //horizontal lines
-		{
-			glBegin(GL_LINE_STRIP);
-			glVertex2f(start_corner_x, h - start_corner_y - i*square_size * 2);
-			glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - i*square_size * 2);
-			glEnd();
-			glBegin(GL_LINE_STRIP);
-			glVertex2f(start_corner_x, h - start_corner_y - square_size - i*square_size * 2);
-			glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - square_size - i*square_size * 2);
-			glEnd();
+		{ 
+			if (mmz->usedMonitors[i])
+			{
+				glBegin(GL_LINE_STRIP);
+				glVertex2f(start_corner_x, h - start_corner_y - ij*square_size * 2);
+				glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - ij*square_size * 2);
+				glEnd();
+				glBegin(GL_LINE_STRIP);
+				glVertex2f(start_corner_x, h - start_corner_y - square_size - ij*square_size * 2);
+				glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - square_size - ij*square_size * 2);
+				glEnd();
+				ij = ij+1;
+			}
 		}
 
 		for (i = 0; i < maxcycles + 1; i++) //vertical lines
@@ -97,46 +103,67 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
 			PrintOnCanvas(mystring, start_corner_x + i*square_size, h - start_corner_y + square_size*2.5);
 
-			for (int j = 0; j <= mmz->moncount() + 1; j++)
-			{			
-				glBegin(GL_LINE_STRIP);
-				glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size * 2 - j*square_size * 2);
-				glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size - j*square_size * 2);
-				glEnd();
+			ij = 0;
+
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size * 2);
+			glVertex2f(start_corner_x + i*square_size, h - start_corner_y + square_size );
+			glEnd();
+
+			for (int j = 0; j < mmz->moncount(); j++)
+			{		
+				if (mmz->usedMonitors[j])
+				{
+					glBegin(GL_LINE_STRIP);
+					glVertex2f(start_corner_x + i*square_size, h - start_corner_y - ij*square_size * 2);
+					glVertex2f(start_corner_x + i*square_size, h - start_corner_y - square_size - ij*square_size * 2);
+					glEnd();
+					ij = ij+1;
+				}
 			}
-			PrintOnCanvas(mystring, start_corner_x + i*square_size, h - start_corner_y - (mmz->moncount())*square_size * 2 - square_size*1.5);
+
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(start_corner_x + i*square_size, h - start_corner_y - ij*square_size * 2);
+			glVertex2f(start_corner_x + i*square_size, h - start_corner_y - square_size - ij*square_size * 2);
+			glEnd();
+
+			PrintOnCanvas(mystring, start_corner_x + i*square_size, h - start_corner_y - (ij)*square_size * 2 - square_size*1.5);
 		}
 
-
+		ij = 0;
 		glLineWidth(2.0);
 		for (int j = 0; j < mmz->moncount(); j++)
 		{
-			name id1, id2;
-			string out_str = "";
-		    mmz->getmonname(j, id1,id2);
-		    out_str.append(nmz->get_str(id1));
+			if (mmz->usedMonitors[j])
+			{	
+				name id1, id2;
+				string out_str = "";
+		    	mmz->getmonname(j, id1,id2);
+		    	out_str.append(nmz->get_str(id1));
 		    
 		    if (id2 != -1){ //check if device is dtype
 				out_str.append(".");
 				out_str.append(nmz->get_str(id2));
 				}
 			wxString myoutputname(out_str);
-			PrintOnCanvas(myoutputname, 10, h - start_corner_y - square_size / 2 - j*square_size * 2);
+			PrintOnCanvas(myoutputname, 10, h - start_corner_y - square_size / 2 - ij*square_size * 2);
 			
 			
 			
 			glBegin(GL_LINE_STRIP);
 			for (i = 0; i < cyclesdisplayed; i++) {
 				if (mmz->getsignaltrace(j, i, s)) {
-					if (s == low) { y = h - start_corner_y - square_size - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red 
-					if (s == high) { y = h - start_corner_y - j*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red
-					if (s == rising) { y = h - start_corner_y - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
-					if (s == falling) { y = h - start_corner_y - square_size / 2 - j*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
+					if (s == low) { y = h - start_corner_y - square_size - ij*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red 
+					if (s == high) { y = h - start_corner_y - ij*square_size * 2;   glColor3f(1.0, 0.0, 0.0); } //red
+					if (s == rising) { y = h - start_corner_y - square_size / 2 - ij*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
+					if (s == falling) { y = h - start_corner_y - square_size / 2 - ij*square_size * 2;   glColor3f(1.0, 0.8, 0.8); } //pink
 					glVertex2f(start_corner_x + i*square_size, y);
 					glVertex2f(start_corner_x + square_size + i*square_size, y);
 				}
 			}
 			glEnd();
+			ij = ij+1;
+		}
 		}
 
 
@@ -391,44 +418,44 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
 
-	wxMonitorArray.clear();
-  for(int i = 0; i < mmz->MonitorTable.used; i++){
-    namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
-    namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
-    string MonListString;
-    if(MonOutput == "Blankname"){
-      MonListString = MonName;
-    }
-    else{
-      MonListString = MonName + ": " + MonOutput;
-    }
-    wxMonitorArray.push_back(wxString(MonListString));
-    MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
-    MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
-  }
+	// wxMonitorArray.clear();
+	// for(int i = 0; i < mmz->MonitorTable.used; i++){
+	// namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+	// namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
+	// string MonListString;
+	// if(MonOutput == "Blankname"){
+	//   MonListString = MonName;
+	// }
+	// else{
+	//   MonListString = MonName + ": " + MonOutput;
+	// }
+	// wxMonitorArray.push_back(wxString(MonListString));
+	// MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
+	// MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
+	// }
 
-  devlink devicesList = firstDevice;
-  while (devicesList->next != NULL) {
-    namestring DevName = nmz->get_str(devicesList->id);
-    DeviceNameArray.push_back(DevName);
-    namestring DevOutName = nmz->get_str(devicesList->olist->id);
-    DeviceOutArray.push_back(wxString(DevOutName));
-    string MonListString;
-    if(DevOutName == "Blankname"){
-      MonListString = DevName;
-    }
-    else{
-      MonListString = DevName + ": " + DevOutName;
-    }
-    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
-      devicesList = devicesList->next;
-    }
-    else{
-      wxMonitorArray.push_back(wxString(MonListString));
-      MonitorIDArray.push_back(devicesList->id);
-      MonitorOutIDArray.push_back(devicesList->olist->id);
-    }
-  }
+ //  devlink devicesList = firstDevice;
+ //  while (devicesList->next != NULL) {
+ //    namestring DevName = nmz->get_str(devicesList->id);
+ //    DeviceNameArray.push_back(DevName);
+ //    namestring DevOutName = nmz->get_str(devicesList->olist->id);
+ //    DeviceOutArray.push_back(wxString(DevOutName));
+ //    string MonListString;
+ //    if(DevOutName == "Blankname"){
+ //      MonListString = DevName;
+ //    }
+ //    else{
+ //      MonListString = DevName + ": " + DevOutName;
+ //    }
+ //    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
+ //      devicesList = devicesList->next;
+ //    }
+ //    else{
+ //      wxMonitorArray.push_back(wxString(MonListString));
+ //      MonitorIDArray.push_back(devicesList->id);
+ //      MonitorOutIDArray.push_back(devicesList->olist->id);
+ //    }
+ //  }
 
 	wxMultiChoiceDialog dialog(this,
 		wxT("Check the device outputs you wish to monitor from the list below"),
@@ -436,7 +463,6 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		wxMonitorArray);
 
 	dialog.SetSelections(selectedArray);
-	int temp_cyclescompleted = cyclescompleted;
 	
 	
 
@@ -446,27 +472,20 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		selectedArray.clear();
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-
-		for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
-
-			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
+		selectedArray = selections;
+		for(int i = 0; i < 1000; i++){
+			mmz->usedMonitors[i] = false;
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			mmz->makemonitor(MonitorIDArray[selections[n]], MonitorOutIDArray[selections[n]], cmdok);
+			mmz->usedMonitors[selections[n]] = true;
 		}
-    mmz->MonitorTable = mmz->getmontable();
-    for (int i = 0; i < mmz->MonitorTable.used; i++) {
-      selectedArray.push_back(i);
-      cout << "monitor used count " << i << endl; 
-    }
-	cyclescompleted = 0;
+ 
     //int ncycles = spin->GetValue()
-    int ncycles = temp_cyclescompleted;
     wxString text;
     text.Printf("Adding new monitors.");
-    mmz->resetmonitor();
-    runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
+    //mmz->resetmonitor();
+    //runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
     canvas->Render(text, cyclescompleted);
 	}
 }
@@ -526,6 +545,71 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	firstDevice = netz->devicelist();
 	mmz->MonitorTable = mmz->getmontable();
 	devlink devicesList = firstDevice;
+	bool cmdok = true;
+
+	
+
+	for(int i = 0; i < 1000; i++){
+		mmz->usedMonitors[i] = false;
+	}
+	wxMonitorArray.clear();
+	for(int i = 0; i < mmz->MonitorTable.used; i++){
+	namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+	namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
+	string MonListString;
+	if(MonOutput == "Blankname"){
+	  MonListString = MonName;
+	}
+	else{
+	  MonListString = MonName + ": " + MonOutput;
+	}
+	wxMonitorArray.push_back(wxString(MonListString));
+	MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
+	MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
+	}
+
+  while (devicesList->next != NULL) {
+    namestring DevName = nmz->get_str(devicesList->id);
+    DeviceNameArray.push_back(DevName);
+    namestring DevOutName = nmz->get_str(devicesList->olist->id);
+    DeviceOutArray.push_back(wxString(DevOutName));
+    string MonListString;
+    if(DevOutName == "Blankname"){
+      MonListString = DevName;
+    }
+    else{
+      MonListString = DevName + ": " + DevOutName;
+    }
+    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
+      devicesList = devicesList->next;
+    }
+    else{
+      wxMonitorArray.push_back(wxString(MonListString));
+      MonitorIDArray.push_back(devicesList->id);
+      MonitorOutIDArray.push_back(devicesList->olist->id);
+    	}
+  	}
+
+  	for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
+		mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
+		mmz->usedMonitors[i] = true;
+	}
+  	for (size_t n = 0; n < MonitorIDArray.size(); n++)
+	{
+		mmz->makemonitor(MonitorIDArray[n], MonitorOutIDArray[n], cmdok);
+	}
+
+
+
+
+
+
+
+
+
+
+
+	devicesList = firstDevice;
 
 	//CREATE LIST OF SWITCHES
 	wxSwitchNameArray.clear();
@@ -536,10 +620,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
-      asignal SwitchState = devicesList->swstate;
-      if(SwitchState == high){
-        selectedSwitchArray.push_back(i);
-      }
+	      asignal SwitchState = devicesList->swstate;
+	      if(SwitchState == high){
+	        selectedSwitchArray.push_back(i);
+	      }
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;

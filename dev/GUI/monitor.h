@@ -28,6 +28,7 @@ class monitor {
 
  public:
   
+  bool usedMonitors[1000];
   monitortable MonitorTable; 
   void makemonitor (name dev, name outp, bool& ok);
     /* Sets a monitor on the 'outp' output of device 'dev' by placing an   */

@@ -61,7 +61,6 @@ private:
   wxArrayInt MonitorIDArray;
   wxArrayInt MonitorOutIDArray;
 
-
   void updateSwitchList(void);
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
