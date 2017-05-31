@@ -179,7 +179,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	 glVertex2f(20*i+30.0, y);
    }
    glEnd();*/
-	  InitGL();
 	}
 
 	PrintOnCanvas(example_text,10,10);
@@ -224,7 +223,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& event)
 	int w, h;
 	wxPaintDC dc(this); // required for correct refreshing under MS windows
 	GetClientSize(&w, &h);
-	Render(text_to_print);
+	Render(text_to_print, -1);
 }
 
 void MyGLCanvas::OnSize(wxSizeEvent& event)
@@ -352,9 +351,12 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 	{
 		CurrentDocPath = OpenDialog->GetPath();
 		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
+		
+		canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
+		canvas->Render(canvas->text_to_print,-1);
+		switchesList->Clear();
 	}
-	canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
-	canvas->Render(canvas->text_to_print,-1);
+
 	//    if (!input_stream.IsOk())
 	//    {
 	//        wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
