@@ -3,6 +3,7 @@
 #include "wx_icon.xpm"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 using namespace std;
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
@@ -339,9 +340,6 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 	{
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		// wxString msg;
-		// msg.Printf(wxT("You selected %i items:\n"),
-		// 	int(selections.GetCount()));
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
@@ -375,14 +373,44 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
-
 	wxMonitorArray.clear();
-	for (int i = 0; i < mmz->MonitorTable.used; i++) {
-		namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
-		namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
-		string MonListString = MonName + ": " + MonOutput;
-		wxMonitorArray.push_back(wxString(MonListString));
-	}
+  for(int i = 0; i < mmz->MonitorTable.used; i++){
+    namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+    namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
+    string MonListString;
+    if(MonOutput == "Blankname"){
+      MonListString = MonName;
+    }
+    else{
+      MonListString = MonName + ": " + MonOutput;
+    }
+    wxMonitorArray.push_back(wxString(MonListString));
+    MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
+    MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
+  }
+
+  devlink devicesList = firstDevice;
+  while (devicesList->next != NULL) {
+    namestring DevName = nmz->get_str(devicesList->id);
+    DeviceNameArray.push_back(DevName);
+    namestring DevOutName = nmz->get_str(devicesList->olist->id);
+    DeviceOutArray.push_back(wxString(DevOutName));
+    string MonListString;
+    if(DevOutName == "Blankname"){
+      MonListString = DevName;
+    }
+    else{
+      MonListString = DevName + ": " + DevOutName;
+    }
+    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
+      devicesList = devicesList->next;
+    }
+    else{
+      wxMonitorArray.push_back(wxString(MonListString));
+      MonitorIDArray.push_back(devicesList->id);
+      MonitorOutIDArray.push_back(devicesList->olist->id);
+    }
+  }
 
 	wxMultiChoiceDialog dialog(this,
 		wxT("Check the device outputs you wish to monitor from the list below"),
@@ -398,15 +426,25 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
 
-		for (int i = 0; i < mmz->MonitorTable.used; i++) {
+		for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
 			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
-			selectedArray.push_back(selections[n]);
+			mmz->makemonitor(MonitorIDArray[selections[n]], MonitorOutIDArray[selections[n]], cmdok);
 		}
+    mmz->MonitorTable = mmz->getmontable();
+    for (int i = 0; i < mmz->MonitorTable.used; i++) {
+      selectedArray.push_back(i);
+      cout << "monitor used count " << i << endl; 
+    }
 		cyclescompleted = 0;
+    int ncycles = spin->GetValue();
+    wxString text;
+    text.Printf("Adding new monitors.");
+    mmz->resetmonitor();
+    runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
+    canvas->Render(text, cyclescompleted);
 	}
 }
 
@@ -460,10 +498,12 @@ void MyFrame::OnButton(wxCommandEvent &event)
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
-		}
+		}    
+
 		devicesList = devicesList->next;
 		i++;
 	}
+
 
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);

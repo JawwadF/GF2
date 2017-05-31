@@ -50,9 +50,13 @@ private:
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
   wxArrayString wxMonitorArray;
+  wxArrayString DeviceNameArray;
+  wxArrayString DeviceOutArray;
   int SwitchIDArray[1000];
   wxArrayInt selectedArray;
   wxArrayInt selectedSwitchArray;
+  wxArrayInt MonitorIDArray;
+  wxArrayInt MonitorOutIDArray;
 
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
