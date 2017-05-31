@@ -103,7 +103,13 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 {
   bool i = 0;
   skipspaces();
-  i = skipcomments(); //skips the comments
+
+  while (curch == '/')
+    {
+      i = skipcomments(); //skips the comments
+      skipspaces(); //skips spaces
+    }
+
   if (i == 1) //if it found just a back slash instead of 2 it returns an error
     {
       id = -1;
