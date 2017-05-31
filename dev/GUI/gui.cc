@@ -82,17 +82,17 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			{
 				glBegin(GL_LINE_STRIP);
 				glVertex2f(start_corner_x, h - start_corner_y - ij*square_size * 2);
-				glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - ij*square_size * 2);
+				glVertex2f(cyclesdisplayed*square_size + start_corner_x, h - start_corner_y - ij*square_size * 2);
 				glEnd();
 				glBegin(GL_LINE_STRIP);
 				glVertex2f(start_corner_x, h - start_corner_y - square_size - ij*square_size * 2);
-				glVertex2f(maxcycles*square_size + start_corner_x, h - start_corner_y - square_size - ij*square_size * 2);
+				glVertex2f(cyclesdisplayed*square_size + start_corner_x, h - start_corner_y - square_size - ij*square_size * 2);
 				glEnd();
 				ij = ij+1;
 			}
 		}
 
-		for (i = 0; i < maxcycles + 1; i++) //vertical lines
+		for (i = 0; i < cyclesdisplayed + 1; i++) //vertical lines
 		{
 			//string mystr;
 			//stringstream iout;
@@ -365,6 +365,12 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 void MyFrame::OnSwitch(wxCommandEvent &event)
 // Event handler for the switch button
 {
+	if (CurrentDocPath == "") {
+		showError("Need to select the logic description file first.");
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
+		return;
+	}
 
 	wxMultiChoiceDialog dialog(this,
 		wxT("Check the switches you wish to set to high from the list below"),
@@ -414,44 +420,12 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
 
-	// wxMonitorArray.clear();
-	// for(int i = 0; i < mmz->MonitorTable.used; i++){
-	// namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
-	// namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
-	// string MonListString;
-	// if(MonOutput == "Blankname"){
-	//   MonListString = MonName;
-	// }
-	// else{
-	//   MonListString = MonName + ": " + MonOutput;
-	// }
-	// wxMonitorArray.push_back(wxString(MonListString));
-	// MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
-	// MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
-	// }
-
- //  devlink devicesList = firstDevice;
- //  while (devicesList->next != NULL) {
- //    namestring DevName = nmz->get_str(devicesList->id);
- //    DeviceNameArray.push_back(DevName);
- //    namestring DevOutName = nmz->get_str(devicesList->olist->id);
- //    DeviceOutArray.push_back(wxString(DevOutName));
- //    string MonListString;
- //    if(DevOutName == "Blankname"){
- //      MonListString = DevName;
- //    }
- //    else{
- //      MonListString = DevName + ": " + DevOutName;
- //    }
- //    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
- //      devicesList = devicesList->next;
- //    }
- //    else{
- //      wxMonitorArray.push_back(wxString(MonListString));
- //      MonitorIDArray.push_back(devicesList->id);
- //      MonitorOutIDArray.push_back(devicesList->olist->id);
- //    }
- //  }
+	if (CurrentDocPath == "") {
+		showError("Need to select the logic description file first.");
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
+		return;
+	}
 
 	wxMultiChoiceDialog dialog(this,
 		wxT("Check the device outputs you wish to monitor from the list below"),
@@ -479,7 +453,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
  
     //int ncycles = spin->GetValue()
     wxString text;
-    text.Printf("Adding new monitors.");
+    text.Printf("Set monitor points.");
     //mmz->resetmonitor();
     //runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
     canvas->Render(text, cyclescompleted);
@@ -659,11 +633,19 @@ void MyFrame::OnButton(wxCommandEvent &event)
 void MyFrame::OnContinue(wxCommandEvent &event)
 // Event handler for continue button
 {
+	if (CurrentDocPath == "") {
+		showError("Need to select the logic description file first.");
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
+		return;
+	}
+
 	int ncycles;
 	ncycles = spin->GetValue();
 	if (cyclescompleted > 0) {
 		if ((ncycles + cyclescompleted) > maxcycles)
 			ncycles = maxcycles - cyclescompleted;
+
 		cout << "Continuing for " << ncycles << " cycles" << endl;
 		canvas->text_to_print.Printf("Continuing for %d cycles", ncycles);
 		runnetwork(ncycles);

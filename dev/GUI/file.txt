@@ -8,5 +8,8 @@ CONNECT = dtype1.QBAR > dtype1.DATA;
 CONNECT = clock1 > dtype1.CLK;
 MONITOR = RECORDS dtype1.Q NAME monitor1;
 MONITOR = RECORDS dtype1.QBAR NAME monitor2;
+<<<<<<< HEAD
 //MONITOR = RECORDS clock1 NAME monitor3;
+=======
+>>>>>>> b241246ce217b78afddf7c50578534c07e2d3247
 MONITOR = RECORDS S2 NAME monitor4;

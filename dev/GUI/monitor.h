@@ -6,7 +6,7 @@
 #include "devices.h"
 
 const int maxmonitors = 10;      /* max number of monitor points */
-const int maxcycles = 50;        /* max number of cycles per run */
+const int maxcycles = 1000;        /* max number of cycles per run */
 
 struct moninfo {
   name devid;
@@ -27,7 +27,6 @@ class monitor {
   signaltrace disp[maxmonitors]; 
 
  public:
-  
   bool usedMonitors[1000];
   monitortable MonitorTable; 
   void makemonitor (name dev, name outp, bool& ok);
