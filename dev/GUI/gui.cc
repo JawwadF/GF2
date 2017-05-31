@@ -300,10 +300,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	pmz = parser_mod;
 	smz = scanner_mod;
 	netz = network_mod;
-	if (nmz == NULL || dmz == NULL || mmz == NULL) {
-		cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
-		exit(1);
-	}
 
 	wxMenu *fileMenu = new wxMenu;
 	
@@ -568,7 +564,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
 	}
 
-  while (devicesList->next != NULL) {
+  while (devicesList != NULL) {
     namestring DevName = nmz->get_str(devicesList->id);
     DeviceNameArray.push_back(DevName);
     namestring DevOutName = nmz->get_str(devicesList->olist->id);
@@ -617,7 +613,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	wxArrayString switchListArray;
 
 	int i = 0;
-	while (devicesList->next != NULL) {
+	while (devicesList != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
 	      asignal SwitchState = devicesList->swstate;
