@@ -293,8 +293,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
-
-	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0);
+	const wxSize* switchStateBoxSize = new wxSize(100, 100);
+	
+	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, *switchStateBoxSize, 0, NULL, 0);
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	button_sizer->Add(switchesList, 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxALL, 10);
@@ -496,6 +497,7 @@ void MyFrame::updateSwitchList(void) {
 	}
 	switchesList->Clear();
 	switchesList->InsertItems(switchListArray, 0);
+	
 }
 
 void MyFrame::OnButton(wxCommandEvent &event)
