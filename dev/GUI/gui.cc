@@ -67,7 +67,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	int start_corner_y = 100; //this is the corner size that is left empty on the top left part of the canvas
 
 
-	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw all the monitor traces
+	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0) && cycles != -10) { // draw all the monitor traces
 
 	// here create the big square trace
 		int w, h;
@@ -168,17 +168,11 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
 
 	}
-	else { // draw an artificial trace
 
-   /*glColor3f(1.0, 1.0, 0.0);
-   glBegin(GL_LINE_STRIP);
-   for (i=0; i<5; i++) {
-	 if (i%2) y = 10.0;
-	 else y = 30.0;
-	 glVertex2f(20*i+10.0, y);
-	 glVertex2f(20*i+30.0, y);
-   }
-   glEnd();*/
+	else if (cycles == -10)
+	{
+		SwapBuffers();
+		cyclesdisplayed = -1;	
 	}
 
 	PrintOnCanvas(example_text,10,10);
@@ -353,8 +347,9 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
 		
 		canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
-		canvas->Render(canvas->text_to_print,-1);
 		switchesList->Clear();
+		cyclescompleted = 0;
+		canvas->Render(canvas->text_to_print, -10);
 	}
 
 	//    if (!input_stream.IsOk())
@@ -565,7 +560,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
     	}
   	}
 
-  cout<<"£££££££"<<mmz->MonitorTable.used<<endl;
   	for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
 		mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		mmz->usedMonitors[i] = true;
