@@ -26,7 +26,9 @@ enum {
   SETMONITOR_BUTTON_ID, //added by me
 }; // widget identifiers
 
+
 class MyGLCanvas;
+
 
 class MyFrame: public wxFrame
 {
@@ -34,7 +36,7 @@ class MyFrame: public wxFrame
   MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
 	  names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, parser *parser_mod = NULL, scanner *scanner_mod = NULL, network *network_mod = NULL,
 	  long style = wxDEFAULT_FRAME_STYLE); // constructor
-  monitortable MonitorTable; 
+
 private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
   wxSpinCtrl *spin;                       // control widget to select the number of cycles
@@ -83,10 +85,11 @@ class MyGLCanvas: public wxGLCanvas
 {
  public:
   MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
-	     const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
+  	     const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	     const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
   void reset(monitor* mmz, names* nmz);
+  wxString text_to_print;
  private:
   wxGLContext *context;              // OpenGL rendering context
   bool init;                         // has the OpenGL context been initialised?
@@ -96,6 +99,7 @@ class MyGLCanvas: public wxGLCanvas
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
+  devices *dmz;                      // pointer to devices class
   void InitGL();                     // function to initialise OpenGL context
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
   void OnPaint(wxPaintEvent& event); // event handler for when canvas is exposed
