@@ -269,7 +269,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	}
 
 	wxMenu *fileMenu = new wxMenu;
-  fileMenu->Append(wxID_OPEN, "&Open");
+	fileMenu->Append(wxID_OPEN, "&Open");
 	fileMenu->Append(wxID_ABOUT, "&About");
 	fileMenu->Append(wxID_HELP, "&Help");
 	fileMenu->Append(wxID_EXIT, "&Quit");
@@ -282,6 +282,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
+	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0);
+	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
+	button_sizer->Add(switchesList, 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
@@ -333,7 +336,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		wxT("Set switches"),
 		wxSwitchNameArray);
 
-  dialog.SetSelections(selectedSwitchArray);
+	dialog.SetSelections(selectedSwitchArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -345,17 +348,18 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
-    selectedSwitchArray.clear();
+		selectedSwitchArray.clear();
+		
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
 			// msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 			// 	int(n), int(selections[n]),
 			// 	wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
-      selectedSwitchArray.push_back(selections[n]);
+			selectedSwitchArray.push_back(selections[n]);
 		}
 		//wxMessageBox(msg, wxT("Got selections"));
-
+		updateSwitchList();
 		devlink devicesList = firstDevice;
 
 		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
@@ -424,6 +428,22 @@ void MyFrame::OnHelp(wxCommandEvent &event) //added by me
 	help.ShowModal();
 }
 
+void MyFrame::updateSwitchList(void) {
+	int k = 0;
+	wxArrayString switchListArray;
+	int size = selectedSwitchArray.size();
+	string state;
+	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
+		state = ": OFF";
+		if (k < size && selectedSwitchArray[k] == i) {
+			state = ": ON";
+			k++;
+		}
+		switchListArray.push_back(wxSwitchNameArray[i] + state);
+	}
+	switchesList->Clear();
+	switchesList->InsertItems(switchListArray, 0);
+}
 
 void MyFrame::OnButton(wxCommandEvent &event)
 // Event handler for the push button
@@ -447,16 +467,17 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	devlink devicesList = firstDevice;
 
 	//CREATE LIST OF SWITCHES
-  wxSwitchNameArray.clear();
-  selectedSwitchArray.clear();
+	wxSwitchNameArray.clear();
+	selectedSwitchArray.clear();
+	wxArrayString switchListArray;
 	int i = 0;
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
-      asignal SwitchState = devicesList->swstate;
-      if(SwitchState == high){
-        selectedSwitchArray.push_back(i);
-      }
+			asignal SwitchState = devicesList->swstate;
+			if (SwitchState == high) {
+				selectedSwitchArray.push_back(i);
+			}
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
@@ -468,7 +489,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
-
+	updateSwitchList();
 	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;

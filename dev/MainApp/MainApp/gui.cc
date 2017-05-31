@@ -91,9 +91,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			wxString mystring = wxString::Format(wxT("%i"), i);
 
 			string stlstring;
-			//stlstring= nmz->get_str(MonitorTable.sigs[i].devid);//name of device
+			//stlstring= nmz->get_str(MyFrame::MonitorTable.sigs[i].devid);//name of device
 			 //nmz->get_str(MonitorTable.sigs[i].op->id)//name of output
-			//wxString mystring(stlstring);
+			// mystring(stlstring);
 
 			PrintOnCanvas(mystring, start_corner + i*square_size, h - start_corner + square_size*2.5);
 
@@ -246,7 +246,6 @@ EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
-EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
 
 
@@ -270,10 +269,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	}
 
 	wxMenu *fileMenu = new wxMenu;
+	fileMenu->Append(wxID_OPEN, "&Open");
 	fileMenu->Append(wxID_ABOUT, "&About");
 	fileMenu->Append(wxID_HELP, "&Help");
 	fileMenu->Append(wxID_EXIT, "&Quit");
-	fileMenu->Append(wxID_OPEN, "&Open");
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(fileMenu, "&File");
 	SetMenuBar(menuBar);
@@ -283,6 +282,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
+	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0);
+	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
+	button_sizer->Add(switchesList, 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
@@ -291,7 +293,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
 	button_sizer->Add(spin, 0, wxALL, 10);
 
-	button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0, wxALL, 10);
 	topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
 	SetSizeHints(750, 500);
@@ -330,42 +331,35 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 // Event handler for the switch button
 {
 
-
-	// wxArrayString choices;
-	// choices.Add(wxT("One"));
-	// choices.Add(wxT("Two"));
-	// choices.Add(wxT("Three"));
-	// choices.Add(wxT("Four"));
-	// choices.Add(wxT("Five"));
-
-	// for(int i = 0; i < StringArray.size(); i++){
-	//   wxStringArray.Add(wxT(StringArray[i]));
-	// }
-
 	wxMultiChoiceDialog dialog(this,
-		wxT("A multi-choice convenience dialog"),
-		wxT("Please select several values"),
+		wxT("Check the switches you wish to set to high from the list below"),
+		wxT("Set switches"),
 		wxSwitchNameArray);
+
+	dialog.SetSelections(selectedSwitchArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		wxString msg;
-		msg.Printf(wxT("You selected %i items:\n"),
-			int(selections.GetCount()));
+		// wxString msg;
+		// msg.Printf(wxT("You selected %i items:\n"),
+		// 	int(selections.GetCount()));
 		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
+		selectedSwitchArray.clear();
+		
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-				int(n), int(selections[n]),
-				wxSwitchNameArray[selections[n]].c_str());
+			// msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
+			// 	int(n), int(selections[n]),
+			// 	wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
+			selectedSwitchArray.push_back(selections[n]);
 		}
-		wxMessageBox(msg, wxT("Got selections"));
-
+		//wxMessageBox(msg, wxT("Got selections"));
+		updateSwitchList();
 		devlink devicesList = firstDevice;
 
 		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
@@ -380,35 +374,11 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		// }
 	}
 
-
-	//SINGLE CHOICE STUFF
-	// const wxString choices[] = { wxT("One"), wxT("Two"), wxT("Three"), wxT("Four"), wxT("Five") } ;
-
-	//   wxSingleChoiceDialog dialog(this,
-	//                               wxT("This is a small sample\n")
-	//                               wxT("A single-choice convenience dialog"),
-	//                               wxT("Please select a value"),
-	//                               WXSIZEOF(choices), choices);
-
-	//   dialog.SetSelection(2);
-
-	//   if (dialog.ShowModal() == wxID_OK)
-	//   {
-	//       wxMessageDialog dialog2(this, dialog.GetStringSelection(), wxT("Got string"));
-	//       dialog2.ShowModal();
-	//   }
 }
 
 void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
-
-	wxArrayString choices;
-	choices.Add(wxT("One"));
-	choices.Add(wxT("Two"));
-	choices.Add(wxT("Three"));
-	choices.Add(wxT("Four"));
-	choices.Add(wxT("Five"));
 
 	wxMonitorArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
@@ -419,8 +389,8 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 	}
 
 	wxMultiChoiceDialog dialog(this,
-		wxT("A multi-choice convenience dialog"),
-		wxT("Please select several values"),
+		wxT("Check the device outputs you wish to monitor from the list below"),
+		wxT("Set monitor points"),
 		wxMonitorArray);
 
 	dialog.SetSelections(selectedArray);
@@ -431,49 +401,16 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		selectedArray.clear();
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
-		wxString msg;
-		msg.Printf(wxT("You selected %i items:\n"),
-			int(selections.GetCount()));
 
 		for (int i = 0; i < mmz->MonitorTable.used; i++) {
 			mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-				int(n), int(selections[n]),
-				wxMonitorArray[selections[n]].c_str());
 			mmz->makemonitor(mmz->MonitorTable.sigs[selections[n]].devid, mmz->MonitorTable.sigs[selections[n]].op->id, cmdok);
 			selectedArray.push_back(selections[n]);
 		}
 		cyclescompleted = 0;
-
-
-		// if (dialog.ShowModal() == wxID_OK)
-		//   {
-		//     bool cmdok = true;
-		//     wxArrayInt selections = dialog.GetSelections();
-		//     wxString msg;
-		//     msg.Printf(wxT("You selected %i items:\n"),
-		//     int(selections.GetCount()));
-		//     for(int i = 0; i<wxSwitchNameArray.size(); i++){
-		//       dmz->setswitch (SwitchIDArray[i], low, cmdok);
-		//     }
-		//     for ( size_t n = 0; n < selections.GetCount(); n++ )
-		//     {
-		//     msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-		//     int(n), int(selections[n]),
-		//     wxSwitchNameArray[selections[n]].c_str());
-		//     dmz->setswitch (SwitchIDArray[selections[n]], high, cmdok);
-		//     }
-		//     wxMessageBox(msg, wxT("Got selections"));
-
-		//     devlink devicesList = firstDevice;
-
-
-
-
-		wxMessageBox(msg, wxT("Got selections"));
 	}
 }
 
@@ -491,6 +428,22 @@ void MyFrame::OnHelp(wxCommandEvent &event) //added by me
 	help.ShowModal();
 }
 
+void MyFrame::updateSwitchList(void) {
+	int k = 0;
+	wxArrayString switchListArray;
+	int size = selectedSwitchArray.size();
+	string state;
+	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
+		state = ": OFF";
+		if (k < size && selectedSwitchArray[k] == i) {
+			state = ": ON";
+			k++;
+		}
+		switchListArray.push_back(wxSwitchNameArray[i] + state);
+	}
+	switchesList->Clear();
+	switchesList->InsertItems(switchListArray, 0);
+}
 
 void MyFrame::OnButton(wxCommandEvent &event)
 // Event handler for the push button
@@ -513,19 +466,18 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	mmz->MonitorTable = mmz->getmontable();
 	devlink devicesList = firstDevice;
 
-	// for(int i = 0; i < 5; i++){
-	//   cout << "i" << endl; 
-	//   if(devices->kind == aswitch){
-	//     cout << "Found a switch" << endl;
-	//   }
-	//   devices = devices->next;
-	// }
-
 	//CREATE LIST OF SWITCHES
+	wxSwitchNameArray.clear();
+	selectedSwitchArray.clear();
+	wxArrayString switchListArray;
 	int i = 0;
 	while (devicesList->next != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
+			asignal SwitchState = devicesList->swstate;
+			if (SwitchState == high) {
+				selectedSwitchArray.push_back(i);
+			}
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
@@ -537,7 +489,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
-
+	updateSwitchList();
 	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;
@@ -549,31 +501,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	runnetwork(ncycles);
 	canvas->Render(text, cyclescompleted);
 
-
-
-	/*    if (ok) {
-		mmz->resetmonitor();
-		dmz->executedevices(ok2);
-		cout << "The network is successful? " << (ok && ok2) << endl;
-		mmz->recordsignals();
-		//dmz->setswitch(43, high, ok);
-		for (int i = 0; i < 10; i++) {
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-		  dmz->executedevices(ok2);
-		  mmz->recordsignals();
-
-		}
-
-		mmz->displaysignals();
-
-	  }*/
 
 	cout << "The content of the lookup table is " << endl;
 	for (int i = 0; i < nmz->length_of_table; i++) {
@@ -612,14 +539,6 @@ void MyFrame::OnSpin(wxSpinEvent &event)
 	canvas->Render(text);
 }
 
-void MyFrame::OnText(wxCommandEvent &event)
-// Event handler for the text entry field
-{
-	wxString text;
-
-	text.Printf("New text entered %s", event.GetString().c_str());
-	canvas->Render(text);
-}
 
 void MyFrame::runnetwork(int ncycles)
 // Function to run the network, derived from corresponding function in userint.cc
