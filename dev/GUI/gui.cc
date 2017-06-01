@@ -15,7 +15,7 @@ EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
 
 void showError(const char* mess) {
-	wxMessageBox(mess, wxT("Syntactic Error"), wxICON_ERROR);
+	wxMessageBox(mess, wxT("Error"), wxICON_ERROR);
 }
 
 void MyGLCanvas::reset(monitor* mm, names* nm) {
