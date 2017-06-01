@@ -344,7 +344,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 	if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
 		CurrentDocPath = OpenDialog->GetPath();
-		SetTitle(wxString("Cicruit from - ") << OpenDialog->GetFilename());
+		SetTitle(wxString("Circuit from - ") << OpenDialog->GetFilename());
 		
 		canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
 		switchesList->Clear();
