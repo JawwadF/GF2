@@ -12,6 +12,7 @@ typedef enum {
 	consym, dtypesym, outsym, insym, monsym, equals, semicol, dot, connect_, badsym, eofsym
 } symbol;
 
+
 class scanner {
 
 	/* put stuff that the class uses internally here */
@@ -30,6 +31,7 @@ class scanner {
 
 public:
 
+	int counter = 1;
 	void setURL(const char* url);
 	void initialise(names* names_mod);
 	void getsymbol(symbol& s, name& id, int& num);

@@ -309,7 +309,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
-	const wxSize* switchStateBoxSize = new wxSize(100, 100);
+	const wxSize* switchStateBoxSize = new wxSize(150, 100);
 	
 	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, *switchStateBoxSize, 0, NULL, 0);
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
@@ -445,7 +445,8 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		}
 		for (size_t n = 0; n < selections.GetCount(); n++)
 		{
-			mmz->usedMonitors[selections[n]] = true;
+			int value = selections[n];
+			mmz->usedMonitors[value] = true;
 		}
  
     //int ncycles = spin->GetValue()
@@ -479,8 +480,7 @@ void MyFrame::updateSwitchList(void) {
 	string state;
 	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 		state = ": OFF";
-		int value = selectedSwitchArray[k];
-		if (k < size &&  value  == i) {
+		if (k < size &&  selectedSwitchArray[k] == i) {
 			state = ": ON";
 			k++;
 		}

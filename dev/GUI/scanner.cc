@@ -9,6 +9,7 @@ using namespace std;
 scanner::scanner(names* names_mod, const char* defname)  /* the constructor */
 {
   nmz = names_mod;
+  counter = 1;
   inf.open(defname);
   if (!inf) 
     {
@@ -71,6 +72,7 @@ void scanner::getnumber(int& num)
 void scanner::getch(void)
 {
    eofile = !inf.get(curch);
+   if (curch == '\n') counter++;
 }
 
 

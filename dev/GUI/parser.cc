@@ -13,7 +13,7 @@ string errorMessage = "";
 
 bool noerrors = true;
 int num;
-int counter = 1;
+
 
 bool parser::readin(void)
 {
@@ -23,14 +23,13 @@ bool parser::readin(void)
 	bool noMonitor = true;
 	errorMessage = "";
 	smz->getsymbol(cursym, id, num);
-	counter = 1;
 	while (cursym != eofsym) {
 		noerror = true;
 		tempsym = cursym;
 		smz->getsymbol(cursym, id, num);
 		//cout << id << endl;
 		if (cursym != equals) {
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting the equal sign\n";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the equal sign\n";
 			cout << "SYNTATIC ERROR expecting the equal sign" << endl;
 			noerror =  false;
 		}
@@ -50,7 +49,7 @@ bool parser::readin(void)
 			break;
 		default:
 			noerror = false;
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR "
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR "
 				"expected keyword DEVICE/CONNECTION/MONITOR or CIRCUIT\n";
 			cout << "SYNTATIC ERROR expected keyword DEVICE/CONNECTION/MONITOR or CIRCUIT" << endl;
 			break;
@@ -58,32 +57,29 @@ bool parser::readin(void)
 
 		if (!noerror) {
 			skip(smz);
-			counter++;
 			continue;
 		}
 
 		smz->getsymbol(cursym, id, num);
 		if (cursym != semicol) {
 			cout << "SYNTATIC ERROR missing semicolon, got " << id << endl;
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR missing a semicolon\n";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing a semicolon\n";
 			noerror = false;
 			skip(smz);
-			counter++;
 			continue;
 		}
 		smz->getsymbol(cursym, id, num);
-		counter++;
 		noerrors = noerrors && noerror;
 	}
 	if (noerrors) {
 		string mess;
 		netz->checknetwork(noerror, mess);
 		if (!noerror) {
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR \n" + mess;
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR \n" + mess;
 			noerrors = false;
 		}
 		else if (noMonitor) {
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR " + 
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR " + 
 				"The circuit must have at lease one monitor";
 			noerrors = false;
 		}
@@ -105,9 +101,8 @@ bool parser::connection(void) {
 	smz->getsymbol(cursym, id, num);
 	name indev = -1, outdev = -1, insig = -1, outsig = -1;
 	if (cursym != namesym) {
-		showError("SYNTATIC ERROR in the name");
 		cout << "SYNTATIC ERROR in the name" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR in the name\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the name\n";
 		return false;
 	}
 	cout << "There is a connection from " << id << " ";
@@ -120,7 +115,7 @@ bool parser::connection(void) {
 		if (cursym != outsym) {
 			showError("SYNTATIC ERROR in the output");
 			cout << "SYNTATIC ERROR in the output" << endl;
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR in the output\n";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the output\n";
 			return false;
 		}
 		cout << id << " ";
@@ -133,14 +128,14 @@ bool parser::connection(void) {
 	}
 	if (cursym != connect_) {
 		cout << "SYNTATIC ERROR missing >" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR missing >\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing >\n";
 		return false;
 	}
 	cout << "To input ";
 	smz->getsymbol(cursym, id, num);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR in the name " << cursym << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR missing the name\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the name\n";
 		return false;
 	}
 	cout << id << " ";
@@ -148,13 +143,13 @@ bool parser::connection(void) {
 	smz->getsymbol(cursym, id, num);
 	if (cursym != dot) {
 		cout << "SYNTATIC ERROR in the dot" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR missing the dot\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the dot\n";
 		return false;
 	}
 	smz->getsymbol(cursym, id, num);
 	if (cursym != insym) {
 		cout << "SYNTATIC ERROR in the input" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR in the input\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the input\n";
 		return false;
 	}
 	cout << id <<endl;
@@ -166,29 +161,29 @@ bool parser::connection(void) {
 		devlink dout = netz->finddevice(outdev);
 		
 			if (din == NULL) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device "+
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Input device "+
 					nmz->get_str(indev) +  " does not exist\n";
 				noerror = false;
 			}
 			else if (netz->findinput(din, insig) == NULL) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device " +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Input device " +
 					nmz->get_str(indev) + " does not have the input "+ nmz->get_str(insig)+ "\n";
 				noerror = false;
 			}
 			if (dout == NULL) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Output device " +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Output device " +
 					nmz->get_str(outdev) + " does not exist\n";
 				noerror = false;
 			} 
 			else if (dout->kind == dtype && netz->findoutput(dout, outsig) == NULL) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR The DTYPE " +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR The DTYPE " +
 					nmz->get_str(outdev) + " must have a valid output (Q or QBAR)\n";
 				noerror = false;
 			}
 			if (noerror) {
 				netz->makeconnection(indev, insig, outdev, outsig, noerror);
 				if (!noerror) {
-					errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Cannot establish a " +
+					errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Cannot establish a " +
 						"connection from " + nmz->get_str(indev) + " to "+ nmz->get_str(outdev) + "\n";
 				}
 			}
@@ -202,7 +197,7 @@ bool getname(scanner* smz) {
 	if (id != 37) smz->getsymbol(cursym, id, num);
 	if (cursym != keysym || id != 37) {
 		cout << "SYNTATIC ERROR: expecting the keyword 'NAME' but getting" <<id<< endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting the keyword 'NAME'\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the keyword 'NAME'\n";
 		return false;
 	}
 	//cout << "["<< id << "] ";
@@ -210,7 +205,7 @@ bool getname(scanner* smz) {
 	smz->getsymbol(cursym, id, num);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR: expecting name" << cursym << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting a name\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a name\n";
 		return false;
 	}
 	cout << "assigned to a variable " << id << endl;
@@ -234,7 +229,7 @@ bool parser::device(void) {
 		return dtype_();
 	default:
 		cout << "SYNTATIC ERROR expecting a device. Received " << cursym << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting a device\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a device\n";
 		return false;
 	}
 
@@ -272,7 +267,7 @@ bool parser::gate(void) {
 		break;
 	default:
 		cout << "SYNTATIC ERROR expecting a AND/NAND/OR/NOR gate" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting a AND/NAND/OR/NOR gate\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a AND/NAND/OR/NOR gate\n";
 		return false;
 		break;
 	}
@@ -283,7 +278,7 @@ bool parser::gate(void) {
 		smz->getsymbol(cursym, id, num);
 		if (cursym != numsym) {
 			cout << endl << "SYNTATIC ERROR expecting the number of inputs" << endl;
-			errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting the number of inputs\n";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the number of inputs\n";
 			return false;
 		}
 		else
@@ -292,7 +287,7 @@ bool parser::gate(void) {
 				cout << num << " inputs ";
 			else {
 				cout << endl << "SYNTATIC ERROR: number of inputs has to be integer greater than 1 and not more than 16" << endl;
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR "
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR "
 					"number of inputs has to be integer greater than 1 and not more than 16\n";
 				return false;
 			}
@@ -300,7 +295,7 @@ bool parser::gate(void) {
 	}
 	else {
 		cout << endl << "SYNTATIC ERROR expecting keyword INPUTS" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR expecting keyword INPUTS\n";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting keyword INPUTS\n";
 		return false;
 	}
 	int numberInputs = num;
@@ -329,21 +324,21 @@ bool parser::clock(void) {
 			}
 			else {
 				cout << endl << "SYNTATIC ERROR: number of cycles has to be integer greater than 0";
-				errorMessage = errorMessage + "Line " + to_string(counter) +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 					": ERROR number of cycles has to be integer greater than 0\n";
 				return false;
 			}
 		}
 		else  {
 			cout << endl << "SYNTATIC ERROR: expected number of cycles";
-			errorMessage = errorMessage + "Line " + to_string(counter) +
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 				": ERROR expected number of cycles\n";
 			return false;
 		}
 	}
 	else  {
 		cout << endl << "SYNTATIC ERROR: expecting keyword 'CYCLES'" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) +
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 			": ERROR expecting keyword 'CYCLES'\n";
 		return false;
 	}
@@ -375,21 +370,21 @@ bool parser::switch_(void)
 			}
 			else{
 				cout << endl << "SYNTATIC ERROR: initial value of switch can be eiher 0 or 1 " << endl;
-				errorMessage = errorMessage + "Line " + to_string(counter) +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 					": ERROR initial value of switch can be eiher 0 or 1\n";
 				return false;
 			}
 		}
 		else  {
 			cout << endl << "SYNTATIC ERROR: expected initial value of switch, 0/1 " << endl;
-			errorMessage = errorMessage + "Line " + to_string(counter) +
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 				": ERROR expected initial value of switch, 0/1 \n";
 			return false;
 		}
 	}
 	else {
 		cout << endl << "SYNTATIC ERROR: expecting keyword 'VALUE'" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) +
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 			": ERROR expecting keyword 'VALUE' \n";
 		return false;
 	}
@@ -434,7 +429,7 @@ bool parser::monitor_(void) {
 				smz->getsymbol(cursym, id, num);
 				if (cursym != outsym) {
 					cout << "SYNTATIC ERROR: expected output" << endl;
-					errorMessage = errorMessage + "Line " + to_string(counter) +
+					errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 						": ERROR expected an output\n";
 					return false;
 				}
@@ -447,14 +442,14 @@ bool parser::monitor_(void) {
 		}
 		else {
 			cout << endl << "SYNTATIC ERROR: expecting a name" << endl;
-			errorMessage = errorMessage + "Line " + to_string(counter) +
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 				": ERROR expecting a name \n";
 			return false;
 		}
 	}
 	else {
 		cout << endl << "SYNTATIC ERROR: expecting keyword 'RECORDS'" << endl;
-		errorMessage = errorMessage + "Line " + to_string(counter) +
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) +
 			": ERROR expecting keyword 'RECORDS' \n";
 		return false;
 	}
@@ -468,11 +463,11 @@ bool parser::monitor_(void) {
 		devlink dout = netz->finddevice(devicename);
 		if (!noerror) {
 			if (dout == NULL) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Output device " +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Output device " +
 					nmz->get_str(devicename) + " does not exist\n";
 			}
 			else if (dout->kind == dtype) {
-				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR The DTYPE " +
+				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR The DTYPE " +
 					nmz->get_str(devicename) + " must have a valid output (Q or QBAR)\n";
 			}
 		}
@@ -500,3 +495,4 @@ parser::parser(network* network_mod, devices* devices_mod,
 	/* any other initialisation you want to do? */
 
 }
+
