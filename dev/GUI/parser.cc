@@ -124,7 +124,10 @@ bool parser::connection(void) {
 	}
 	else {
 		outsig = -1;
-		if (noerrors && netz->finddevice(outdev) != NULL) netz->addoutput(netz->finddevice(outdev), outsig);
+		devlink o = netz->finddevice(outdev);
+		if (noerrors &&  o != NULL && netz->findoutput(o, -1) == NULL) {
+			netz->addoutput(netz->finddevice(outdev), outsig);
+		}
 	}
 	if (cursym != connect_) {
 		cout << "SYNTATIC ERROR missing >" << endl;
