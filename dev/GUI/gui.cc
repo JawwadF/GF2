@@ -374,7 +374,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		wxT("Set switches"),
 		wxSwitchNameArray);
 
-  dialog.SetSelections(selectedSwitchArray);
+	dialog.SetSelections(selectedSwitchArray);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -581,10 +581,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	while (devicesList != NULL) {
 		if (devicesList->kind == aswitch) {
 			int ID = devicesList->id;
-	      asignal SwitchState = devicesList->swstate;
-	      if(SwitchState == high){
-	        selectedSwitchArray.push_back(i);
-	      }
+	    	asignal SwitchState = devicesList->swstate;
+	    	if(SwitchState == high){
+	        	selectedSwitchArray.push_back(i);//save the index of high switch
+	    	}
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
