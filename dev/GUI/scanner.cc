@@ -145,7 +145,6 @@ void scanner::getsymbol(symbol &s, name &id, int &num)
 		  else if (id == nmz->cvtname("CLOCK")) s = clksym;
 		  else if (id == nmz->cvtname("SWITCH")) s = swisym;
 		  else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
-		  else if (id == nmz->cvtname("CIRCUIT")) s = cirsym;
 		  else if (id == nmz->cvtname("MONITOR")) s = monsym;
 
 		  else if (id == nmz->cvtname("AND")) s = gatesym;
