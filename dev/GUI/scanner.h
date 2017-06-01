@@ -9,7 +9,7 @@
 
 typedef enum {
 	namesym, numsym, devsym, xorsym, gatesym, keysym, clksym, swisym,
-	consym, dtypesym, cirsym, outsym, insym, monsym, equals, semicol, dot, connect_, badsym, eofsym
+	consym, dtypesym, outsym, insym, monsym, equals, semicol, dot, connect_, badsym, eofsym
 } symbol;
 
 class scanner {
