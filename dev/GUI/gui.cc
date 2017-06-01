@@ -479,7 +479,8 @@ void MyFrame::updateSwitchList(void) {
 	string state;
 	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 		state = ": OFF";
-		if (k < size && selectedSwitchArray[k] == i) {
+		int value = selectedSwitchArray[k];
+		if (k < size &&  value  == i) {
 			state = ": ON";
 			k++;
 		}
@@ -588,9 +589,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
+			i++;
 		}    
 		devicesList = devicesList->next;
-		i++;
+		
 	}
 	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
