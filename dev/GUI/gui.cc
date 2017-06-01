@@ -15,7 +15,7 @@ EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
 
 void showError(const char* mess) {
-	wxMessageBox(mess, wxT("Syntactic Error"), wxICON_ERROR);
+	wxMessageBox(mess, wxT("Error"), wxICON_ERROR);
 }
 
 void MyGLCanvas::reset(monitor* mm, names* nm) {
@@ -479,7 +479,8 @@ void MyFrame::updateSwitchList(void) {
 	string state;
 	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
 		state = ": OFF";
-		if (k < size && selectedSwitchArray[k] == i) {
+		int value = selectedSwitchArray[k];
+		if (k < size &&  value  == i) {
 			state = ": ON";
 			k++;
 		}
@@ -588,9 +589,10 @@ void MyFrame::OnButton(wxCommandEvent &event)
 			namestring SwitchName = nmz->get_str(ID);
 			wxSwitchNameArray.push_back(wxString(SwitchName));
 			SwitchIDArray[i] = ID;
+			i++;
 		}    
 		devicesList = devicesList->next;
-		i++;
+		
 	}
 	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
