@@ -129,7 +129,7 @@ bool parser::connection(void) {
 	}
 	else {
 		outsig = -1;
-		if (noerrors) netz->addoutput(netz->finddevice(outdev), outsig);
+		if (noerrors && netz->finddevice(outdev) != NULL) netz->addoutput(netz->finddevice(outdev), outsig);
 	}
 	if (cursym != connect_) {
 		cout << "SYNTATIC ERROR missing >" << endl;
@@ -159,29 +159,40 @@ bool parser::connection(void) {
 	}
 	cout << id <<endl;
 	insig = id;
-	bool noerror = false;
+	bool noerror = true;
 	if (noerrors) {
-		netz->makeconnection(indev, insig, outdev, outsig, noerror);
+		
 		devlink din = netz->finddevice(indev);
 		devlink dout = netz->finddevice(outdev);
-		if (!noerror) {
+		
 			if (din == NULL) {
 				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device "+
 					nmz->get_str(indev) +  " does not exist\n";
+				noerror = false;
 			}
 			else if (netz->findinput(din, insig) == NULL) {
 				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Input device " +
 					nmz->get_str(indev) + " does not have the input "+ nmz->get_str(insig)+ "\n";
+				noerror = false;
 			}
 			if (dout == NULL) {
 				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Output device " +
 					nmz->get_str(outdev) + " does not exist\n";
+				noerror = false;
 			} 
-			else if (dout->kind == dtype) {
+			else if (dout->kind == dtype && netz->findoutput(dout, outsig) == NULL) {
 				errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR The DTYPE " +
 					nmz->get_str(outdev) + " must have a valid output (Q or QBAR)\n";
+				noerror = false;
 			}
-		}
+			if (noerror) {
+				netz->makeconnection(indev, insig, outdev, outsig, noerror);
+				if (!noerror) {
+					errorMessage = errorMessage + "Line " + to_string(counter) + ": ERROR Cannot establish a " +
+						"connection from " + nmz->get_str(indev) + " to "+ nmz->get_str(outdev) + "\n";
+				}
+			}
+
 	}
 	return noerror;
 
