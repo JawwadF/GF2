@@ -1,0 +1,42 @@
+//Full Binary Adder Circuit 
+//The circuit has three inputs: A, B and Carry In and two outputs: SUM and Carry Out
+//Generally the Carry IN is fed from a previous stage and Carry Out feeds another full adder set.
+//Circuit and diagram taken from:
+//http://www.circuitstoday.com/half-adder-and-full-adder
+
+//Devices
+//AND gates
+DEVICE = AND INPUTS 2 NAME G1;
+DEVICE = AND INPUTS 2 NAME G2;
+
+//XOR gates
+DEVICE = XOR NAME X1;
+DEVICE = XOR NAME Sum;
+
+//OR gate
+DEVICE = OR INPUTS 2 NAME Cout;
+
+//Switches
+DEVICE = SWITCH VALUE 0 NAME A;
+DEVICE = SWITCH VALUE 0 NAME B;
+DEVICE = SWITCH VALUE 0 NAME Cin;
+
+//CONNECTIONS
+CONNECT = A > X1.I1;
+CONNECT = B > X1.I2;
+
+CONNECT = X1 > Sum.I1;
+CONNECT = Cin > Sum.I2;
+
+CONNECT = Cin > G1.I1;
+CONNECT = X1 > G1.I2;
+
+CONNECT = B > G2.I1;
+CONNECT = A > G2.I2;
+
+CONNECT = G1 > Cout.I1;
+CONNECT = G2 > Cout.I2;
+
+//MONITORS
+MONITOR = RECORDS Sum NAME M1;
+MONITOR = RECORDS Cout NAME M2;
