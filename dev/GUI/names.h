@@ -14,9 +14,7 @@ typedef string namestring;
 
 class names{
 
-  /* put stuff that the class uses internally here */
   namestring table[maxnames];
-
 
 public:
   int length_of_table;

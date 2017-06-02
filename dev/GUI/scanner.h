@@ -21,7 +21,7 @@ class scanner {
 	char* url;
 	bool eofile;
 	ifstream inf;
-
+	string curline;
 	void getch(void);
 	void skipspaces(void);
 	void getnumber(int& num);
@@ -31,6 +31,7 @@ class scanner {
 
 public:
 
+	string geterror(void);
 	int counter = 1;
 	void setURL(const char* url);
 	void initialise(names* names_mod);

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 
@@ -10,6 +11,7 @@ scanner::scanner(names* names_mod, const char* defname)  /* the constructor */
 {
   nmz = names_mod;
   counter = 1;
+  curline = "";
   inf.open(defname);
   if (!inf) 
     {
@@ -56,6 +58,24 @@ bool scanner::skipcomments(void)
   return i;
 }
 
+string scanner::geterror(void) {
+	char ch = curch;
+	string line = "";
+	int errorpos = curline.size() - 1;
+	while (curline != "") {
+		line = curline;
+		getch();
+	}
+	curch = ch;
+	int size = line.size();
+
+	string spaces(2*size , ' ');
+	double total = pow(2, ((errorpos*1.0)/ (size - 1)));
+	//if (total >= size) total = size - 1;
+	spaces[round(total*errorpos)] = '^';
+	line = line + "\n" + spaces;
+	return line;
+}
 
 void scanner::getnumber(int& num)
 {
@@ -72,7 +92,11 @@ void scanner::getnumber(int& num)
 void scanner::getch(void)
 {
    eofile = !inf.get(curch);
-   if (curch == '\n') counter++;
+   curline = curline + curch;
+   if (curch == '\n') {
+	   counter++;
+	   curline = "";
+   }
 }
 
 

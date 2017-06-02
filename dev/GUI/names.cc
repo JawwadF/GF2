@@ -5,14 +5,32 @@
 
 using namespace std;
 
-
-/* Name storage and retrieval routines */
-
-names::names(void)  /* the constructor */
+/***********************************************************************
+ *
+ * The constructor, table is initialised empty 
+ * Initilises the lenght_of_table to 0
+ *
+ */
+names::names(void)
 {
   length_of_table = 0;
 }
 
+/***********************************************************************
+ *
+ * Takes a string as argument 
+ * Searches through the table for this string
+ * 
+ * If the string exists in the table, 
+ * returns its ID (the index in the array)
+ * 
+ * If the string is not in the table, 
+ * it inserts it in the table and returns its ID
+ * 
+ * The string can be maxlength characters long, 
+ * otherwise it gets truncated
+ *
+ */
 name names::lookup (namestring str)
 {
   name i;
@@ -39,6 +57,13 @@ name names::lookup (namestring str)
     }
 }
 
+/***********************************************************************
+ *
+ * Takes an ID as argument
+ * Searches through the table for this ID and returns the string in 
+ * character form.
+ *
+ */
 namestring names::get_str (name id)
 {
   if (id == -1)
@@ -52,6 +77,14 @@ namestring names::get_str (name id)
     }
 }
 
+/***********************************************************************
+ *
+ * Takes a string as argument 
+ * Searches through the table for this string
+ * If the string exists in the table, returns its ID (the index in the array)
+ * If the string is not in the table, it returns blankname
+ *
+ */
 name names::cvtname (namestring str)
 {
   name t=blankname;
@@ -61,6 +94,12 @@ name names::cvtname (namestring str)
   return t;
 }
 
+/***********************************************************************
+ *
+ * Takes an ID as argument
+ * Prints the string in character form on the console.
+ *
+ */
 void names::writename (name id)
 {
   if (id >= 0 && id<length_of_table)
@@ -76,6 +115,12 @@ void names::writename (name id)
   }
 }
 
+/***********************************************************************
+ *
+ * Takes an ID as argument
+ * Returns the length (ie number of characters) of the string
+ *
+ */
 int names::namelength (name id)
 {
   if (id >= 0 && id<length_of_table)
@@ -89,7 +134,6 @@ int names::namelength (name id)
       cout<<"Warning, this id does not exist";
       return 0;
     }
-
 }
 
 

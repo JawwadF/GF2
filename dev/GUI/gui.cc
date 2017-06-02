@@ -72,6 +72,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	// here create the big square trace
 		int w, h;
 		GetClientSize(&w, &h);
+		
 		glLineWidth(1.0);
 		glColor3f(0.0, 0.0, 1.0); //blue
 		
@@ -182,6 +183,13 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	SwapBuffers();
 }
 
+void MyGLCanvas::resetView() {
+	pan_x = 0;
+	pan_y = 0;
+	zoom = 1.0;
+	init = false;
+	Render(text_to_print);
+}
 void MyGLCanvas::InitGL()
 // Function to initialise the GL context
 {
@@ -210,7 +218,14 @@ void MyGLCanvas::PrintOnCanvas(wxString example_text, int xaxis, int yaxis) //pr
 
 }
 
-
+void MyGLCanvas::setCanv(int cyclescompleted) {
+	int w, h;
+	GetClientSize(&w, &h);
+	if (100 + cyclescompleted*30 + pan_x > w) {
+		pan_x = 100 - cyclescompleted*30 + 0.5 * w;
+		init = false;
+	}
+}
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
 // Event handler for when the canvas is exposed
 {
@@ -276,6 +291,7 @@ EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
 EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
+EVT_BUTTON(RESTCANVAS_BUTTON_ID, MyFrame::OnRestCav)
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
 END_EVENT_TABLE()
 
@@ -316,6 +332,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	button_sizer->Add(switchesList, 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
+	button_sizer->Add(new wxButton(this, RESTCANVAS_BUTTON_ID, "Reset View"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
@@ -326,7 +343,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	SetSizer(topsizer);
 }
 
-
+void MyFrame::OnRestCav(wxCommandEvent &event) {
+	canvas->resetView();
+}
 
 void MyFrame::OnExit(wxCommandEvent &event)
 // Event handler for the exit menu item
@@ -346,6 +365,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 		CurrentDocPath = OpenDialog->GetPath();
 		SetTitle(wxString("Circuit from - ") << OpenDialog->GetFilename());
 		
+		canvas->resetView();
 		canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
 		switchesList->Clear();
 		cyclescompleted = 0;
@@ -612,7 +632,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	runnetwork(ncycles);
 	canvas->Render(canvas->text_to_print, cyclescompleted);
 
-
+	canvas->resetView();
 	cout << "The content of the lookup table is " << endl;
 	for (int i = 0; i < nmz->length_of_table; i++) {
 		cout << "id " << i << " name: ";
@@ -642,6 +662,7 @@ void MyFrame::OnContinue(wxCommandEvent &event)
 		cout << "Continuing for " << ncycles << " cycles" << endl;
 		canvas->text_to_print.Printf("Continuing for %d cycles", ncycles);
 		runnetwork(ncycles);
+		canvas->setCanv(cyclescompleted);
 		canvas->Render(canvas->text_to_print, cyclescompleted);
 	}
 	else
@@ -650,6 +671,7 @@ void MyFrame::OnContinue(wxCommandEvent &event)
 		canvas->Render(canvas->text_to_print);
 		cout << "Error: nothing to continue!" << endl;
 	}	
+	
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)

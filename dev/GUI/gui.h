@@ -24,6 +24,7 @@ enum {
   CONTINUE_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
+  RESTCANVAS_BUTTON_ID,
 }; // widget identifiers
 
 
@@ -74,7 +75,7 @@ private:
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
   void OnDebug(wxCommandEvent &event); // event handler for the debug button
-
+  void OnRestCav(wxCommandEvent &event);
   // The Path to the file we have open
     wxString CurrentDocPath;
     DECLARE_EVENT_TABLE()
@@ -88,6 +89,8 @@ class MyGLCanvas: public wxGLCanvas
 	     const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
   void reset(monitor* mmz, names* nmz);
+  void resetView();
+  void setCanv(int cyclescompleted);
   wxString text_to_print;
  private:
   wxGLContext *context;              // OpenGL rendering context
