@@ -40,6 +40,7 @@ public:
     /* Returns length ie number of characters in given name                */
 
   names (void);
+  /* Called on class initialisation.                                      */
 };
 
 #endif /* names_h */

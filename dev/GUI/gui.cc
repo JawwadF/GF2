@@ -479,9 +479,9 @@ void MyFrame::updateSwitchList(void) {
 	int size = selectedSwitchArray.size();
 	string state;
 	for (int i = 0; i < wxSwitchNameArray.size(); i++) {
-		state = ": OFF";
+		state = ": LOW";
 		if (k < size &&  selectedSwitchArray[k] == i) {
-			state = ": ON";
+			state = ": HIGH";
 			k++;
 		}
 		switchListArray.push_back(wxSwitchNameArray[i] + state);
