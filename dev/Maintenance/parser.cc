@@ -13,6 +13,7 @@ string errorMessage = "";
 
 bool noerrors = true;
 int num;
+string signalstr = "";
 
 
 bool parser::readin(void)
@@ -22,11 +23,11 @@ bool parser::readin(void)
 	noerrors = true;
 	bool noMonitor = true;
 	errorMessage = "";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	while (cursym != eofsym) {
 		noerror = true;
 		tempsym = cursym;
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		//cout << id << endl;
 		if (cursym != equals) {
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the equal sign\n";
@@ -63,7 +64,7 @@ bool parser::readin(void)
 			continue;
 		}
 
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != semicol) {
 			cout << "SYNTATIC ERROR missing semicolon, got " << id << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing a semicolon\n";
@@ -72,7 +73,7 @@ bool parser::readin(void)
 			skip(smz);
 			continue;
 		}
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		noerrors = noerrors && noerror;
 	}
 	if (noerrors) {
@@ -97,14 +98,14 @@ bool parser::readin(void)
 
 void skip(scanner* smz) {
 	while (cursym != eofsym && cursym != semicol) {
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	noerrors = false;
 }
 
 bool parser::connection(void) {
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	name indev = -1, outdev = -1, insig = -1, outsig = -1;
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR in the name" << endl;
@@ -114,11 +115,11 @@ bool parser::connection(void) {
 	}
 	cout << "There is a connection from " << id << " ";
 	outdev = id;
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	
 	if (cursym == dot) { //here we should check if we expect a dot
 		cout << "output ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != outsym) {
 			showError("SYNTATIC ERROR in the output");
 			cout << "SYNTATIC ERROR in the output" << endl;
@@ -128,7 +129,7 @@ bool parser::connection(void) {
 		}
 		cout << id << " ";
 		outsig = id;
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 	}
 	else {
 		outsig = -1;
@@ -144,7 +145,7 @@ bool parser::connection(void) {
 		return false;
 	}
 	cout << "To input ";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR in the name " << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the name\n";
@@ -153,14 +154,14 @@ bool parser::connection(void) {
 	}
 	cout << id << " ";
 	indev = id;
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != dot) {
 		cout << "SYNTATIC ERROR in the dot" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the dot\n";
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != insym) {
 		cout << "SYNTATIC ERROR in the input" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the input\n";
@@ -214,7 +215,7 @@ bool parser::connection(void) {
 }
 bool getname(scanner* smz) {
 
-	if (id != 37) smz->getsymbol(cursym, id, num);
+	if (id != 37) smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != keysym || id != 37) {
 		cout << "SYNTATIC ERROR: expecting the keyword 'NAME' but getting" <<id<< endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the keyword 'NAME'\n";
@@ -223,7 +224,7 @@ bool getname(scanner* smz) {
 	}
 	//cout << "["<< id << "] ";
 	
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR: expecting name" << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a name\n";
@@ -236,7 +237,7 @@ bool getname(scanner* smz) {
 }
 
 bool parser::device(void) {
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	switch (cursym)
 	{
 	case xorsym:
@@ -295,11 +296,11 @@ bool parser::gate(void) {
 		return false;
 		break;
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 18) {
 		//cout << id << " ";
 		cout << "That has ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != numsym) {
 			cout << endl << "SYNTATIC ERROR expecting the number of inputs" << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the number of inputs\n";
@@ -337,11 +338,11 @@ bool parser::gate(void) {
 bool parser::clock(void) {
 	int numOfcycles = -1;
 	cout << "Creating a Clock";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 38)
 	{
 		cout << " that changes state every ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == numsym)
 		{
 			if (num > 0)
@@ -387,11 +388,11 @@ bool parser::switch_(void)
 {
 	int switchvalue = -1;
 	cout << "Creating a SWITCH";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 19)
 	{
 		cout << " starting with value ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == numsym)
 		{
 			if (num == 0 || num == 1) {
@@ -444,22 +445,22 @@ bool parser::dtype_(void) {
 
 bool parser::monitor_(void) {
 	cout << "Creating a MONITOR";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	name devicename;
 	name output = -1;
 	if (cursym == keysym && id == 41)
 	{
 		cout << " that records the output of ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == namesym)
 		{
 			cout << id << " ";
 			devicename = id;
-			smz->getsymbol(cursym, id, num);
+			smz->getsymbol(cursym, id, num, signalstr);
 			if (cursym == dot) //here we should check if we expect a dot
 			{
 				cout << "output ";
-				smz->getsymbol(cursym, id, num);
+				smz->getsymbol(cursym, id, num, signalstr);
 				if (cursym != outsym) {
 					cout << "SYNTATIC ERROR: expected output" << endl;
 					errorMessage = errorMessage + "Line " + to_string(smz->counter) +
@@ -471,7 +472,7 @@ bool parser::monitor_(void) {
 					cout << id << " ";
 					output = id;
 				}
-				smz->getsymbol(cursym, id, num);
+				smz->getsymbol(cursym, id, num, signalstr);
 			}
 		}
 		else {
@@ -528,7 +529,7 @@ parser::parser(network* network_mod, devices* devices_mod,
 	dmz = devices_mod;   /* so we can call functions from these classes  */
 	mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
 	smz = scanner_mod;   /* class you say:                               */
-	nmz = names_mod;					 /* netz->makeconnection (i1, i2, o1, o2, ok);   */
+	nmz = names_mod;	/* netz->makeconnection (i1, i2, o1, o2, ok);   */
 
 	/* any other initialisation you want to do? */
 
