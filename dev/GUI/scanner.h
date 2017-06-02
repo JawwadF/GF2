@@ -15,37 +15,67 @@ typedef enum {
 
 class scanner {
 
-	/* put stuff that the class uses internally here */
 	names* nmz;
 	char curch;
 	char* url;
 	bool eofile;
 	ifstream inf;
 	string curline;
+	
 	void getch(void);
+	/* Gets the next character from the input file						*/
+	/* Counts how many lines it read from the file for error 			*/
+	/* handling purposes 												*/
+	
 	void skipspaces(void);
+	/* Skips spaces from the input file									*/
+	
 	void getnumber(int& num);
+	/* Reads a number - unsigned int from the input file 				*/
+	/* Sets the value of num equal to this value 						*/
+	
 	bool skipcomments(void);
+	/* Ignores comments from the input file 							*/
+	/* Comments start with // and finish at the end of the line 		*/
+	/* It returns TRUE (1) if only one back-slash was found and not two,*/
+	/* which makes the comment syntax invalid 							*/
+	
 	void getname(name& id);
+	/* Gets a name from the input file and finds its id from the names  */
+	/* table. If the name is not in the table, it automatically adds it */
+	/* It also constricts the length of the string to maxlength characters */
 
 
 public:
 
-	string geterror(void);
 	int counter = 1;
-	void setURL(const char* url);
-	void initialise(names* names_mod);
-	void getsymbol(symbol& s, name& id, int& num);
-	/* s = the sort of symbol read from a file */
-	/* id = return the name id here if it is a name */
-	/* num = return the value here if it is a number */
+	
+	string geterror(void);
+	/* Reads the current line from the input file 						*/
+	/* and returns it as string to be printed in an error message 		*/
+	 
 
-	~scanner(void); //destructor of the class, closes input file
+	void setURL(const char* url);
+	/* Sets the url for the read file  									*/
+    
+	void initialise(names* names_mod);
+	/* Opens the file and reads the first character, used for errors	*/
+	
+	void getsymbol(symbol& s, name& id, int& num);
+	/* s = reads the next symbol from the file 							*/
+	/* Skips comments and empty spaces						  			*/
+	/* s = the type of symbol read from a file 							*/
+	/* id = return the name id here if it is a name 					*/
+	/* num = return the value here if it is a number 					*/
+
+	~scanner(void); 
+	/* destructor of the class, closes input file						*/
 
 	scanner(names* names_mod, const char* defname);
-	/* names initialises the name table.  This procedure is called at      */
-	/* system initialisation before any of the above procedures/functions  */
-	/* are used.                                                           */
+	/* The constructor. This procedure is called at system initialisation*/
+	/* before any of the above procedures/functions are used. 			*/
+	/* Opens the file and reads first character                 		*/
+
 };
 
 #endif /* scanner_h */

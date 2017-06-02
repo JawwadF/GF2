@@ -81,7 +81,8 @@ namestring names::get_str (name id)
  *
  * Takes a string as argument 
  * Searches through the table for this string
- * If the string exists in the table, returns its ID (the index in the array)
+ * If the string exists in the table, returns its ID 
+ * (the index in the array)
  * If the string is not in the table, it returns blankname
  *
  */

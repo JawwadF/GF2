@@ -24,7 +24,9 @@ monitor = "RECORDS", identifier, [".", output];
 identifier = letter, {letter|digit};
 
 expression = connection | (device | monitor), "NAME", identifier;
+
 type = "DEVICE"|"CONNECT"|"MONITOR";
+
 rule = type, "=", expression, ";" ;
 
 EBNFgrammar = {rule};

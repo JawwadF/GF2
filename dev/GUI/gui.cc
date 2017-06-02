@@ -52,6 +52,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	float y;
 	unsigned int i;
 	asignal s;
+	
+	int w, h;
+	GetClientSize(&w, &h);
 
 	if (cycles >= 0) cyclesdisplayed = cycles;
 
@@ -64,14 +67,12 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
 	int square_size = 30; //this is the size of one square on the trace
 	int start_corner_x = 100; //this is the corner size that is left empty on the top left part of the canvas
-	int start_corner_y = 100; //this is the corner size that is left empty on the top left part of the canvas
+	int start_corner_y = 130; //this is the corner size that is left empty on the top left part of the canvas
 
 
 	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0) && cycles != -10) { // draw all the monitor traces
 
 	// here create the big square trace
-		int w, h;
-		GetClientSize(&w, &h);
 		
 		glLineWidth(1.0);
 		glColor3f(0.0, 0.0, 1.0); //blue
@@ -176,7 +177,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 		cyclesdisplayed = -1;	
 	}
 
-	PrintOnCanvas(example_text,10,10);
+	PrintOnCanvas(example_text,10,h-15);
 
 	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
