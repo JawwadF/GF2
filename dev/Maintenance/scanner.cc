@@ -250,7 +250,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num, string &signalstr)
 			}
 			else if (curch == '#') //if the first character is # it reads a series of bits into signalstr
 			{
-				s = signalsym;
+				s = bitsersym;
 				id = -1;
 				num = -1;
 				getbitseries(signalstr);
@@ -269,6 +269,7 @@ void scanner::getsymbol(symbol &s, name &id, int &num, string &signalstr)
 					else if (id == nmz->cvtname("SWITCH")) s = swisym;
 					else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
 					else if (id == nmz->cvtname("MONITOR")) s = monsym;
+					else if (id == nmz->cvtname("SIGGEN")) s = siggensym;
 
 					else if (id == nmz->cvtname("AND")) s = gatesym;
 					else if (id == nmz->cvtname("NAND")) s = gatesym;
