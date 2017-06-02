@@ -1,0 +1,15 @@
+gui.o
+guitest
+devices.o
+guitest.o
+monitor.o
+names.o
+network.o
+parser.o
+scanner.o
+logsim.o
+logsim
+file.txt
+userint.o
+Input/
+file.txt
