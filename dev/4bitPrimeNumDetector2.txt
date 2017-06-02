@@ -6,6 +6,7 @@ DEVICE = SWITCH VALUE 0 NAME A0;
 DEVICE = SWITCH VALUE 0 NAME A1;
 DEVICE = SWITCH VALUE 0 NAME A2;
 DEVICE = SWITCH VALUE 0 NAME A3;
+//This circuit will identify  the prime numbers between zero and fifteen. The input is a 4 bit binary number and if it is a prime number the output of OR1 will be set to high. Switch A0 represents the least significant bit.
 
 DEVICE = AND INPUTS 3 NAME AND1;
 DEVICE = AND INPUTS 3 NAME AND2;
