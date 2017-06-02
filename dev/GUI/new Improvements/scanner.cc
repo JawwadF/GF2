@@ -1,0 +1,237 @@
+#include "scanner.h"
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <cmath>
+
+using namespace std;
+
+
+scanner::scanner(names* names_mod, const char* defname)  /* the constructor */
+{
+  nmz = names_mod;
+  counter = 1;
+  curline = "";
+  inf.open(defname);
+  if (!inf) 
+    {
+      cout << "Error: cannot open file " << defname<< " for reading" << endl;
+      exit(1);
+    }
+  getch();
+  
+}
+
+void scanner::setURL(const char* ur) {
+	url = (char*) ur;
+}
+
+void scanner::initialise(names* names_mod) {
+	nmz = names_mod;
+	inf.close();
+	inf.open(url);
+	if (!inf)
+	{
+		cout << "Error: cannot open file " << url << " for reading" << endl;
+		exit(1);
+	}
+	getch();
+}
+
+scanner::~scanner(void)  /* the destructor */
+{
+  inf.close();
+}
+
+bool scanner::skipcomments(void) 
+{ 
+  bool i = 0;
+  if (curch == '/')
+    {
+      getch();
+      if (curch == '/')
+	while (!eofile && curch != '\n')
+	  getch();
+      else 
+	i = 1;
+    }
+  return i;
+}
+
+string scanner::geterror(void) {
+	char ch = curch;
+	string line = "";
+	int errorpos = curline.size() - 1;
+	while (curline != "") {
+		line = curline;
+		getch();
+	}
+	curch = ch;
+	int size = line.size();
+
+	string spaces(2*size , ' ');
+	double total = pow(2, ((errorpos*1.0)/ (size - 1)));
+	//if (total >= size) total = size - 1;
+	spaces[round(total*errorpos)] = '^';
+	line = line + "\n" + spaces;
+	return line;
+}
+
+void scanner::getnumber(int& num)
+{
+  string numstr;
+  while (!eofile) {
+    if (!isdigit(curch))
+      break;
+    numstr += curch;
+    getch();
+  }
+  num = atoi(numstr.c_str());
+}
+
+void scanner::getch(void)
+{
+   eofile = !inf.get(curch);
+   curline = curline + curch;
+   if (curch == '\n') {
+	   counter++;
+	   curline = "";
+   }
+}
+
+
+void scanner:: getname(name &id)
+{
+  namestring vari = "";
+  namestring str;
+  while (!eofile && (isalpha(curch) || isdigit(curch)))
+    {
+      vari += curch;
+      getch();
+    }
+  str = vari;
+  if (vari.length() > maxlength)
+    {
+      str.resize(maxlength);
+      cout<<"Warning: the name '"<<vari<<"' was truncated to "<<str <<endl;
+    }
+  id = nmz->lookup(str); 
+}
+
+
+void scanner::skipspaces(void)
+{
+  while (isspace(curch) && !eofile)
+    getch();
+}
+
+void scanner::getsymbol(symbol &s, name &id, int &num)
+{
+  bool i = 0;
+  skipspaces();
+
+  while (curch == '/')
+    {
+      i = skipcomments(); //skips the comments
+      skipspaces(); //skips spaces
+    }
+
+  if (i == 1) //if it found just a back slash instead of 2 it returns an error
+    {
+      id = -1;
+      num = -1;
+      s = badsym;
+    }
+  else
+    {    
+      skipspaces(); //skips spaces
+      if (eofile)
+	{
+	  s = eofsym;
+	  id = -1;
+	  num = -1;
+	}
+      else 
+	{
+	  if (isdigit(curch)) // if the first character is a number, it reads a number into num
+	    {
+	      s = numsym;
+	      getnumber(num);
+	      id = -1;
+	    }
+	  else 
+	    {
+	      num = -1;
+	      if (isalpha(curch)) // if the first character is a letter, it reads a name and returns its id
+		{ 
+		  getname(id);
+		  if (id == nmz->cvtname("DEVICE")) s = devsym;
+		  else if (id == nmz->cvtname("CONNECT")) s = consym;
+		  else if (id == nmz->cvtname("XOR")) s = xorsym;
+		  else if (id == nmz->cvtname("CLOCK")) s = clksym;
+		  else if (id == nmz->cvtname("SWITCH")) s = swisym;
+		  else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
+		  else if (id == nmz->cvtname("MONITOR")) s = monsym;
+
+		  else if (id == nmz->cvtname("AND")) s = gatesym;
+		  else if (id == nmz->cvtname("NAND")) s = gatesym;
+		  else if (id == nmz->cvtname("OR")) s = gatesym;
+		  else if (id == nmz->cvtname("NOR")) s = gatesym;
+
+		  else if (id == nmz->cvtname("INPUTS")) s = keysym;
+		  else if (id == nmz->cvtname("VALUE")) s = keysym;
+		  else if (id == nmz->cvtname("QVAL")) s = keysym;
+		  else if (id == nmz->cvtname("NAME")) s = keysym;
+		  else if (id == nmz->cvtname("CYCLES")) s = keysym;
+		  else if (id == nmz->cvtname("START")) s = keysym;
+		  else if (id == nmz->cvtname("INCLUDES")) s = keysym;
+		  else if (id == nmz->cvtname("RECORDS")) s = keysym;
+
+		  else if (id == nmz->cvtname("Q")) s = outsym;
+		  else if (id == nmz->cvtname("QBAR")) s = outsym;
+
+		  else if (id == nmz->cvtname("I1")) s = insym;
+		  else if (id == nmz->cvtname("I2")) s = insym;
+		  else if (id == nmz->cvtname("I3")) s = insym;
+		  else if (id == nmz->cvtname("I4")) s = insym;
+		  else if (id == nmz->cvtname("I5")) s = insym;
+		  else if (id == nmz->cvtname("I6")) s = insym;
+		  else if (id == nmz->cvtname("I7")) s = insym;
+		  else if (id == nmz->cvtname("I8")) s = insym;
+		  else if (id == nmz->cvtname("I9")) s = insym;
+		  else if (id == nmz->cvtname("I10")) s = insym;
+		  else if (id == nmz->cvtname("I11")) s = insym;
+		  else if (id == nmz->cvtname("I12")) s = insym;
+		  else if (id == nmz->cvtname("I13")) s = insym;
+		  else if (id == nmz->cvtname("I14")) s = insym;
+		  else if (id == nmz->cvtname("I15")) s = insym;
+		  else if (id == nmz->cvtname("I16")) s = insym;
+
+		  else if (id == nmz->cvtname("DATA")) s = insym;
+		  else if (id == nmz->cvtname("SET")) s = insym;
+		  else if (id == nmz->cvtname("CLEAR")) s = insym;
+		  else if (id == nmz->cvtname("CLK")) s = insym;
+
+		  else s = namesym;
+		}
+	      else 
+		{
+		  id = -1;
+		  switch (curch) //symbols
+		    {
+		    case '=': s = equals; break;
+		    case ';': s = semicol; break;
+		    case '.': s = dot; break;
+		    case '>': s = connect_; break;
+		    default: s = badsym; break;
+		    }
+		  getch();
+		    }
+	    }
+	}
+    }
+}
+
+
+
+
