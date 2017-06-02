@@ -443,6 +443,7 @@ bool parser::dtype_(void) {
 }
 
 bool parser::siggen_(void) {
+	string tempsignalstr = "";
 	cout<<"Creating a SIGGEN";
 	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == bitsersym)
@@ -450,6 +451,7 @@ bool parser::siggen_(void) {
 		if (signalstr.length() > 0)
 		{
 			cout<<" with signal "<<signalstr<<" ";
+			tempsignalstr = signalstr;
 		}
 		else {
 			cout << endl << "SYNTATIC ERROR: binary signal has to be at least one cycles long";
@@ -469,9 +471,10 @@ bool parser::siggen_(void) {
 	if (!getname(smz)) {
 		return false;
 		}
-	//here I have to make a device in devices
+		
+	//here I have to make a device in devices and then delete the true (look at clock)
 	bool noerror = true;
-	//dmz->makedevice(aclock, id, numOfcycles, noerror);
+	//dmz->makedevice(aclock, id, inputSeries, noerror);
 	return noerror;
 }
 
