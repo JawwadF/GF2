@@ -110,6 +110,30 @@ void devices::makeclock (name id, int frequency)
 
 /***********************************************************************
  *
+ * Used to make new siggen devices.
+ * Called by makedevice.
+ *
+ */
+void devices::makesiggen (name id, string binSeries)
+{
+	string tempstr = binSeries;
+	devlink d;
+	netz->adddevice (asiggen, id, d);
+	netz->addoutput (d, blankname);
+	d->counter = 0;
+	d->bitstring = binSeries;
+	d->frequency = binSeries.length();
+	if (binSeries.at(0) == '1')
+	{
+		d->olist->sig = high;
+	}
+	else
+		d->olist->sig = low;
+}
+
+
+/***********************************************************************
+ *
  * Used to make new AND, NAND, OR, NOR and XOR gates. 
  * Called by makedevice.
  *
@@ -167,7 +191,7 @@ void devices::makedtype (name id)
  * number of inputs. 'ok' returns true if operation succeeds.         
  *
  */
-void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
+void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, string binSeries)
 {
   ok = true;
   switch (dkind) {
@@ -188,6 +212,9 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
       break;
     case dtype:
       makedtype(did);
+      break;
+    case asiggen:
+      makesiggen(did, binSeries);
       break;
   }
 }
@@ -332,6 +359,23 @@ void devices::execclock(devlink d)
 
 /***********************************************************************
  *
+ * Used to simulate the operation of siggen devices.
+ * Called by executedevices.
+ *
+ */
+void devices::execsiggen(devlink d)
+{
+  if (d->olist->sig == rising)
+    signalupdate (high, d->olist->sig);
+  else {
+    if (d->olist->sig == falling)
+      signalupdate (low, d->olist->sig);
+  }
+}
+
+
+/***********************************************************************
+ *
  * Increment the counters in the clock devices and initiate changes
  * in their outputs when the end of their period is reached.
  * Called by executedevices.
@@ -340,17 +384,40 @@ void devices::execclock(devlink d)
 void devices::updateclocks (void)
 {
   devlink d;
-  for (d = netz->devicelist (); d != NULL; d = d->next) {
-    if (d->kind == aclock) {
-      if (d->counter == d->frequency) {
-	d->counter = 0;
-	if (d->olist->sig == high)
-	  d->olist->sig = falling;
-	else
-	  d->olist->sig = rising;
-      }
-      (d->counter)++;
+  string nextsignal;
+  
+  for (d = netz->devicelist (); d != NULL; d = d->next) 
+  {
+	if (d->kind == aclock)
+	{
+		if (d->counter == d->frequency) 
+		{
+			d->counter = 0;
+			if (d->olist->sig == high)
+				d->olist->sig = falling;
+			else
+				d->olist->sig = rising;
+		}
+		(d->counter)++;
     }
+    else if (d->kind == asiggen)
+    {
+		nextsignal = d->bitstring.at(d->counter);
+		if (d->counter == ((d->frequency)-1)) 
+			d->counter = 0;
+		else
+			(d->counter)++;	
+		
+		if (d->olist->sig == low && nextsignal == "0")
+			d->olist->sig = low;
+		else if (d->olist->sig == low && nextsignal == "1")
+			d->olist->sig = rising;
+		else if (d->olist->sig == high && nextsignal == "1")
+			d->olist->sig = high;
+		else if (d->olist->sig == high && nextsignal == "0")
+			d->olist->sig = falling;
+		else cout<<"!!!!!There is a problem in devices.cc updateclocks"<<endl;
+	}
   }
 }
 
@@ -379,6 +446,7 @@ void devices::executedevices (bool& ok)
     for (d = netz->devicelist (); d != NULL; d = d->next) {
       switch (d->kind) {
         case aswitch:  execswitch (d);           break;
+        case asiggen:  execsiggen (d);           break;
         case aclock:   execclock (d);            break;
         case orgate:   execgate (d, low, low);   break;
         case norgate:  execgate (d, low, high);  break;
@@ -494,6 +562,5 @@ devices::devices (names* names_mod, network* net_mod)
   temp = nmz->lookup("START");
   temp = nmz->lookup("INCLUDES");
   temp = nmz->lookup("RECORDS");
-  temp = nmz->lookup("SIGGEN");
-
+  dtab[asiggen] = nmz->lookup("SIGGEN");
 }

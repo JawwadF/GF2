@@ -268,7 +268,7 @@ bool parser::xor_(void) {
 	cout << "[" << id << "] ";
 	cout << "Creating a XOR gate ";
 	bool noerror;
-	dmz->makedevice(xorgate, id, 2, noerror);
+	dmz->makedevice(xorgate, id, 2, noerror, "");
 	return noerror;
 }
 
@@ -334,7 +334,7 @@ bool parser::gate(void) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(gatetype, id, numberInputs, noerror);
+	dmz->makedevice(gatetype, id, numberInputs, noerror, "");
 	return noerror;
 }
 
@@ -381,7 +381,7 @@ bool parser::clock(void) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(aclock, id, numOfcycles, noerror);
+	dmz->makedevice(aclock, id, numOfcycles, noerror, "");
 	return noerror;
 }
 
@@ -426,7 +426,7 @@ bool parser::switch_(void) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(aswitch, id, switchvalue, noerror);
+	dmz->makedevice(aswitch, id, switchvalue, noerror, "");
 	return noerror;
 }
 
@@ -438,11 +438,12 @@ bool parser::dtype_(void) {
 	}
 
 	bool noerror;
-	dmz->makedevice(dtype, id, -1, noerror);
+	dmz->makedevice(dtype, id, -1, noerror, "");
 	return noerror;
 }
 
 bool parser::siggen_(void) {
+	string InputSeries = "";
 	cout<<"Creating a SIGGEN";
 	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == bitsersym)
@@ -450,6 +451,7 @@ bool parser::siggen_(void) {
 		if (signalstr.length() > 0)
 		{
 			cout<<" with signal "<<signalstr<<" ";
+			InputSeries = signalstr;
 		}
 		else {
 			cout << endl << "SYNTATIC ERROR: binary signal has to be at least one cycles long";
@@ -469,9 +471,9 @@ bool parser::siggen_(void) {
 	if (!getname(smz)) {
 		return false;
 		}
-	//here I have to make a device in devices
-	bool noerror = true;
-	//dmz->makedevice(aclock, id, numOfcycles, noerror);
+		
+	bool noerror;
+	dmz->makedevice(asiggen, id, -1, noerror, InputSeries);
 	return noerror;
 }
 

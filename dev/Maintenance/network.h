@@ -2,12 +2,13 @@
 #define network_h
 
 #include "names.h"
+#include <string>
 
 /* Network specification */
 
 typedef enum {falling, low, rising, high} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
-	      norgate, xorgate, dtype, baddevice} devicekind;
+	      norgate, xorgate, dtype, asiggen, baddevice} devicekind;
 
 struct outputrec {
   name       id;
@@ -29,9 +30,10 @@ struct devicerec {
   devicekind kind;
   /* the next elements are only used by some of the device kinds */
   asignal swstate;      // used when kind == aswitch
-  int frequency;        // used when kind == aclock
-  int counter;          // used when kind == aclock
+  int frequency;        // used when kind == aclock || asiggen
+  int counter;          // used when kind == aclock ||asiggen
   asignal memory;       // used when kind == dtype
+  string bitstring;     // used when kind == asiggen
 };
 typedef devicerec* devlink;
 
