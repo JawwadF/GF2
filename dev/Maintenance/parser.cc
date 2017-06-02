@@ -211,8 +211,8 @@ bool parser::connection(void) {
 
 	}
 	return noerror;
-
 }
+
 bool getname(scanner* smz) {
 
 	if (id != 37) smz->getsymbol(cursym, id, num, signalstr);
@@ -250,15 +250,17 @@ bool parser::device(void) {
 		return switch_();
 	case dtypesym:
 		return dtype_();
+	case siggensym:
+		return siggen_();
 	default:
 		cout << "SYNTATIC ERROR expecting a device. Received " << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a device\n";
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-
 	return false;
 }
+
 bool parser::xor_(void) {
 	if (!getname(smz)) {
 		return false;
@@ -269,6 +271,7 @@ bool parser::xor_(void) {
 	dmz->makedevice(xorgate, id, 2, noerror);
 	return noerror;
 }
+
 bool parser::gate(void) {
 	devicekind gatetype;
 	switch (id)
@@ -382,10 +385,7 @@ bool parser::clock(void) {
 	return noerror;
 }
 
-
-
-bool parser::switch_(void)
-{
+bool parser::switch_(void) {
 	int switchvalue = -1;
 	cout << "Creating a SWITCH";
 	smz->getsymbol(cursym, id, num, signalstr);
@@ -442,6 +442,38 @@ bool parser::dtype_(void) {
 	return noerror;
 }
 
+bool parser::siggen_(void) {
+	cout<<"Creating a SIGGEN";
+	smz->getsymbol(cursym, id, num, signalstr);
+	if (cursym == bitsersym)
+	{
+		if (signalstr.length() > 0)
+		{
+			cout<<" with signal "<<signalstr<<" ";
+		}
+		else {
+			cout << endl << "SYNTATIC ERROR: binary signal has to be at least one cycles long";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + 
+				": ERROR binary signal has to be at least one cycles long \n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
+	}
+	else {
+		cout << endl << "SYNTATIC ERROR: expected '#'";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + 
+		    ": ERROR expected '#' \n";
+		errorMessage = errorMessage + smz->geterror() + "\n";
+		return false;
+	}
+	if (!getname(smz)) {
+		return false;
+		}
+	//here I have to make a device in devices
+	bool noerror = true;
+	//dmz->makedevice(aclock, id, numOfcycles, noerror);
+	return noerror;
+}
 
 bool parser::monitor_(void) {
 	cout << "Creating a MONITOR";
