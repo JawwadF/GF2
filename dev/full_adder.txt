@@ -1,3 +1,9 @@
+//Full Binary Adder Circuit 
+//The circuit has three inputs: A, B and Carry In and two outputs: SUM and Carry Out
+//Generally the Carry IN is fed from a previous stage and Carry Out feeds another full adder set.
+//Circuit and diagram taken from:
+//http://www.circuitstoday.com/half-adder-and-full-adder
+
 //Devices
 //AND gates
 DEVICE = AND INPUTS 2 NAME G1;
