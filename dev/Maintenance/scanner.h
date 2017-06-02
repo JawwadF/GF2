@@ -8,7 +8,7 @@
 //using namespace std;
 
 typedef enum {
-	namesym, numsym, devsym, xorsym, gatesym, signalsym, keysym, clksym, swisym,
+	namesym, numsym, devsym, xorsym, siggensym, gatesym, bitsersym, keysym, clksym, swisym,
 	consym, dtypesym, outsym, insym, monsym, equals, semicol, dot, connect_, badsym, eofsym
 } symbol;
 

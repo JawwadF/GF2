@@ -494,5 +494,6 @@ devices::devices (names* names_mod, network* net_mod)
   temp = nmz->lookup("START");
   temp = nmz->lookup("INCLUDES");
   temp = nmz->lookup("RECORDS");
+  temp = nmz->lookup("SIGGEN");
 
 }
