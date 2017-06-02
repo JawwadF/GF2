@@ -31,6 +31,7 @@ class parser {
   bool clock(void);
   bool switch_(void);
   bool dtype_(void);
+  bool siggen_(void);
   //void monitor(void);
   parser (network* network_mod, devices* devices_mod,
 	  monitor* monitor_mod, scanner* scanner_mod, names* names_mod);
