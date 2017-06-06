@@ -12,9 +12,14 @@ bool noerrors = true;
 int num;
 string signalstr = "";
 
-
-bool parser::readin(void)
-{
+/***********************************************************************
+ * 
+ * Reads the definition of the logic system and builds the          
+ * corresponding internal representation via calls to the 'Network' 
+ * module and the 'Devices' module.                                 
+ *
+ */
+bool parser::readin(void) {
 	symbol tempsym;
 	bool noerror;
 	noerrors = true;
@@ -92,6 +97,14 @@ bool parser::readin(void)
 
 }
 
+
+/***********************************************************************
+ * 
+ * If an error has been detected in the input file, this function 	
+ * skips reading the input file until the next semcolon, where it 	
+ * resumes normal operation. Used for error handling.				
+ *
+ */
 void parser::skip(void) {
 	while (cursym != eofsym && cursym != semicol) {
 		smz->getsymbol(cursym, id, num, signalstr);
@@ -100,6 +113,14 @@ void parser::skip(void) {
 	noerrors = false;
 }
 
+
+/***********************************************************************
+ * 
+ * Used to initialise a connection between an output device and an 	
+ * input device. Called from readin()  								
+ * It returns FALSE if there is an error in the initialisation		
+ * 	
+ */
 bool parser::connection(void) {
 	smz->getsymbol(cursym, id, num, signalstr);
 	name indev = -1, outdev = -1, insig = -1, outsig = -1;
@@ -229,6 +250,14 @@ bool parser::connection(void) {
 	return noerror;
 }
 
+
+/***********************************************************************
+ * 
+ * Used during the initialisation of a device or monitor to read the  
+ * the name of the new variable from the definition file				
+ * It returns FALSE if there is an error with the name initialisation	
+ *
+ */
 bool parser::readname(void) {
 
 	if (id != 37) smz->getsymbol(cursym, id, num, signalstr);
@@ -251,6 +280,14 @@ bool parser::readname(void) {
 	return true;
 }
 
+
+/***********************************************************************
+ * 
+ * Used for the initialisation of a device, it checks what type the 	
+ * new device is and calls the correct function. Called from readin() 
+ * It returns FALSE if there is an error in the initialisation		
+ * 	
+ */
 bool parser::device(void) {
 	smz->getsymbol(cursym, id, num, signalstr);
 	switch (cursym)
@@ -276,6 +313,14 @@ bool parser::device(void) {
 	return false;
 }
 
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a xor gate		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::xor_(void) {
 	cout << "Creating a XOR gate ";
 	
@@ -288,6 +333,15 @@ bool parser::xor_(void) {
 	return noerror;
 }
 
+
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of an AND/NAND/OR/NOR gate		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::gate(void) {
 	devicekind gatetype;
 	switch (id)
@@ -353,6 +407,14 @@ bool parser::gate(void) {
 	return noerror;
 }
 
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a clock device		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::clock(void) {
 	int numOfcycles = -1;
 	cout << "Creating a Clock";
@@ -400,6 +462,14 @@ bool parser::clock(void) {
 	return noerror;
 }
 
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a switch		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::switch_(void) {
 	int switchvalue = -1;
 	cout << "Creating a SWITCH";
@@ -445,6 +515,13 @@ bool parser::switch_(void) {
 	return noerror;
 }
 
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a dtype device			
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::dtype_(void) {
 	cout << "Creating a DTYPE ";
 
@@ -457,6 +534,14 @@ bool parser::dtype_(void) {
 	return noerror;
 }
 
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a siggen device			
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 		
+ * 
+ */
 bool parser::siggen_(void) {
 	string InputSeries = "";
 	cout<<"Creating a SIGGEN";
@@ -494,9 +579,10 @@ bool parser::siggen_(void) {
 
 
 /***********************************************************************
- * Creates a monitor point that records an output of a device  
- * Called from readin() 										
- * It returns FALSE if there is an error in making the monitor 	
+ * 
+ * Receives and checks the initialisation of a monitor point  
+ * from the scanner. Called from readin() 										
+ * It returns FALSE if there is an error in the initialisation 	
  */
 bool parser::monitor_(void) {
 	cout << "Creating a MONITOR";
