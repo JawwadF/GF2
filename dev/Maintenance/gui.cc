@@ -507,7 +507,7 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		bool cmdok = true;
 		int selectedOutDeviceIndex = dialog.GetSelection();
 		cout << "SELECTED CONNECTION OUTPUT: " << nmz->get_str(MonitorIDArray[selectedOutDeviceIndex]);
-		int selectedOutDeviceID = MonitorIDArray[selectedOutDeviceIndex];
+		int selectedOutDeviceID = MonitorOutIDArray[selectedOutDeviceIndex];
 		cout << "Selected device ID for connection: " << selectedOutDeviceID << endl;
 		cout << "Selected device name for connection: " << nmz->get_str(selectedOutDeviceID) << endl;
 
@@ -518,20 +518,25 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		if(dialog2.ShowModal() == wxID_OK){
 			int selectedInDeviceIndex = dialog2.GetSelection();
 			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
-			//int selectedInDeviceID = Monit
-			netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
+
+			// cout << "Selected input device name ID: " << DeviceInIDArray[selectedInDeviceIndex] << endl;
+			// cout << "Selected input name ID: " << selectedInDeviceID << endl;
+			// cout << "Selected output device name ID: " << MonitorIDArray[selectedOutDeviceIndex] << endl;
+			// cout << "Selected output name ID: " << selectedOutDeviceID << endl;
+			netz->makeconnection(DeviceInIDArray[selectedInDeviceIndex], selectedInDeviceID, MonitorIDArray[selectedOutDeviceIndex], selectedOutDeviceID, cmdok);
 		}
 		
-		// for (devlink d = firstDevice; d != NULL; d = d->next){
-  //   		for (inplink i = d->ilist; i != NULL; i = i->next){
-  //     			namestring devicename = nmz->get_str(d->id);
-  //     			namestring deviceinputname = nmz->get_str(i->id);
-  //     			namestring deviceconnection = nmz->get_str(i->connect->id);
-  //     			cout << "Name of device: " << devicename << endl;
-  //     			cout << "Name of input: " << deviceinputname << endl;
-  //     			cout << "Output its connected to: " << deviceconnection << endl;
-  //     		}
-		// }
+	// for (devlink d = firstDevice; d != NULL; d = d->next){
+ //    		for (inplink i = d->ilist; i != NULL; i = i->next){
+ //      			namestring devicename = nmz->get_str(d->id);
+ //      			namestring deviceinputname = nmz->get_str(i->id);
+ //      			namestring deviceconnection = nmz->get_str(i->connect->devid);
+ //      			cout << "Name of device: " << devicename << endl;
+ //      			cout << "Name of input: " << deviceinputname << endl;
+ //      			cout << "Output its connected to: " << deviceconnection << endl;
+ //      		}
+	// 	}
+	
       
 
 	}
@@ -651,7 +656,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
  //    		for (inplink i = d->ilist; i != NULL; i = i->next){
  //      			namestring devicename = nmz->get_str(d->id);
  //      			namestring deviceinputname = nmz->get_str(i->id);
- //      			namestring deviceconnection = nmz->get_str(i->connect->id);
+ //      			namestring deviceconnection = nmz->get_str(i->connect->devid);
  //      			cout << "Name of device: " << devicename << endl;
  //      			cout << "Name of input: " << deviceinputname << endl;
  //      			cout << "Output its connected to: " << deviceconnection << endl;
