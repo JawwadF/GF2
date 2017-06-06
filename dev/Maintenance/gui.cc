@@ -553,32 +553,50 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 		return;
 	}
 
-	wxArrayString wxDeviceArray = wxMonitorArray;
+	wxConnectionArray.clear();
+
+		for (devlink d = firstDevice; d != NULL; d = d->next){
+    		for (inplink i = d->ilist; i != NULL; i = i->next){
+      			namestring devicename = nmz->get_str(d->id);
+      			removeConnectionInputIDArray.push_back(d->id);
+      			removeConnectionDevIDArray.push_back(i->id);
+      			namestring deviceinputname = nmz->get_str(i->id);
+      			namestring deviceconnection = nmz->get_str(i->connect->devid);
+      			namestring deviceoutputname = nmz->get_str(i->connect->id);
+      			wxString connectionArrayEntry;
+      			if(deviceoutputname == "Blankname"){
+      				connectionArrayEntry = deviceconnection + " -> " + devicename + ":" + deviceinputname; 
+      			}
+      			else{
+      				connectionArrayEntry = deviceconnection + ":" + deviceoutputname + " -> " + devicename + ":" + deviceinputname; 
+      			}
+      			wxConnectionArray.push_back(connectionArrayEntry);
+      			// cout << "Name of device: " << devicename << endl;
+      			// cout << "Name of input: " << deviceinputname << endl;
+      			// cout << "Output its connected to: " << deviceconnection << endl;
+      		}
+		}
+
 
 	wxSingleChoiceDialog dialog(this,
-		wxT("Select the device output you wish to connect to another device."),
-		wxT("Make connection: Select Output"),
-		wxDeviceArray);
+		wxT("Select the connection/s you wish to remove"),
+		wxT("Remove connections"),
+		wxConnectionArray);
+
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		bool cmdok = true;
-		int selectedOutDeviceIndex = dialog.GetSelection();
-		cout << "SELECTED CONNECTION OUTPUT: " << nmz->get_str(MonitorIDArray[selectedOutDeviceIndex]);
-		int selectedOutDeviceID = MonitorIDArray[selectedOutDeviceIndex];
-		cout << "Selected device ID for connection: " << selectedOutDeviceID << endl;
-		cout << "Selected device name for connection: " << nmz->get_str(selectedOutDeviceID) << endl;
-
-		wxSingleChoiceDialog dialog2(this,
-		wxT("Select the device input you wish to connect the previously selected output to."),
-		wxT("Make connection: Select Input"),
-		DeviceInArray);
-		if(dialog2.ShowModal() == wxID_OK){
-			int selectedInDeviceIndex = dialog2.GetSelection();
-			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
-			//int selectedInDeviceID = Monit
-			netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
-		}
+		int selectedConnectionIndex = dialog.GetSelection();
+		cout << "SELECTED REMOVE CONNECTION device name: ";
+		nmz->writename(removeConnectionDevIDArray[selectedConnectionIndex]);
+		cout << endl;
+		cout << "SELECTED REMOVE CONNECTION input name: ";
+		nmz->writename(removeConnectionInputIDArray[selectedConnectionIndex]);
+		cout << endl;
+		//int selectedInDeviceID = Monit
+		//netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
+		
 		
 		// for (devlink d = firstDevice; d != NULL; d = d->next){
   //   		for (inplink i = d->ilist; i != NULL; i = i->next){
@@ -746,7 +764,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	}
 devicesList = firstDevice;
 while(devicesList != NULL){
-	 ////////////////////////FINISH THIS BIT/////////////////////
 	    inplink  i;
 		for (i = devicesList->ilist; i != NULL; i = i->next) {
 			//nmz->writename (i->id);
