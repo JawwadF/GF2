@@ -12,6 +12,7 @@ typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 
 struct outputrec {
   name       id;
+  name 		 devid;
   asignal    sig;
   outputrec* next;
 };
@@ -64,7 +65,7 @@ class network {
     /* Adds an input to the device pointed to by 'dev' with the specified  */
     /* name.                                                               */
  
-  void addoutput (devlink dev, name oid);
+  void addoutput (devlink dev, name oid, name tdevid);
     /* Adds an output to the device pointed to by 'dev' with the specified */
     /* name.                                                               */
 

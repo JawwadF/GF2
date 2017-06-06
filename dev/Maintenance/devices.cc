@@ -86,7 +86,7 @@ void devices::makeswitch (name id, int setting, bool& ok)
   ok = (setting <= 1);
   if (ok) {
     netz->adddevice (aswitch, id, d);
-    netz->addoutput (d, blankname);
+    netz->addoutput (d, blankname, id);
     d->swstate = (setting == 0) ? low : high;
   }
 }
@@ -102,7 +102,7 @@ void devices::makeclock (name id, int frequency)
 {
   devlink d;
   netz->adddevice (aclock, id, d);
-  netz->addoutput (d, blankname);
+  netz->addoutput (d, blankname, id);
   d->frequency = frequency;
   d->counter = 0;
 }
@@ -119,7 +119,7 @@ void devices::makesiggen (name id, string binSeries)
 	string tempstr = binSeries;
 	devlink d;
 	netz->adddevice (asiggen, id, d);
-	netz->addoutput (d, blankname);
+	netz->addoutput (d, blankname,id);
 	d->counter = 0;
 	d->bitstring = binSeries;
 	d->frequency = binSeries.length();
@@ -147,7 +147,7 @@ void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok)
   ok = (ninputs <= maxinputs);
   if (ok) {
     netz->adddevice (dkind, did, d);
-    netz->addoutput (d, blankname);
+    netz->addoutput (d, blankname, did);
     for (n = 1; n <= ninputs; n++) {
       iname = "I";
       if (n < 10) {
@@ -178,8 +178,8 @@ void devices::makedtype (name id)
   netz->addinput (d, clkpin);
   netz->addinput (d, setpin);
   netz->addinput (d, clrpin);
-  netz->addoutput (d, qpin);
-  netz->addoutput (d, qbarpin);
+  netz->addoutput (d, qpin, id);
+  netz->addoutput (d, qbarpin, id);
   d->memory = low;
 }
 
