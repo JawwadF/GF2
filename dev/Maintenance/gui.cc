@@ -342,15 +342,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	button_sizer->Add(new wxButton(this, RESTCANVAS_BUTTON_ID, "Reset View"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
-<<<<<<< HEAD
-	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles per seconds"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
-	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("5"));
-=======
 	button_sizer->Add(new wxButton(this, MAKECONNECTION_BUTTON_ID, "Make Connection"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, REMOVECONNECTION_BUTTON_ID, "Remove Connection"), 0, wxALL, 10); //added by me
-	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
-	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
->>>>>>> 62689671c97d8d40a82abfb6bbba83ca0ac04000
+	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles per seconds"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
+	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("5"));
 	button_sizer->Add(spin, 0, wxALL, 10);
 	topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 	SetSizeHints(750, 500);
@@ -884,16 +879,10 @@ while(devicesList != NULL){
 		nmz->writename(i);
 		cout << endl;
 	}
-<<<<<<< HEAD
 	
 	startstopAnim();
 	continueButton->Enable(true);
-	
-=======
 
-
-
->>>>>>> 62689671c97d8d40a82abfb6bbba83ca0ac04000
 	return;
 
 }
