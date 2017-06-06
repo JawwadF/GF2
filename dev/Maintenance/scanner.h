@@ -8,7 +8,7 @@
 //using namespace std;
 
 typedef enum {
-	namesym, numsym, devsym, xorsym, gatesym, keysym, clksym, swisym,
+	namesym, numsym, devsym, xorsym, siggensym, gatesym, bitsersym, keysym, clksym, swisym,
 	consym, dtypesym, outsym, insym, monsym, equals, semicol, dot, connect_, badsym, eofsym
 } symbol;
 
@@ -21,6 +21,7 @@ class scanner {
 	bool eofile;
 	ifstream inf;
 	string curline;
+	string signalstr;
 	
 	void getch(void);
 	/* Gets the next character from the input file						*/
@@ -44,6 +45,10 @@ class scanner {
 	/* Gets a name from the input file and finds its id from the names  */
 	/* table. If the name is not in the table, it automatically adds it */
 	/* It also constricts the length of the string to maxlength characters */
+	
+	void getbitseries(string& signalstr);
+	/* Reads a series of bits (0s and 1s) from the input file 			*/
+	/* Stores the series in the string signalstr 						*/
 
 
 public:
@@ -61,7 +66,7 @@ public:
 	void initialise(names* names_mod);
 	/* Opens the file and reads the first character, used for errors	*/
 	
-	void getsymbol(symbol& s, name& id, int& num);
+	void getsymbol(symbol& s, name& id, int& num, string &signalstr);
 	/* s = reads the next symbol from the file 							*/
 	/* Skips comments and empty spaces						  			*/
 	/* s = the type of symbol read from a file 							*/

@@ -70,7 +70,7 @@ namestring names::get_str (name id)
     return "Blankname";
   else if (id>=0 && id<length_of_table)
     return table[id];
-  else 
+  else
     {
       cout<<"Warning, this id does not exist";
       return "";
@@ -111,8 +111,9 @@ void names::writename (name id)
 		  cout << "Blankname";
 		  return ;
 	  }
-	  cout << "Warning, this id does not exist";
-	  return;
+	  else 
+		{cout << "Warning, this id does not exist";
+		return;}
   }
 }
 

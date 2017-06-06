@@ -18,6 +18,7 @@ scanner::scanner(names* names_mod, const char* defname)
   nmz = names_mod;
   counter = 1;
   curline = "";
+  signalstr = "";
   inf.open(defname);
   if (!inf) 
     {
@@ -183,6 +184,26 @@ void scanner::skipspaces(void)
 
 /***********************************************************************
  * 
+ * Reads a series of bits (0s and 1s) from the input file 	
+ * Stores the series in the string signalstr 
+ * 
+ */
+
+void scanner::getbitseries(string& signalstr)
+{
+	signalstr = "";
+	getch();
+		
+	while (curch == '0' || curch == '1')
+	{
+		signalstr += curch;
+		getch();
+	}
+}
+
+
+/***********************************************************************
+ * 
  * s = reads the next symbol from the file 			
  * Skips comments and empty spaces						  		
  * s = the type of symbol read from a file 					
@@ -190,110 +211,122 @@ void scanner::skipspaces(void)
  * num = return the value here if it is a number 				
  * 
  */
-void scanner::getsymbol(symbol &s, name &id, int &num)
+void scanner::getsymbol(symbol &s, name &id, int &num, string &signalstr)
 {
-  bool i = 0;
-  skipspaces();
+	bool i = 0;
+	skipspaces();
 
-  while (curch == '/')
-    {
-      i = skipcomments(); //skips the comments
-      skipspaces(); //skips spaces
-    }
-
-  if (i == 1) //if it found just a back slash instead of 2 it returns an error
-    {
-      id = -1;
-      num = -1;
-      s = badsym;
-    }
-  else
-    {    
-      skipspaces(); //skips spaces
-      if (eofile)
-		{
-		  s = eofsym;
-		  id = -1;
-		  num = -1;
-		}
-      else 
-		{
-		  if (isdigit(curch)) // if the first character is a number, it reads a number into num
-	    {
-	      s = numsym;
-	      getnumber(num);
-	      id = -1;
-	    }
-	  else 
-	    {
-	      num = -1;
-	      if (isalpha(curch)) // if the first character is a letter, it reads a name and returns its id
-		    { 
-		      getname(id);
-		      if (id == nmz->cvtname("DEVICE")) s = devsym;
-			  else if (id == nmz->cvtname("CONNECT")) s = consym;
-			  else if (id == nmz->cvtname("XOR")) s = xorsym;
-			  else if (id == nmz->cvtname("CLOCK")) s = clksym;
-			  else if (id == nmz->cvtname("SWITCH")) s = swisym;
-			  else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
-			  else if (id == nmz->cvtname("MONITOR")) s = monsym;
-
-			  else if (id == nmz->cvtname("AND")) s = gatesym;
-			  else if (id == nmz->cvtname("NAND")) s = gatesym;
-			  else if (id == nmz->cvtname("OR")) s = gatesym;
-			  else if (id == nmz->cvtname("NOR")) s = gatesym;
-
-			  else if (id == nmz->cvtname("INPUTS")) s = keysym;
-			  else if (id == nmz->cvtname("VALUE")) s = keysym;
-			  else if (id == nmz->cvtname("QVAL")) s = keysym;
-			  else if (id == nmz->cvtname("NAME")) s = keysym;
-			  else if (id == nmz->cvtname("CYCLES")) s = keysym;
-			  else if (id == nmz->cvtname("START")) s = keysym;
-			  else if (id == nmz->cvtname("INCLUDES")) s = keysym;
-			  else if (id == nmz->cvtname("RECORDS")) s = keysym;
-
-			  else if (id == nmz->cvtname("Q")) s = outsym;
-			  else if (id == nmz->cvtname("QBAR")) s = outsym;
-
-			  else if (id == nmz->cvtname("I1")) s = insym;
-			  else if (id == nmz->cvtname("I2")) s = insym;
-			  else if (id == nmz->cvtname("I3")) s = insym;
-			  else if (id == nmz->cvtname("I4")) s = insym;
-			  else if (id == nmz->cvtname("I5")) s = insym;
-			  else if (id == nmz->cvtname("I6")) s = insym;
-			  else if (id == nmz->cvtname("I7")) s = insym;
-			  else if (id == nmz->cvtname("I8")) s = insym;
-			  else if (id == nmz->cvtname("I9")) s = insym;
-			  else if (id == nmz->cvtname("I10")) s = insym;
-			  else if (id == nmz->cvtname("I11")) s = insym;
-			  else if (id == nmz->cvtname("I12")) s = insym;
-			  else if (id == nmz->cvtname("I13")) s = insym;
-			  else if (id == nmz->cvtname("I14")) s = insym;
-			  else if (id == nmz->cvtname("I15")) s = insym;
-			  else if (id == nmz->cvtname("I16")) s = insym;
-
-			  else if (id == nmz->cvtname("DATA")) s = insym;
-			  else if (id == nmz->cvtname("SET")) s = insym;
-			  else if (id == nmz->cvtname("CLEAR")) s = insym;
-			  else if (id == nmz->cvtname("CLK")) s = insym;
-
-			  else s = namesym;
-			}
-	      else 
-			{
-			  id = -1;
-		      switch (curch) //symbols
-		        {
-		          case '=': s = equals; break;
-				  case ';': s = semicol; break;
-			  	  case '.': s = dot; break;
-				  case '>': s = connect_; break;
-				  default: s = badsym; break;
-				}
-			  getch();
-		    }
-	    }
+	while (curch == '/')
+	{
+		i = skipcomments(); //skips the comments
+		skipspaces(); //skips spaces
 	}
+
+	if (i == 1) //if it found just a back slash instead of 2 it returns an error
+	{
+		id = -1;
+		num = -1;
+		s = badsym;
+		signalstr = "";
+	}
+	else
+	{    
+		skipspaces(); //skips spaces
+		if (eofile) //if it reached the end of file
+		{
+			s = eofsym;
+			id = -1;
+			num = -1;
+			signalstr = "";
+		}
+		else 
+		{
+			if (isdigit(curch)) // if the first character is a number, it reads a number into num
+			{
+			  s = numsym;
+			  getnumber(num);
+			  id = -1;
+			  signalstr = "";
+			}
+			else if (curch == '#') //if the first character is # it reads a series of bits into signalstr
+			{
+				s = bitsersym;
+				id = -1;
+				num = -1;
+				getbitseries(signalstr);
+			}
+			else 
+			{
+				signalstr = "";
+				num = -1;
+				if (isalpha(curch)) // if the first character is a letter, it reads a name and returns its id
+				{ 
+					getname(id);
+					if (id == nmz->cvtname("DEVICE")) s = devsym;
+					else if (id == nmz->cvtname("CONNECT")) s = consym;
+					else if (id == nmz->cvtname("XOR")) s = xorsym;
+					else if (id == nmz->cvtname("CLOCK")) s = clksym;
+					else if (id == nmz->cvtname("SWITCH")) s = swisym;
+					else if (id == nmz->cvtname("DTYPE")) s = dtypesym;
+					else if (id == nmz->cvtname("MONITOR")) s = monsym;
+					else if (id == nmz->cvtname("SIGGEN")) s = siggensym;
+
+					else if (id == nmz->cvtname("AND")) s = gatesym;
+					else if (id == nmz->cvtname("NAND")) s = gatesym;
+					else if (id == nmz->cvtname("OR")) s = gatesym;
+					else if (id == nmz->cvtname("NOR")) s = gatesym;
+
+					else if (id == nmz->cvtname("INPUTS")) s = keysym;
+					else if (id == nmz->cvtname("VALUE")) s = keysym;
+					else if (id == nmz->cvtname("QVAL")) s = keysym;
+					else if (id == nmz->cvtname("NAME")) s = keysym;
+					else if (id == nmz->cvtname("CYCLES")) s = keysym;
+					else if (id == nmz->cvtname("START")) s = keysym;
+					else if (id == nmz->cvtname("INCLUDES")) s = keysym;
+					else if (id == nmz->cvtname("RECORDS")) s = keysym;
+
+					else if (id == nmz->cvtname("Q")) s = outsym;
+					else if (id == nmz->cvtname("QBAR")) s = outsym;
+
+					else if (id == nmz->cvtname("I1")) s = insym;
+					else if (id == nmz->cvtname("I2")) s = insym;
+					else if (id == nmz->cvtname("I3")) s = insym;
+					else if (id == nmz->cvtname("I4")) s = insym;
+					else if (id == nmz->cvtname("I5")) s = insym;
+					else if (id == nmz->cvtname("I6")) s = insym;
+					else if (id == nmz->cvtname("I7")) s = insym;
+					else if (id == nmz->cvtname("I8")) s = insym;
+					else if (id == nmz->cvtname("I9")) s = insym;
+					else if (id == nmz->cvtname("I10")) s = insym;
+					else if (id == nmz->cvtname("I11")) s = insym;
+					else if (id == nmz->cvtname("I12")) s = insym;
+					else if (id == nmz->cvtname("I13")) s = insym;
+					else if (id == nmz->cvtname("I14")) s = insym;
+					else if (id == nmz->cvtname("I15")) s = insym;
+					else if (id == nmz->cvtname("I16")) s = insym;
+
+					else if (id == nmz->cvtname("DATA")) s = insym;
+					else if (id == nmz->cvtname("SET")) s = insym;
+					else if (id == nmz->cvtname("CLEAR")) s = insym;
+					else if (id == nmz->cvtname("CLK")) s = insym;
+
+					else s = namesym;
+				}
+				else 
+				{
+					id = -1;
+					switch (curch) //symbols
+					{
+						case '=': s = equals; break;
+						case ';': s = semicol; break;
+						case '.': s = dot; break;
+						case '>': s = connect_; break;
+						default: s = badsym; break;
+					}
+					getch();
+				}
+			}
+		}
     }
 }
 

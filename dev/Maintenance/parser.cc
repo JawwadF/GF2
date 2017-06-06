@@ -3,9 +3,6 @@
 
 using namespace std;
 
-void skip(scanner* smz);
-bool getname(scanner* smz);
-/* The parser for the circuit definition files */
 devlink dev;
 symbol cursym;
 name id;
@@ -13,21 +10,26 @@ string errorMessage = "";
 
 bool noerrors = true;
 int num;
+string signalstr = "";
 
-
-bool parser::readin(void)
-{
+/***********************************************************************
+ * 
+ * Reads the definition of the logic system and builds the          
+ * corresponding internal representation via calls to the 'Network' 
+ * module and the 'Devices' module.                                 
+ *
+ */
+bool parser::readin(void) {
 	symbol tempsym;
 	bool noerror;
 	noerrors = true;
 	bool noMonitor = true;
 	errorMessage = "";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	while (cursym != eofsym) {
 		noerror = true;
 		tempsym = cursym;
-		smz->getsymbol(cursym, id, num);
-		//cout << id << endl;
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != equals) {
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the equal sign\n";
 			cout << "SYNTATIC ERROR expecting the equal sign" << endl;
@@ -58,21 +60,21 @@ bool parser::readin(void)
 		}
 
 		if (!noerror) {
-			skip(smz);
+			skip();
 			
 			continue;
 		}
 
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != semicol) {
 			cout << "SYNTATIC ERROR missing semicolon, got " << id << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing a semicolon\n";
 			errorMessage = errorMessage + smz->geterror() + "\n";
 			noerror = false;
-			skip(smz);
+			skip();
 			continue;
 		}
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		noerrors = noerrors && noerror;
 	}
 	if (noerrors) {
@@ -95,16 +97,32 @@ bool parser::readin(void)
 
 }
 
-void skip(scanner* smz) {
+
+/***********************************************************************
+ * 
+ * If an error has been detected in the input file, this function 	
+ * skips reading the input file until the next semcolon, where it 	
+ * resumes normal operation. Used for error handling.				
+ *
+ */
+void parser::skip(void) {
 	while (cursym != eofsym && cursym != semicol) {
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	noerrors = false;
 }
 
+
+/***********************************************************************
+ * 
+ * Used to initialise a connection between an output device and an 	
+ * input device. Called from readin()  								
+ * It returns FALSE if there is an error in the initialisation		
+ * 	
+ */
 bool parser::connection(void) {
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	name indev = -1, outdev = -1, insig = -1, outsig = -1;
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR in the name" << endl;
@@ -114,13 +132,24 @@ bool parser::connection(void) {
 	}
 	cout << "There is a connection from " << id << " ";
 	outdev = id;
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	
-	if (cursym == dot) { //here we should check if we expect a dot
+	//here we check if the ouput device is a dtype and we are expecting a dot
+	
+	devlink dd;
+	dd=netz->finddevice(outdev);
+	if (dd != NULL && dd->kind == dtype)
+	{
+		if (cursym != dot)
+		{
+			cout << "SYNTATIC ERROR missing '.'" << endl;
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing '.'\n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
+		smz->getsymbol(cursym, id, num, signalstr);
 		cout << "output ";
-		smz->getsymbol(cursym, id, num);
 		if (cursym != outsym) {
-			showError("SYNTATIC ERROR in the output");
 			cout << "SYNTATIC ERROR in the output" << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the output\n";
 			errorMessage = errorMessage + smz->geterror() + "\n";
@@ -128,15 +157,24 @@ bool parser::connection(void) {
 		}
 		cout << id << " ";
 		outsig = id;
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 	}
 	else {
+		if (cursym == dot)
+		{
+			string outstr = nmz->get_str(outdev);
+			cout << "ERROR: device "<<outstr<<" does not have multiple outputs" << endl;
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR: device "+ outstr + " does not have multiple outputs\n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
 		outsig = -1;
 		devlink o = netz->finddevice(outdev);
 		if (noerrors &&  o != NULL && netz->findoutput(o, -1) == NULL) {
-			netz->addoutput(netz->finddevice(outdev), outsig);
+			netz->addoutput(netz->finddevice(outdev), outsig, outdev);
 		}
 	}
+	
 	if (cursym != connect_) {
 		cout << "SYNTATIC ERROR missing >" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing >\n";
@@ -144,7 +182,7 @@ bool parser::connection(void) {
 		return false;
 	}
 	cout << "To input ";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR in the name " << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the name\n";
@@ -153,14 +191,14 @@ bool parser::connection(void) {
 	}
 	cout << id << " ";
 	indev = id;
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != dot) {
 		cout << "SYNTATIC ERROR in the dot" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing the dot\n";
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != insym) {
 		cout << "SYNTATIC ERROR in the input" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the input\n";
@@ -210,20 +248,27 @@ bool parser::connection(void) {
 
 	}
 	return noerror;
-
 }
-bool getname(scanner* smz) {
 
-	if (id != 37) smz->getsymbol(cursym, id, num);
+
+/***********************************************************************
+ * 
+ * Used during the initialisation of a device or monitor to read the  
+ * the name of the new variable from the definition file				
+ * It returns FALSE if there is an error with the name initialisation	
+ *
+ */
+bool parser::readname(void) {
+
+	if (id != 37) smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != keysym || id != 37) {
 		cout << "SYNTATIC ERROR: expecting the keyword 'NAME' but getting" <<id<< endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the keyword 'NAME'\n";
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	//cout << "["<< id << "] ";
 	
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR: expecting name" << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a name\n";
@@ -235,8 +280,16 @@ bool getname(scanner* smz) {
 	return true;
 }
 
+
+/***********************************************************************
+ * 
+ * Used for the initialisation of a device, it checks what type the 	
+ * new device is and calls the correct function. Called from readin() 
+ * It returns FALSE if there is an error in the initialisation		
+ * 	
+ */
 bool parser::device(void) {
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	switch (cursym)
 	{
 	case xorsym:
@@ -249,25 +302,46 @@ bool parser::device(void) {
 		return switch_();
 	case dtypesym:
 		return dtype_();
+	case siggensym:
+		return siggen_();
 	default:
 		cout << "SYNTATIC ERROR expecting a device. Received " << cursym << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting a device\n";
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-
 	return false;
 }
+
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a xor gate		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::xor_(void) {
-	if (!getname(smz)) {
+	cout << "Creating a XOR gate ";
+	
+	if (!readname()) {
 		return false;
 	}
-	cout << "[" << id << "] ";
-	cout << "Creating a XOR gate ";
+
 	bool noerror;
-	dmz->makedevice(xorgate, id, 2, noerror);
+	dmz->makedevice(xorgate, id, 2, noerror, "");
 	return noerror;
 }
+
+
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of an AND/NAND/OR/NOR gate		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::gate(void) {
 	devicekind gatetype;
 	switch (id)
@@ -295,11 +369,10 @@ bool parser::gate(void) {
 		return false;
 		break;
 	}
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 18) {
-		//cout << id << " ";
-		cout << "That has ";
-		smz->getsymbol(cursym, id, num);
+		cout << "that has ";
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != numsym) {
 			cout << endl << "SYNTATIC ERROR expecting the number of inputs" << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the number of inputs\n";
@@ -326,27 +399,35 @@ bool parser::gate(void) {
 		return false;
 	}
 	int numberInputs = num;
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(gatetype, id, numberInputs, noerror);
+	dmz->makedevice(gatetype, id, numberInputs, noerror, "");
 	return noerror;
 }
 
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a clock device		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::clock(void) {
 	int numOfcycles = -1;
 	cout << "Creating a Clock";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 38)
 	{
 		cout << " that changes state every ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == numsym)
 		{
 			if (num > 0)
 			{
-				cout << num << " cyles";
+				cout << num << " cyles ";
 				numOfcycles = num;
 			}
 			else {
@@ -373,25 +454,30 @@ bool parser::clock(void) {
 		return false;
 	}
 	
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(aclock, id, numOfcycles, noerror);
+	dmz->makedevice(aclock, id, numOfcycles, noerror, "");
 	return noerror;
 }
 
 
-
-bool parser::switch_(void)
-{
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a switch		
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
+bool parser::switch_(void) {
 	int switchvalue = -1;
 	cout << "Creating a SWITCH";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 19)
 	{
 		cout << " starting with value ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == numsym)
 		{
 			if (num == 0 || num == 1) {
@@ -421,57 +507,126 @@ bool parser::switch_(void)
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
-	dmz->makedevice(aswitch, id, switchvalue, noerror);
+	dmz->makedevice(aswitch, id, switchvalue, noerror, "");
 	return noerror;
 }
 
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a dtype device			
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 	
+ * 	
+ */
 bool parser::dtype_(void) {
-	cout << "Creating a DTYPE";
+	cout << "Creating a DTYPE ";
 
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 
 	bool noerror;
-	dmz->makedevice(dtype, id, -1, noerror);
+	dmz->makedevice(dtype, id, -1, noerror, "");
 	return noerror;
 }
 
 
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a siggen device			
+ * from the scanner. Called from device() 							
+ * It returns FALSE if there is an error in the initialisation 		
+ * 
+ */
+bool parser::siggen_(void) {
+	string InputSeries = "";
+	cout<<"Creating a SIGGEN";
+	smz->getsymbol(cursym, id, num, signalstr);
+	if (cursym == bitsersym)
+	{
+		if (signalstr.length() > 0)
+		{
+			cout<<" with signal "<<signalstr<<" ";
+			InputSeries = signalstr;
+		}
+		else {
+			cout << endl << "SYNTATIC ERROR: binary signal has to be at least one cycles long";
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + 
+				": ERROR binary signal has to be at least one cycles long \n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
+	}
+	else {
+		cout << endl << "SYNTATIC ERROR: expected '#'";
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + 
+		    ": ERROR expected '#' \n";
+		errorMessage = errorMessage + smz->geterror() + "\n";
+		return false;
+	}
+	if (!readname()) {
+		return false;
+		}
+		
+	bool noerror;
+	dmz->makedevice(asiggen, id, -1, noerror, InputSeries);
+	return noerror;
+}
+
+
+/***********************************************************************
+ * 
+ * Receives and checks the initialisation of a monitor point  
+ * from the scanner. Called from readin() 										
+ * It returns FALSE if there is an error in the initialisation 	
+ */
 bool parser::monitor_(void) {
 	cout << "Creating a MONITOR";
-	smz->getsymbol(cursym, id, num);
+	smz->getsymbol(cursym, id, num, signalstr);
 	name devicename;
 	name output = -1;
 	if (cursym == keysym && id == 41)
 	{
 		cout << " that records the output of ";
-		smz->getsymbol(cursym, id, num);
+		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym == namesym)
 		{
 			cout << id << " ";
 			devicename = id;
-			smz->getsymbol(cursym, id, num);
-			if (cursym == dot) //here we should check if we expect a dot
+			
+			devlink dd;
+			dd=netz->finddevice(id);
+			if (dd != NULL && dd->kind == dtype)
 			{
-				cout << "output ";
-				smz->getsymbol(cursym, id, num);
-				if (cursym != outsym) {
-					cout << "SYNTATIC ERROR: expected output" << endl;
-					errorMessage = errorMessage + "Line " + to_string(smz->counter) +
-						": ERROR expected an output\n";
-					errorMessage = errorMessage + smz->geterror() + "\n";
-					return false;
+				smz->getsymbol(cursym, id, num, signalstr);
+				if (cursym == dot)
+				{
+					cout << "output ";
+					smz->getsymbol(cursym, id, num, signalstr);
+					if (cursym != outsym) {
+						cout << "SYNTATIC ERROR: expected output" << endl;
+						errorMessage = errorMessage + "Line " + to_string(smz->counter) +
+							": ERROR expected an output\n";
+						errorMessage = errorMessage + smz->geterror() + "\n";
+						return false;
+					}
+					else {
+						cout << id << " ";
+						output = id;
+					}
 				}
-				else {
-					cout << id << " ";
-					output = id;
+				else 
+				{
+					cout << "SYNTATIC ERROR: expected a dot '.'" << endl;
+						errorMessage = errorMessage + "Line " + to_string(smz->counter) +
+							": ERROR expected a dot\n";
+						errorMessage = errorMessage + smz->geterror() + "\n";
+						return false;
 				}
-				smz->getsymbol(cursym, id, num);
 			}
 		}
 		else {
@@ -489,7 +644,8 @@ bool parser::monitor_(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	if (!getname(smz)) {
+	
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
@@ -520,17 +676,19 @@ bool parser::monitor_(void) {
 }
 
 
-
+/***********************************************************************
+ *
+ * The constructor, takes pointers to various other classes as parameters     
+ *
+ */
 parser::parser(network* network_mod, devices* devices_mod,
 	monitor* monitor_mod, scanner* scanner_mod, names* names_mod)
 {
-	netz = network_mod;  /* make internal copies of these class pointers */
-	dmz = devices_mod;   /* so we can call functions from these classes  */
-	mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
-	smz = scanner_mod;   /* class you say:                               */
-	nmz = names_mod;					 /* netz->makeconnection (i1, i2, o1, o2, ok);   */
-
-	/* any other initialisation you want to do? */
+	netz = network_mod; 
+	dmz = devices_mod;   
+	mmz = monitor_mod;   
+	smz = scanner_mod;   
+	nmz = names_mod;	
 
 }
 

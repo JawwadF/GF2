@@ -1,0 +1,36 @@
+connection = identifier,[".", output] ,">", identifier, ".", input;
+
+output = "Q"|"QBAR";
+
+input = "I1"|"I2"|"I3"|"I4"|"I5"|"I6"|"I7"|"I8"|"I9"|"I10"|"I11"|"I12"|"I13"|"I14"|"I15"|"I16"|
+	"DATA"|"SET"|"CLK"|"CLEAR";
+
+device = "XOR" | gate | clock | switch | "DTYPE" | siggen;
+
+gate = "AND"|"OR"|"NAND"|"NOR", "INPUTS",number;
+
+number = "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10"|"11"|"12"|"13"|"14"|"15"|"16";
+
+clock = "CLOCK", "CYCLES", {non_zero_digit};
+
+non_zero_digit = "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
+
+bit = "0"|"1";
+
+switch = "SWITCH", "VALUE", bit;
+
+siggen = "SIGGEN", sig_signal;
+
+sig_signal = "#", {bit}; 
+
+monitor = "RECORDS", identifier, [".", output]; 
+
+identifier = letter, {letter|digit};
+
+expression = connection | (device | monitor), "NAME", identifier;
+
+type = "DEVICE"|"CONNECT"|"MONITOR";
+
+rule = type, "=", expression, ";" ;
+
+EBNFgrammar = {rule};

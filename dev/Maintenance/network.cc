@@ -90,17 +90,23 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
   dev->kind = dkind;
   dev->ilist = NULL;
   dev->olist = NULL;
-  if (dkind != aclock) {        // device goes at head of list 
+  if (dkind != aclock) // device goes at head of list 
+  {        
     if (lastdev == NULL)
-	lastdev = dev;
+		lastdev = dev;
     dev->next = devs;
     devs = dev;
-  } else {                      // aclock devices must go last 
+  }
+  else 				  // aclock devices must go last 
+  {                      
     dev->next = NULL;
-    if (lastdev == NULL) {
+    if (lastdev == NULL) 
+    {
       devs = dev;
       lastdev = dev;
-    } else {
+    }
+    else
+    {
       lastdev->next = dev;
       lastdev = dev;
     }
@@ -130,11 +136,12 @@ void network::addinput (devlink dev, name iid)
  * name.                                                               
  *
  */
-void network::addoutput (devlink dev, name oid)
+void network::addoutput (devlink dev, name oid, name tdevid)
 {
   outplink o = new outputrec;
   o->id = oid;
   o->sig = low;
+  o->devid = tdevid;
   o->next = dev->olist;
   dev->olist = o;
 }
@@ -163,31 +170,6 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
       i->connect = o;
   }
 }
-
-/***********************************************************************
- *
- * Removes the connection between the 'inp' input of device 'idev' and the 
- * 'outp' output of device 'odev'. 'ok' is set true if operation       
- * succeeds.                                                           
- *
- */
-// void network::removeconnection (name idev, name inp, name odev, name outp, bool& ok)
-// {
-//   devlink din, dout;
-//   outplink o;
-//   inplink i;
-//   din = finddevice (idev);
-//   dout = finddevice (odev);
-//   ok = ((din != NULL) && (dout != NULL));
-//   if (ok) {
-//     o = findoutput (dout, outp);
-//     i = findinput (din, inp);
-//     ok = ((o != NULL) && (i != NULL));
-//     if (ok)
-//       i->connect = o;
-//   }
-// }
-
 
 
 /***********************************************************************
