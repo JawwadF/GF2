@@ -8,6 +8,7 @@
 #include <wx/textctrl.h>
 #include <wx/choicdlg.h>
 #include <wx/arrstr.h>
+#include <wx/timer.h>
 #include <vector>
 #include "names.h"
 #include "devices.h"
@@ -21,7 +22,8 @@ enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
   MY_BUTTON_ID,
-  CONTINUE_BUTTON_ID, //added by me
+  TIMER_ID,
+  STOP_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
   RESTCANVAS_BUTTON_ID,
@@ -48,8 +50,9 @@ private:
   parser *pmz;
   scanner *smz;
 
+  wxButton *continueButton;
   devlink firstDevice;
-
+  wxTimer* timer;                    // Time to produce the animation
   int cyclescompleted; // how many simulation cycles have been completed
   wxArrayString wxSwitchNameArray;
   wxListBox* switchesList;
@@ -62,14 +65,16 @@ private:
   wxArrayInt MonitorIDArray;
   wxArrayInt MonitorOutIDArray;
 
+  void MyFrame::startstopAnim(void);
   void updateSwitchList(void);
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
+  void OnUpdateCanvas(wxTimerEvent& event);
   void OnOpen(wxCommandEvent& event); //added by me
   void OnHelp(wxCommandEvent& event); //added by me
   void OnButton(wxCommandEvent& event);   // event handler for push button
-  void OnContinue(wxCommandEvent& event); //added by me - for continue button
+  void OnStop(wxCommandEvent& event); //added by me - for continue button
   void OnSwitch(wxCommandEvent& event); //added by me - for set switch button
   void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control

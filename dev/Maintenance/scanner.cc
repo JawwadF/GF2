@@ -96,7 +96,7 @@ bool scanner::skipcomments(void)
 string scanner::geterror(void) {
 	char ch = curch;
 	string line = "";
-	int errorpos = curline.size() - 1;
+	int errorpos = curline.size();
 	while (curline != "") {
 		line = curline;
 		getch();
@@ -104,9 +104,8 @@ string scanner::geterror(void) {
 	curch = ch;
 	int size = line.size();
 
-	string spaces(2*size , ' ');
-	double total = pow(2, ((errorpos*1.0)/ (size - 1)));
-	spaces[round(total*errorpos)] = '^';
+	string spaces(2*size , '_');
+	spaces[errorpos] = '^';
 	line = line + "\n" + spaces;
 	return line;
 }

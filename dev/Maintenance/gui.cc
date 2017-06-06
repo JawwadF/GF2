@@ -6,6 +6,8 @@
 #include <algorithm>
 using namespace std;
 
+bool isStopAnim = true;
+int xpos = 10;
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
@@ -23,7 +25,6 @@ void MyGLCanvas::reset(monitor* mm, names* nm) {
 	nmz = nm;
 }
 
-
 int wxglcanvas_attrib_list[5] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
 
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
@@ -39,7 +40,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
 	pan_y = 0;
 	zoom = 1.0;
 	cyclesdisplayed = -1;
-
+	
 	text_to_print = "No file selected, please select input file";
 }
 
@@ -148,7 +149,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 				out_str.append(nmz->get_str(id2));
 				}
 			wxString myoutputname(out_str);
-			PrintOnCanvas(myoutputname, 10, h - start_corner_y - square_size / 2 - ij*square_size * 2);
+			PrintOnCanvas(myoutputname, xpos+w-60, h - start_corner_y - square_size / 2 - ij*square_size * 2);
 			
 			
 			
@@ -177,7 +178,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 		cyclesdisplayed = -1;	
 	}
 
-	PrintOnCanvas(example_text,10,h-15);
+	PrintOnCanvas(example_text,xpos,h-15);
 
 	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
@@ -222,8 +223,9 @@ void MyGLCanvas::PrintOnCanvas(wxString example_text, int xaxis, int yaxis) //pr
 void MyGLCanvas::setCanv(int cyclescompleted) {
 	int w, h;
 	GetClientSize(&w, &h);
-	if (100 + cyclescompleted*30 + pan_x > w) {
-		pan_x = 100 - cyclescompleted*30 + 0.5 * w;
+	if (160 + cyclescompleted*30 + pan_x > w) {
+		pan_x = -360 - cyclescompleted*30 + 0.5 * w;
+		xpos = 410 + cyclesdisplayed * 30 - 0.5 * w;
 		init = false;
 	}
 }
@@ -289,11 +291,12 @@ EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 EVT_MENU(wxID_HELP, MyFrame::OnHelp)
 EVT_MENU(wxID_OPEN, MyFrame::OnOpen)
 EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
-EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
+EVT_BUTTON(STOP_BUTTON_ID, MyFrame::OnStop) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
 EVT_BUTTON(RESTCANVAS_BUTTON_ID, MyFrame::OnRestCav)
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
+EVT_TIMER(TIMER_ID, MyFrame::OnUpdateCanvas)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
@@ -327,27 +330,74 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 
 	wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
 	const wxSize* switchStateBoxSize = new wxSize(150, 100);
-	
+	continueButton = new wxButton(this, STOP_BUTTON_ID, "Stop");
+	continueButton->Disable();
 	switchesList = new wxListBox(this, wxID_ANY, wxDefaultPosition, *switchStateBoxSize, 0, NULL, 0);
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Switches States:"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	button_sizer->Add(switchesList, 0, wxALL, 10);
 	button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxALL, 10);
-	button_sizer->Add(new wxButton(this, CONTINUE_BUTTON_ID, "Continue"), 0, wxALL, 10); //added by me
+	button_sizer->Add(continueButton, 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, RESTCANVAS_BUTTON_ID, "Reset View"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
-	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
-	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
+	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles per seconds"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
+	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("5"));
 	button_sizer->Add(spin, 0, wxALL, 10);
 	topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 	SetSizeHints(750, 500);
 	SetSizer(topsizer);
+	timer = new wxTimer(this, TIMER_ID);
 }
 
+
+void MyFrame::OnUpdateCanvas(wxTimerEvent& event) {
+
+	if (CurrentDocPath == "") {
+		return;
+	}
+
+	int speed = spin->GetValue();
+	int ncycles;
+	ncycles = 1;
+	if (cyclescompleted > 0) {
+		if ((ncycles + cyclescompleted) > maxcycles)
+			ncycles = maxcycles - cyclescompleted;
+
+		cout << "Continuing for " << speed << " cycles per seconds" << endl;
+		canvas->text_to_print.Printf("Continuing for %d cycles per seconds", speed);
+		runnetwork(ncycles);
+		canvas->setCanv(cyclescompleted);
+		canvas->Render(canvas->text_to_print, cyclescompleted);
+	}
+	else
+	{
+		canvas->text_to_print.Printf("Error: nothing to continue!");
+		canvas->Render(canvas->text_to_print);
+		cout << "Error: nothing to continue!" << endl;
+	}
+
+}
 void MyFrame::OnRestCav(wxCommandEvent &event) {
+	if (!isStopAnim) {
+		startstopAnim();
+	}
+
 	canvas->resetView();
 }
+void MyFrame::startstopAnim(void) {
+	if (isStopAnim) {
+		timer->Start(1000/spin->GetValue());
+		continueButton->SetLabel("Stop");
 
+	}
+	else {
+		timer->Stop();
+		continueButton->SetLabel("Continue");
+		canvas->text_to_print.Printf("Animation stopped");
+		canvas->Render(canvas->text_to_print);
+	}
+	isStopAnim = !isStopAnim;
+}
 void MyFrame::OnExit(wxCommandEvent &event)
 // Event handler for the exit menu item
 {
@@ -373,11 +423,9 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 		canvas->Render(canvas->text_to_print, -10);
 	}
 
-	//    if (!input_stream.IsOk())
-	//    {
-	//        wxLogError("Cannot open file '%s'.", openFileDialog.GetPath());
-	//        return;
-	//    }
+	if (!isStopAnim) {
+		startstopAnim();
+	}
 }
 
 void MyFrame::OnSwitch(wxCommandEvent &event)
@@ -388,6 +436,10 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		canvas->text_to_print.Printf("No file selected, please select input file");
 		canvas->Render(canvas->text_to_print);
 		return;
+	}
+
+	if (!isStopAnim) {
+		startstopAnim();
 	}
 
 	wxMultiChoiceDialog dialog(this,
@@ -452,7 +504,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 
 	dialog.SetSelections(selectedArray);
 	
-	
+	if (!isStopAnim) {
+		startstopAnim();
+	}
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
@@ -482,6 +536,9 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
 // Event handler for the about menu item
 {
+	if (!isStopAnim) {
+		startstopAnim();
+	}
 	wxMessageDialog about(this, "Logic simulator GUI written by \nBianca Bilovolschi - bab42 \nJawwad Farid - jmf81 \nOsman Ramadan - oior2 \nMay-June 2017", "About Logsim", wxICON_INFORMATION | wxOK);
 	about.ShowModal();
 }
@@ -489,6 +546,10 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 void MyFrame::OnHelp(wxCommandEvent &event) //added by me
   // Event handler for the help menu item
 {
+
+	if (!isStopAnim) {
+		startstopAnim();
+	}
 
 	wxMessageDialog help(this, "Logic simulator \nUse 'OPEN' to select the desired definition file - see user manual for correct syntax \n \n'Run' - run the simulation for n cycles \n'Continue' - continue to run the simulation for another n cycles \n'Set Switch' - list of all switches and their current state (low/high), which can be modified \n'Set Monitor Point' - list of all outputs in the system that can be monitored \n'Cycles' - select the number of cycles to run/continue", "Help window", wxICON_INFORMATION | wxOK);
 	help.ShowModal();
@@ -521,7 +582,8 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		canvas->Render(canvas->text_to_print);
 		return;
 	}
-
+	xpos = 10;
+	isStopAnim = true;
 	nmz = new names();
 	netz = new network(nmz);
 	dmz = new devices(nmz, netz);
@@ -624,12 +686,12 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;
-	ncycles = spin->GetValue();
+	ncycles = 1;
 
-
-	canvas->text_to_print.Printf("Run button pressed: Running for %d cycles", ncycles);
+	int speed = spin->GetValue();
+	canvas->text_to_print.Printf("Run button pressed: Running for %d cycles per seconds", speed);
 	mmz->resetmonitor();
-	cout << "Running for " << ncycles << " cycles" << endl;
+	cout << "Running for " << speed << " cycles per seconds" << endl;
 	runnetwork(ncycles);
 	canvas->Render(canvas->text_to_print, cyclescompleted);
 
@@ -640,39 +702,18 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		nmz->writename(i);
 		cout << endl;
 	}
+	
+	startstopAnim();
+	continueButton->Enable(true);
+	
 	return;
 
 }
 
-void MyFrame::OnContinue(wxCommandEvent &event)
-// Event handler for continue button
+void MyFrame::OnStop(wxCommandEvent &event)
+// Event handler for stop button
 {
-	if (CurrentDocPath == "") {
-		showError("Need to select the logic description file first.");
-		canvas->text_to_print.Printf("No file selected, please select input file");
-		canvas->Render(canvas->text_to_print);
-		return;
-	}
-
-	int ncycles;
-	ncycles = spin->GetValue();
-	if (cyclescompleted > 0) {
-		if ((ncycles + cyclescompleted) > maxcycles)
-			ncycles = maxcycles - cyclescompleted;
-
-		cout << "Continuing for " << ncycles << " cycles" << endl;
-		canvas->text_to_print.Printf("Continuing for %d cycles", ncycles);
-		runnetwork(ncycles);
-		canvas->setCanv(cyclescompleted);
-		canvas->Render(canvas->text_to_print, cyclescompleted);
-	}
-	else
-	{
-		canvas->text_to_print.Printf("Error: nothing to continue!");
-		canvas->Render(canvas->text_to_print);
-		cout << "Error: nothing to continue!" << endl;
-	}	
-	
+	startstopAnim();
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
