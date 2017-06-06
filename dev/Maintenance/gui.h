@@ -26,6 +26,8 @@ enum {
   STOP_BUTTON_ID, //added by me
   SETSWITCH_BUTTON_ID, //added by me
   SETMONITOR_BUTTON_ID, //added by me
+  MAKECONNECTION_BUTTON_ID, //added by me
+  REMOVECONNECTION_BUTTON_ID, //added by me
   RESTCANVAS_BUTTON_ID,
 }; // widget identifiers
 
@@ -59,7 +61,13 @@ private:
   wxArrayString wxMonitorArray;
   wxArrayString DeviceNameArray;
   wxArrayString DeviceOutArray;
+  wxArrayString DeviceInArray;
+  wxArrayString wxConnectionArray;
   int SwitchIDArray[1000];
+  wxArrayInt removeConnectionDevIDArray;
+  wxArrayInt removeConnectionInputIDArray;
+  wxArrayInt DeviceInIDArray;
+  wxArrayInt DeviceInInputIDArray;
   wxArrayInt selectedArray;
   wxArrayInt selectedSwitchArray;
   wxArrayInt MonitorIDArray;
@@ -77,6 +85,8 @@ private:
   void OnStop(wxCommandEvent& event); //added by me - for continue button
   void OnSwitch(wxCommandEvent& event); //added by me - for set switch button
   void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
+  void OnMakeCon(wxCommandEvent& event); //added by me - for make connection button
+  void OnRemCon(wxCommandEvent& event); //added by me - for remove connection button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
   void OnDebug(wxCommandEvent &event); // event handler for the debug button

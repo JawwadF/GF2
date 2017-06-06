@@ -12,6 +12,7 @@ typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 
 struct outputrec {
   name       id;
+  name 		 devid;
   asignal    sig;
   outputrec* next;
 };
@@ -64,7 +65,7 @@ class network {
     /* Adds an input to the device pointed to by 'dev' with the specified  */
     /* name.                                                               */
  
-  void addoutput (devlink dev, name oid);
+  void addoutput (devlink dev, name oid, name tdevid);
     /* Adds an output to the device pointed to by 'dev' with the specified */
     /* name.                                                               */
 
@@ -72,6 +73,13 @@ class network {
     /* Makes a connection between the 'inp' input of device 'idev' and the */
     /* 'outp' output of device 'odev'. 'ok' is set true if operation       */
     /* succeeds.                                                           */
+    
+    
+  void deleteconnection (name idev, name inp);
+	/* Deletes the connection that exists at the 'inp' input of device  */
+	/* 'idev' . 										                */
+
+
  
   void checknetwork (bool& ok, string& mess);
     /* Checks that all inputs are connected to an output.                  */
