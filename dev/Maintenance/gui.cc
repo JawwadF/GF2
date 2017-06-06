@@ -292,6 +292,8 @@ EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
 EVT_BUTTON(CONTINUE_BUTTON_ID, MyFrame::OnContinue) //added by me
 EVT_BUTTON(SETSWITCH_BUTTON_ID, MyFrame::OnSwitch) //added by me
 EVT_BUTTON(SETMONITOR_BUTTON_ID, MyFrame::OnSetMon) //added by me
+EVT_BUTTON(MAKECONNECTION_BUTTON_ID, MyFrame::OnMakeCon) //added by me
+EVT_BUTTON(REMOVECONNECTION_BUTTON_ID, MyFrame::OnRemCon) //added by me
 EVT_BUTTON(RESTCANVAS_BUTTON_ID, MyFrame::OnRestCav)
 EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
 END_EVENT_TABLE()
@@ -336,6 +338,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	button_sizer->Add(new wxButton(this, RESTCANVAS_BUTTON_ID, "Reset View"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETSWITCH_BUTTON_ID, "Set Switch"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxButton(this, SETMONITOR_BUTTON_ID, "Set Monitor point"), 0, wxALL, 10); //added by me
+	button_sizer->Add(new wxButton(this, MAKECONNECTION_BUTTON_ID, "Make Connection"), 0, wxALL, 10); //added by me
+	button_sizer->Add(new wxButton(this, REMOVECONNECTION_BUTTON_ID, "Remove Connection"), 0, wxALL, 10); //added by me
 	button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP | wxLEFT | wxRIGHT, 10);
 	spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
 	button_sizer->Add(spin, 0, wxALL, 10);
@@ -400,13 +404,13 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		bool cmdok = true;
-		wxArrayInt selections = dialog.GetSelections();
-		for (int i = 0; i < wxSwitchNameArray.size(); i++) {
+		wxArrayInt selections = dialog.GetSelections(); //array of indices of selected switches
+		for (int i = 0; i < wxSwitchNameArray.size(); i++) {//set all switches to low
 			dmz->setswitch(SwitchIDArray[i], low, cmdok);
 		}
 		selectedSwitchArray.clear();
 		
-		for (size_t n = 0; n < selections.GetCount(); n++)
+		for (size_t n = 0; n < selections.GetCount(); n++)//set selected switches to high
 		{
 			// msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
 			// 	int(n), int(selections[n]),
@@ -479,6 +483,113 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 	}
 }
 
+
+void MyFrame::OnMakeCon(wxCommandEvent &event)
+// Event handler for the make connection button
+{
+
+	if (CurrentDocPath == "") {
+		showError("Need to select the logic description file first.");
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
+		return;
+	}
+
+	wxArrayString wxDeviceArray = wxMonitorArray;
+
+	wxSingleChoiceDialog dialog(this,
+		wxT("Select the device output you wish to connect to another device."),
+		wxT("Make connection: Select Output"),
+		wxDeviceArray);
+
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		bool cmdok = true;
+		int selectedOutDeviceIndex = dialog.GetSelection();
+		cout << "SELECTED CONNECTION OUTPUT: " << nmz->get_str(MonitorIDArray[selectedOutDeviceIndex]);
+		int selectedOutDeviceID = MonitorIDArray[selectedOutDeviceIndex];
+		cout << "Selected device ID for connection: " << selectedOutDeviceID << endl;
+		cout << "Selected device name for connection: " << nmz->get_str(selectedOutDeviceID) << endl;
+
+		wxSingleChoiceDialog dialog2(this,
+		wxT("Select the device input you wish to connect the previously selected output to."),
+		wxT("Make connection: Select Input"),
+		DeviceInArray);
+		if(dialog2.ShowModal() == wxID_OK){
+			int selectedInDeviceIndex = dialog2.GetSelection();
+			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
+			//int selectedInDeviceID = Monit
+			netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
+		}
+		
+		// for (devlink d = firstDevice; d != NULL; d = d->next){
+  //   		for (inplink i = d->ilist; i != NULL; i = i->next){
+  //     			namestring devicename = nmz->get_str(d->id);
+  //     			namestring deviceinputname = nmz->get_str(i->id);
+  //     			namestring deviceconnection = nmz->get_str(i->connect->id);
+  //     			cout << "Name of device: " << devicename << endl;
+  //     			cout << "Name of input: " << deviceinputname << endl;
+  //     			cout << "Output its connected to: " << deviceconnection << endl;
+  //     		}
+		// }
+      
+
+	}
+}
+
+void MyFrame::OnRemCon(wxCommandEvent &event)
+// Event handler for the remove connection button
+{
+
+	if (CurrentDocPath == "") {
+		showError("Need to select the logic description file first.");
+		canvas->text_to_print.Printf("No file selected, please select input file");
+		canvas->Render(canvas->text_to_print);
+		return;
+	}
+
+	wxArrayString wxDeviceArray = wxMonitorArray;
+
+	wxSingleChoiceDialog dialog(this,
+		wxT("Select the device output you wish to connect to another device."),
+		wxT("Make connection: Select Output"),
+		wxDeviceArray);
+
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		bool cmdok = true;
+		int selectedOutDeviceIndex = dialog.GetSelection();
+		cout << "SELECTED CONNECTION OUTPUT: " << nmz->get_str(MonitorIDArray[selectedOutDeviceIndex]);
+		int selectedOutDeviceID = MonitorIDArray[selectedOutDeviceIndex];
+		cout << "Selected device ID for connection: " << selectedOutDeviceID << endl;
+		cout << "Selected device name for connection: " << nmz->get_str(selectedOutDeviceID) << endl;
+
+		wxSingleChoiceDialog dialog2(this,
+		wxT("Select the device input you wish to connect the previously selected output to."),
+		wxT("Make connection: Select Input"),
+		DeviceInArray);
+		if(dialog2.ShowModal() == wxID_OK){
+			int selectedInDeviceIndex = dialog2.GetSelection();
+			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
+			//int selectedInDeviceID = Monit
+			netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
+		}
+		
+		// for (devlink d = firstDevice; d != NULL; d = d->next){
+  //   		for (inplink i = d->ilist; i != NULL; i = i->next){
+  //     			namestring devicename = nmz->get_str(d->id);
+  //     			namestring deviceinputname = nmz->get_str(i->id);
+  //     			namestring deviceconnection = nmz->get_str(i->connect->id);
+  //     			cout << "Name of device: " << devicename << endl;
+  //     			cout << "Name of input: " << deviceinputname << endl;
+  //     			cout << "Output its connected to: " << deviceconnection << endl;
+  //     		}
+		// }
+      
+
+	}
+}
+
 void MyFrame::OnAbout(wxCommandEvent &event)
 // Event handler for the about menu item
 {
@@ -536,15 +647,25 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	devlink devicesList = firstDevice;
 	bool cmdok = true;
 
+	// for (devlink d = firstDevice; d != NULL; d = d->next){
+ //    		for (inplink i = d->ilist; i != NULL; i = i->next){
+ //      			namestring devicename = nmz->get_str(d->id);
+ //      			namestring deviceinputname = nmz->get_str(i->id);
+ //      			namestring deviceconnection = nmz->get_str(i->connect->id);
+ //      			cout << "Name of device: " << devicename << endl;
+ //      			cout << "Name of input: " << deviceinputname << endl;
+ //      			cout << "Output its connected to: " << deviceconnection << endl;
+ //      		}
+	// 	}
 	
 
 	for(int i = 0; i < 1000; i++){
 		mmz->usedMonitors[i] = false;
 	}
-	wxMonitorArray.clear();
-	MonitorIDArray.clear();
-	MonitorOutIDArray.clear();
-	for(int i = 0; i < mmz->MonitorTable.used; i++){
+	wxMonitorArray.clear();//MonitorArray contains strings of Monitor name
+	MonitorIDArray.clear();//MonitorIDArray contains ID of device
+	MonitorOutIDArray.clear();//MonitorOutIDArray contains ID of device output
+	for(int i = 0; i < mmz->MonitorTable.used; i++){//populate arrays with existing monitors defined in config file
 	namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
 	namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
 	string MonListString;
@@ -558,28 +679,31 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
 	MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
 	}
-	DeviceNameArray.clear();
-	DeviceOutArray.clear();
-  while (devicesList != NULL) {
-    namestring DevName = nmz->get_str(devicesList->id);
-    DeviceNameArray.push_back(DevName);
-    namestring DevOutName = nmz->get_str(devicesList->olist->id);
-    DeviceOutArray.push_back(wxString(DevOutName));
-    string MonListString;
-    if(DevOutName == "Blankname"){
-      MonListString = DevName;
-    }
-    else{
-      MonListString = DevName + ": " + DevOutName;
-    }
-    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){
-      devicesList = devicesList->next;
-    }
-    else{
-      wxMonitorArray.push_back(wxString(MonListString));
-      MonitorIDArray.push_back(devicesList->id);
-      MonitorOutIDArray.push_back(devicesList->olist->id);
-    	}
+	DeviceNameArray.clear();//contains namestrings of devices
+	DeviceOutArray.clear();//contains namesstrings of outputs of devices
+	DeviceInArray.clear();
+  	while (devicesList != NULL) {
+	    namestring DevName = nmz->get_str(devicesList->id);//get name string of device
+	    DeviceNameArray.push_back(DevName);
+	    namestring DevOutName = nmz->get_str(devicesList->olist->id);
+	    //namestring DevInName = nmz->get_str(devicesList->ilist->id);
+	    
+	   	    DeviceOutArray.push_back(wxString(DevOutName));
+	    string MonListString;
+	    if(DevOutName == "Blankname"){
+	      MonListString = DevName;
+	    }
+	    else{
+	      MonListString = DevName + ": " + DevOutName;
+	    }
+	    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){//check if device is already in monitor array
+	      devicesList = devicesList->next;
+	    }
+	    else{
+	      wxMonitorArray.push_back(wxString(MonListString));
+	      MonitorIDArray.push_back(devicesList->id);
+	      MonitorOutIDArray.push_back(devicesList->olist->id);
+	    	}
   	}
 
   	for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
@@ -615,6 +739,22 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		devicesList = devicesList->next;
 		
 	}
+devicesList = firstDevice;
+while(devicesList != NULL){
+	 ////////////////////////FINISH THIS BIT/////////////////////
+	    inplink  i;
+		for (i = devicesList->ilist; i != NULL; i = i->next) {
+			//nmz->writename (i->id);
+			namestring DevInName = nmz->get_str(devicesList->id);
+			DeviceInIDArray.push_back(devicesList->id);
+			namestring DevInputName = nmz->get_str(i->id);
+			DeviceInInputIDArray.push_back(i->id);
+			wxString DevInputArrayString = DevInName + ": " + DevInputName;
+			DeviceInArray.push_back(DevInputArrayString);
+		}
+		devicesList = devicesList->next;
+}
+
 	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
@@ -640,6 +780,9 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		nmz->writename(i);
 		cout << endl;
 	}
+
+
+
 	return;
 
 }

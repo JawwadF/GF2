@@ -164,6 +164,31 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
   }
 }
 
+/***********************************************************************
+ *
+ * Removes the connection between the 'inp' input of device 'idev' and the 
+ * 'outp' output of device 'odev'. 'ok' is set true if operation       
+ * succeeds.                                                           
+ *
+ */
+// void network::removeconnection (name idev, name inp, name odev, name outp, bool& ok)
+// {
+//   devlink din, dout;
+//   outplink o;
+//   inplink i;
+//   din = finddevice (idev);
+//   dout = finddevice (odev);
+//   ok = ((din != NULL) && (dout != NULL));
+//   if (ok) {
+//     o = findoutput (dout, outp);
+//     i = findinput (din, inp);
+//     ok = ((o != NULL) && (i != NULL));
+//     if (ok)
+//       i->connect = o;
+//   }
+// }
+
+
 
 /***********************************************************************
  *
