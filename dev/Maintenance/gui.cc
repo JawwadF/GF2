@@ -554,26 +554,39 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 	}
 
 	wxConnectionArray.clear();
-
+	removeConnectionInputIDArray.clear();
+	removeConnectionDevIDArray.clear();
+	int i = 0;
 		for (devlink d = firstDevice; d != NULL; d = d->next){
+			cout << "Outer loop: " << i << endl;
+			i++;
+			int j = 0;
     		for (inplink i = d->ilist; i != NULL; i = i->next){
-      			namestring devicename = nmz->get_str(d->id);
-      			removeConnectionInputIDArray.push_back(d->id);
-      			removeConnectionDevIDArray.push_back(i->id);
-      			namestring deviceinputname = nmz->get_str(i->id);
-      			namestring deviceconnection = nmz->get_str(i->connect->devid);
-      			namestring deviceoutputname = nmz->get_str(i->connect->id);
-      			wxString connectionArrayEntry;
-      			if(deviceoutputname == "Blankname"){
-      				connectionArrayEntry = deviceconnection + " -> " + devicename + ":" + deviceinputname; 
-      			}
-      			else{
-      				connectionArrayEntry = deviceconnection + ":" + deviceoutputname + " -> " + devicename + ":" + deviceinputname; 
-      			}
-      			wxConnectionArray.push_back(connectionArrayEntry);
-      			// cout << "Name of device: " << devicename << endl;
-      			// cout << "Name of input: " << deviceinputname << endl;
-      			// cout << "Output its connected to: " << deviceconnection << endl;
+    			cout << "  Inner loop: " << j << endl;
+    			j++;
+    			if(i->connect != NULL){
+	      			namestring devicename = nmz->get_str(d->id);
+	      			removeConnectionInputIDArray.push_back(i->id);
+	      			removeConnectionDevIDArray.push_back(d->id);
+	      			if(i->connect != NULL){
+
+	      			}
+	      			namestring deviceinputname = nmz->get_str(i->id);
+	      			namestring deviceconnection = nmz->get_str(i->connect->devid);
+	       			namestring deviceoutputname = nmz->get_str(i->connect->id);
+
+	      			wxString connectionArrayEntry;
+	      			if(deviceoutputname == "Blankname"){
+	      				connectionArrayEntry = deviceconnection + " -> " + devicename + ":" + deviceinputname; 
+	      			}
+	      			else{
+	      				connectionArrayEntry = deviceconnection + ":" + deviceoutputname + " -> " + devicename + ":" + deviceinputname; 
+	      			}
+	      			wxConnectionArray.push_back(connectionArrayEntry);
+	      			// cout << "Name of device: " << devicename << endl;
+	      			// cout << "Name of input: " << deviceinputname << endl;
+	      			// cout << "Output its connected to: " << deviceconnection << endl;
+	      		}
       		}
 		}
 
@@ -595,6 +608,7 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 		cout << "SELECTED REMOVE CONNECTION input name: ";
 		nmz->writename(removeConnectionInputIDArray[selectedConnectionIndex]);
 		cout << endl;
+		netz->deleteconnection (removeConnectionDevIDArray[selectedConnectionIndex], removeConnectionInputIDArray[selectedConnectionIndex]);
 		//int selectedInDeviceID = Monit
 		//netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
 		
