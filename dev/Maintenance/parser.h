@@ -21,6 +21,10 @@ class parser {
   
   bool device(void);
   bool monitor_(void);
+  /* Creates a monitor point that records an output of a device 		*/
+  /* Called from readin() 												*/
+  /* It returns FALSE if there is an error in making the monitor 		*/
+  
   bool xor_(void);
   bool gate(void);
   bool clock(void);
@@ -34,9 +38,9 @@ class parser {
 
  public:
   bool readin ();
-    /* Reads the definition of the logic system and builds the             */
-    /* corresponding internal representation via calls to the 'Network'    */
-    /* module and the 'Devices' module.                                    */
+    /* Reads the definition of the logic system and builds the          */
+    /* corresponding internal representation via calls to the 'Network' */
+    /* module and the 'Devices' module.                                 */
 
   parser (network* network_mod, devices* devices_mod,
 	  monitor* monitor_mod, scanner* scanner_mod, names* names_mod);

@@ -3,8 +3,6 @@
 
 using namespace std;
 
-
-/* The parser for the circuit definition files */
 devlink dev;
 symbol cursym;
 name id;
@@ -27,7 +25,6 @@ bool parser::readin(void)
 		noerror = true;
 		tempsym = cursym;
 		smz->getsymbol(cursym, id, num, signalstr);
-		//cout << id << endl;
 		if (cursym != equals) {
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR expecting the equal sign\n";
 			cout << "SYNTATIC ERROR expecting the equal sign" << endl;
@@ -116,11 +113,22 @@ bool parser::connection(void) {
 	outdev = id;
 	smz->getsymbol(cursym, id, num, signalstr);
 	
-	if (cursym == dot) { //here we should check if we expect a dot
-		cout << "output ";
+	//here we check if the ouput device is a dtype and we are expecting a dot
+	
+	devlink dd;
+	dd=netz->finddevice(outdev);
+	if (dd != NULL && dd->kind == dtype)
+	{
+		if (cursym != dot)
+		{
+			cout << "SYNTATIC ERROR missing '.'" << endl;
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing '.'\n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
 		smz->getsymbol(cursym, id, num, signalstr);
+		cout << "output ";
 		if (cursym != outsym) {
-			showError("SYNTATIC ERROR in the output");
 			cout << "SYNTATIC ERROR in the output" << endl;
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR in the output\n";
 			errorMessage = errorMessage + smz->geterror() + "\n";
@@ -131,12 +139,21 @@ bool parser::connection(void) {
 		smz->getsymbol(cursym, id, num, signalstr);
 	}
 	else {
+		if (cursym == dot)
+		{
+			string outstr = nmz->get_str(outdev);
+			cout << "ERROR: device "<<outstr<<" does not have multiple outputs" << endl;
+			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR: device "+ outstr + " does not have multiple outputs\n";
+			errorMessage = errorMessage + smz->geterror() + "\n";
+			return false;
+		}
 		outsig = -1;
 		devlink o = netz->finddevice(outdev);
 		if (noerrors &&  o != NULL && netz->findoutput(o, -1) == NULL) {
-			netz->addoutput(netz->finddevice(outdev), outsig);
+			netz->addoutput(netz->finddevice(outdev), outsig, outdev);
 		}
 	}
+	
 	if (cursym != connect_) {
 		cout << "SYNTATIC ERROR missing >" << endl;
 		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing >\n";
@@ -221,7 +238,6 @@ bool parser::readname(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	//cout << "["<< id << "] ";
 	
 	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
@@ -349,7 +365,7 @@ bool parser::clock(void) {
 		{
 			if (num > 0)
 			{
-				cout << num << " cyles";
+				cout << num << " cyles ";
 				numOfcycles = num;
 			}
 			else {
@@ -476,6 +492,12 @@ bool parser::siggen_(void) {
 	return noerror;
 }
 
+
+/***********************************************************************
+ * Creates a monitor point that records an output of a device  
+ * Called from readin() 										
+ * It returns FALSE if there is an error in making the monitor 	
+ */
 bool parser::monitor_(void) {
 	cout << "Creating a MONITOR";
 	smz->getsymbol(cursym, id, num, signalstr);
@@ -492,7 +514,7 @@ bool parser::monitor_(void) {
 			
 			devlink dd;
 			dd=netz->finddevice(id);
-			if (dd->kind == dtype)
+			if (dd != NULL && dd->kind == dtype)
 			{
 				smz->getsymbol(cursym, id, num, signalstr);
 				if (cursym == dot)
@@ -568,17 +590,19 @@ bool parser::monitor_(void) {
 }
 
 
-
+/***********************************************************************
+ *
+ * The constructor, takes pointers to various other classes as parameters     
+ *
+ */
 parser::parser(network* network_mod, devices* devices_mod,
 	monitor* monitor_mod, scanner* scanner_mod, names* names_mod)
 {
-	netz = network_mod;  /* make internal copies of these class pointers */
-	dmz = devices_mod;   /* so we can call functions from these classes  */
-	mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
-	smz = scanner_mod;   /* class you say:                               */
-	nmz = names_mod;	/* netz->makeconnection (i1, i2, o1, o2, ok);   */
-
-	/* any other initialisation you want to do? */
+	netz = network_mod; 
+	dmz = devices_mod;   
+	mmz = monitor_mod;   
+	smz = scanner_mod;   
+	nmz = names_mod;	
 
 }
 

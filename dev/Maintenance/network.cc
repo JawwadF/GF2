@@ -136,11 +136,12 @@ void network::addinput (devlink dev, name iid)
  * name.                                                               
  *
  */
-void network::addoutput (devlink dev, name oid)
+void network::addoutput (devlink dev, name oid, name tdevid)
 {
   outplink o = new outputrec;
   o->id = oid;
   o->sig = low;
+  o->devid = tdevid;
   o->next = dev->olist;
   dev->olist = o;
 }
