@@ -59,7 +59,10 @@ private:
   wxArrayString DeviceNameArray;
   wxArrayString DeviceOutArray;
   wxArrayString DeviceInArray;
+  wxArrayString wxConnectionArray;
   int SwitchIDArray[1000];
+  wxArrayInt removeConnectionDevIDArray;
+  wxArrayInt removeConnectionInputIDArray;
   wxArrayInt DeviceInIDArray;
   wxArrayInt DeviceInInputIDArray;
   wxArrayInt selectedArray;
