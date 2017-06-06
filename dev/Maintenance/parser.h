@@ -14,16 +14,11 @@ class parser {
   monitor* mmz;
   scanner* smz;
   names* nmz;
-  /* put other stuff that the class uses internally here */
-  /* also declare internal functions                     */
 
-
- public:
-  bool readin ();
-    /* Reads the definition of the logic system and builds the             */
-    /* corresponding internal representation via calls to the 'Network'    */
-    /* module and the 'Devices' module.                                    */
   bool connection(void);
+  /*  */
+  /* */
+  
   bool device(void);
   bool monitor_(void);
   bool xor_(void);
@@ -32,7 +27,17 @@ class parser {
   bool switch_(void);
   bool dtype_(void);
   bool siggen_(void);
-  //void monitor(void);
+  
+  void skip(void);
+  bool readname(void);
+
+
+ public:
+  bool readin ();
+    /* Reads the definition of the logic system and builds the             */
+    /* corresponding internal representation via calls to the 'Network'    */
+    /* module and the 'Devices' module.                                    */
+
   parser (network* network_mod, devices* devices_mod,
 	  monitor* monitor_mod, scanner* scanner_mod, names* names_mod);
     /* the constructor takes pointers to various other classes as parameters */

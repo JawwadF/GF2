@@ -3,8 +3,7 @@
 
 using namespace std;
 
-void skip(scanner* smz);
-bool getname(scanner* smz);
+
 /* The parser for the circuit definition files */
 devlink dev;
 symbol cursym;
@@ -59,7 +58,7 @@ bool parser::readin(void)
 		}
 
 		if (!noerror) {
-			skip(smz);
+			skip();
 			
 			continue;
 		}
@@ -70,7 +69,7 @@ bool parser::readin(void)
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR missing a semicolon\n";
 			errorMessage = errorMessage + smz->geterror() + "\n";
 			noerror = false;
-			skip(smz);
+			skip();
 			continue;
 		}
 		smz->getsymbol(cursym, id, num, signalstr);
@@ -96,7 +95,7 @@ bool parser::readin(void)
 
 }
 
-void skip(scanner* smz) {
+void parser::skip(void) {
 	while (cursym != eofsym && cursym != semicol) {
 		smz->getsymbol(cursym, id, num, signalstr);
 	}
@@ -213,7 +212,7 @@ bool parser::connection(void) {
 	return noerror;
 }
 
-bool getname(scanner* smz) {
+bool parser::readname(void) {
 
 	if (id != 37) smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != keysym || id != 37) {
@@ -262,11 +261,12 @@ bool parser::device(void) {
 }
 
 bool parser::xor_(void) {
-	if (!getname(smz)) {
+	cout << "Creating a XOR gate ";
+	
+	if (!readname()) {
 		return false;
 	}
-	cout << "[" << id << "] ";
-	cout << "Creating a XOR gate ";
+
 	bool noerror;
 	dmz->makedevice(xorgate, id, 2, noerror, "");
 	return noerror;
@@ -301,8 +301,7 @@ bool parser::gate(void) {
 	}
 	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym == keysym && id == 18) {
-		//cout << id << " ";
-		cout << "That has ";
+		cout << "that has ";
 		smz->getsymbol(cursym, id, num, signalstr);
 		if (cursym != numsym) {
 			cout << endl << "SYNTATIC ERROR expecting the number of inputs" << endl;
@@ -330,7 +329,7 @@ bool parser::gate(void) {
 		return false;
 	}
 	int numberInputs = num;
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
@@ -377,7 +376,7 @@ bool parser::clock(void) {
 		return false;
 	}
 	
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
@@ -422,7 +421,7 @@ bool parser::switch_(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
@@ -431,9 +430,9 @@ bool parser::switch_(void) {
 }
 
 bool parser::dtype_(void) {
-	cout << "Creating a DTYPE";
+	cout << "Creating a DTYPE ";
 
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 	}
 
@@ -468,7 +467,7 @@ bool parser::siggen_(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	if (!getname(smz)) {
+	if (!readname()) {
 		return false;
 		}
 		
@@ -490,23 +489,36 @@ bool parser::monitor_(void) {
 		{
 			cout << id << " ";
 			devicename = id;
-			smz->getsymbol(cursym, id, num, signalstr);
-			if (cursym == dot) //here we should check if we expect a dot
+			
+			devlink dd;
+			dd=netz->finddevice(id);
+			if (dd->kind == dtype)
 			{
-				cout << "output ";
 				smz->getsymbol(cursym, id, num, signalstr);
-				if (cursym != outsym) {
-					cout << "SYNTATIC ERROR: expected output" << endl;
-					errorMessage = errorMessage + "Line " + to_string(smz->counter) +
-						": ERROR expected an output\n";
-					errorMessage = errorMessage + smz->geterror() + "\n";
-					return false;
+				if (cursym == dot)
+				{
+					cout << "output ";
+					smz->getsymbol(cursym, id, num, signalstr);
+					if (cursym != outsym) {
+						cout << "SYNTATIC ERROR: expected output" << endl;
+						errorMessage = errorMessage + "Line " + to_string(smz->counter) +
+							": ERROR expected an output\n";
+						errorMessage = errorMessage + smz->geterror() + "\n";
+						return false;
+					}
+					else {
+						cout << id << " ";
+						output = id;
+					}
 				}
-				else {
-					cout << id << " ";
-					output = id;
+				else 
+				{
+					cout << "SYNTATIC ERROR: expected a dot '.'" << endl;
+						errorMessage = errorMessage + "Line " + to_string(smz->counter) +
+							": ERROR expected a dot\n";
+						errorMessage = errorMessage + smz->geterror() + "\n";
+						return false;
 				}
-				smz->getsymbol(cursym, id, num, signalstr);
 			}
 		}
 		else {
@@ -524,7 +536,8 @@ bool parser::monitor_(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
-	if (!getname(smz)) {
+	
+	if (!readname()) {
 		return false;
 	}
 	bool noerror;
