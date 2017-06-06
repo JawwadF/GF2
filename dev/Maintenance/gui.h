@@ -73,7 +73,7 @@ private:
   wxArrayInt MonitorIDArray;
   wxArrayInt MonitorOutIDArray;
 
-  void MyFrame::startstopAnim(void);
+  void startstopAnim(void);
   void updateSwitchList(void);
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
