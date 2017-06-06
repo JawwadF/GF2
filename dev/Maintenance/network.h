@@ -73,6 +73,13 @@ class network {
     /* Makes a connection between the 'inp' input of device 'idev' and the */
     /* 'outp' output of device 'odev'. 'ok' is set true if operation       */
     /* succeeds.                                                           */
+    
+    
+  void deleteconnection (name idev, name inp);
+	/* Deletes the connection that exists at the 'inp' input of device  */
+	/* 'idev' . 										                */
+
+
  
   void checknetwork (bool& ok, string& mess);
     /* Checks that all inputs are connected to an output.                  */

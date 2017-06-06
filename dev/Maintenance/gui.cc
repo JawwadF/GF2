@@ -587,6 +587,7 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		bool cmdok = true;
+
 		int selectedConnectionIndex = dialog.GetSelection();
 		cout << "SELECTED REMOVE CONNECTION device name: ";
 		nmz->writename(removeConnectionDevIDArray[selectedConnectionIndex]);
@@ -597,7 +598,7 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 		//int selectedInDeviceID = Monit
 		//netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
 		
-		
+
 		// for (devlink d = firstDevice; d != NULL; d = d->next){
   //   		for (inplink i = d->ilist; i != NULL; i = i->next){
   //     			namestring devicename = nmz->get_str(d->id);

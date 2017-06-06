@@ -174,6 +174,25 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
 
 /***********************************************************************
  *
+
+ * Deletes the connection that exists at the 'inp' input of device 
+ * 'idev'.                                                           
+ *
+ */
+void network::deleteconnection (name idev, name inp)
+{
+  devlink din, dout;
+  outplink o;
+  inplink i;
+  din = finddevice (idev);
+  i = findinput (din, inp);
+  i->connect = NULL;
+}
+
+
+/***********************************************************************
+ *
+
  * Checks that all inputs are connected to an output.   
  *
  */
