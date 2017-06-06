@@ -549,6 +549,37 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		return;
 	}
 
+	if (!isStopAnim) {
+		startstopAnim();
+	}
+
+	DeviceInArray.clear();
+	DeviceInIDArray.clear();
+	DeviceInInputIDArray.clear();
+	devlink devicesList = firstDevice;
+	while (devicesList != NULL) {
+		inplink  i;
+		for (i = devicesList->ilist; i != NULL; i = i->next) {
+			//nmz->writename (i->id);
+			//if (i->connect != NULL) {
+				namestring DevInName = nmz->get_str(devicesList->id);
+				DeviceInIDArray.push_back(devicesList->id);
+				namestring DevInputName = nmz->get_str(i->id);
+				DeviceInInputIDArray.push_back(i->id);
+				wxString DevInputArrayString;
+				if (i->connect == NULL) {
+					DevInputArrayString = DevInName + ": " + DevInputName + " (Unconnected)";
+				}
+				else {
+					namestring DevOutName = nmz->get_str(i->connect->devid);
+					DevInputArrayString = DevInName + ": " + DevInputName + " (Currently connected to " + DevOutName + ")";
+				}
+				DeviceInArray.push_back(DevInputArrayString);
+			//}
+		}
+		devicesList = devicesList->next;
+	}
+
 	wxArrayString wxDeviceArray = wxMonitorArray;
 
 	wxSingleChoiceDialog dialog(this,
@@ -607,6 +638,12 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 		return;
 	}
 
+
+
+	if (!isStopAnim) {
+		startstopAnim();
+	}
+
 	wxConnectionArray.clear();
 	removeConnectionInputIDArray.clear();
 	removeConnectionDevIDArray.clear();
@@ -644,6 +681,10 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
       		}
 		}
 
+		if (removeConnectionDevIDArray.empty()) {
+			showError("No connections to remove");
+			return;
+		}
 
 	wxSingleChoiceDialog dialog(this,
 		wxT("Select the connection/s you wish to remove"),
@@ -656,12 +697,12 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 		bool cmdok = true;
 
 		int selectedConnectionIndex = dialog.GetSelection();
-		cout << "SELECTED REMOVE CONNECTION device name: ";
-		nmz->writename(removeConnectionDevIDArray[selectedConnectionIndex]);
-		cout << endl;
-		cout << "SELECTED REMOVE CONNECTION input name: ";
-		nmz->writename(removeConnectionInputIDArray[selectedConnectionIndex]);
-		cout << endl;
+		//cout << "SELECTED REMOVE CONNECTION device name: ";
+		//nmz->writename(removeConnectionDevIDArray[selectedConnectionIndex]);
+		//cout << endl;
+		//cout << "SELECTED REMOVE CONNECTION input name: ";
+		//nmz->writename(removeConnectionInputIDArray[selectedConnectionIndex]);
+		//cout << endl;
 		netz->deleteconnection (removeConnectionDevIDArray[selectedConnectionIndex], removeConnectionInputIDArray[selectedConnectionIndex]);
 		//int selectedInDeviceID = Monit
 		//netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
@@ -781,7 +822,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	}
 	DeviceNameArray.clear();//contains namestrings of devices
 	DeviceOutArray.clear();//contains namesstrings of outputs of devices
-	DeviceInArray.clear();
+
   	while (devicesList != NULL) {
 	    namestring DevName = nmz->get_str(devicesList->id);//get name string of device
 	    DeviceNameArray.push_back(DevName);
@@ -839,20 +880,8 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		devicesList = devicesList->next;
 		
 	}
-devicesList = firstDevice;
-while(devicesList != NULL){
-	    inplink  i;
-		for (i = devicesList->ilist; i != NULL; i = i->next) {
-			//nmz->writename (i->id);
-			namestring DevInName = nmz->get_str(devicesList->id);
-			DeviceInIDArray.push_back(devicesList->id);
-			namestring DevInputName = nmz->get_str(i->id);
-			DeviceInInputIDArray.push_back(i->id);
-			wxString DevInputArrayString = DevInName + ": " + DevInputName;
-			DeviceInArray.push_back(DevInputArrayString);
-		}
-		devicesList = devicesList->next;
-}
+
+
 
 	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
@@ -906,7 +935,17 @@ void MyFrame::runnetwork(int ncycles)
 {
 	bool ok = true;
 	int n = ncycles;
-
+	string mess;
+	netz->checknetwork(ok, mess);
+	mess = "ERROR \n" + mess;
+	if (!ok) {
+		timer->Stop();
+		showError(mess.c_str());
+		if (!isStopAnim) {
+			startstopAnim();
+		}
+		return;
+	}
 	while ((n > 0) && ok) {
 		dmz->executedevices(ok);
 		if (ok) {
