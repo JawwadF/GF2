@@ -682,7 +682,9 @@ void MyFrame::updateSwitchList(void) {
 		switchListArray.push_back(wxSwitchNameArray[i] + state);
 	}
 	switchesList->Clear();
-	switchesList->InsertItems(switchListArray, 0);
+	if(!switchListArray.empty()){
+		switchesList->InsertItems(switchListArray, 0);
+	}
 }
 
 void MyFrame::OnButton(wxCommandEvent &event)
