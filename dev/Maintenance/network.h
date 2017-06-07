@@ -44,6 +44,9 @@ class network {
  public:
   devlink devicelist (void);
     /* Returns list of devices                                             */
+
+  void writeconnections(devlink d);
+    /* TEST FUNCTION: Prints out all the connections in the network */
  
   devlink finddevice (name id);
    /* Returns link to device with specified name. Returns NULL if not       */

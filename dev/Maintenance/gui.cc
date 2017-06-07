@@ -553,6 +553,8 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		startstopAnim();
 	}
 
+	netz->writeconnections(firstDevice);
+
 	DeviceInArray.clear();
 	DeviceInIDArray.clear();
 	DeviceInInputIDArray.clear();
@@ -610,6 +612,8 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 			// cout << "Selected output name ID: " << selectedOutDeviceID << endl;
 			netz->makeconnection(DeviceInIDArray[selectedInDeviceIndex], selectedInDeviceID, MonitorIDArray[selectedOutDeviceIndex], selectedOutDeviceID, cmdok);
 		}
+
+		
 		
 	// for (devlink d = firstDevice; d != NULL; d = d->next){
  //    		for (inplink i = d->ilist; i != NULL; i = i->next){

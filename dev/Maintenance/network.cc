@@ -13,6 +13,28 @@ devlink network::devicelist (void)
   return devs;
 }
 
+/***********************************************************************
+ *
+ * TEST FUNCTION: Prints out all the connections in the network
+ *
+ */
+void network::writeconnections (devlink firstDevice)
+{
+  for (devlink d = firstDevice; d != NULL; d = d->next){
+    for (inplink i = d->ilist; i != NULL; i = i->next){
+       namestring devicename = nmz->get_str(d->id);
+       namestring deviceinputname = nmz->get_str(i->id);
+       namestring deviceconnection = nmz->get_str(i->connect->devid);
+       cout << "Name of device: " << devicename << endl;
+       cout << "Name of input: " << deviceinputname << endl;
+       cout << "Output its connected to: " << deviceconnection << endl;
+     }
+     cout << endl;
+  }
+  return;
+}
+
+
 
 /***********************************************************************
  *
