@@ -554,12 +554,6 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		startstopAnim();
 	}
 
-<<<<<<< HEAD
-	//netz->writeconnections(firstDevice);
-=======
-	//	netz->writeconnections(firstDevice);
->>>>>>> f8f4c8575dc6ca37284516865c384e30a8179304
-
 	DeviceInArray.clear();
 	DeviceInIDArray.clear();
 	DeviceInInputIDArray.clear();
