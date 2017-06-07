@@ -79,14 +79,14 @@ private:
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
   void OnUpdateCanvas(wxTimerEvent& event);
-  void OnOpen(wxCommandEvent& event); //added by me
-  void OnHelp(wxCommandEvent& event); //added by me
-  void OnButton(wxCommandEvent& event);   // event handler for push button
-  void OnStop(wxCommandEvent& event); //added by me - for continue button
-  void OnSwitch(wxCommandEvent& event); //added by me - for set switch button
-  void OnSetMon(wxCommandEvent& event); //added by me - for set monitor point button
-  void OnMakeCon(wxCommandEvent& event); //added by me - for make connection button
-  void OnRemCon(wxCommandEvent& event); //added by me - for remove connection button
+  void OnOpen(wxCommandEvent& event); // event handler to open directory browser
+  void OnHelp(wxCommandEvent& event); //event handler for help page
+  void OnButton(wxCommandEvent& event);   // event handler for Run button
+  void OnStop(wxCommandEvent& event); //event handler for continue button
+  void OnSwitch(wxCommandEvent& event); //event handler for set switch button
+  void OnSetMon(wxCommandEvent& event); //event handler for set monitor point button
+  void OnMakeCon(wxCommandEvent& event); //event handler for make connection button
+  void OnRemCon(wxCommandEvent& event); //event handler for remove connection button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
   void OnDebug(wxCommandEvent &event); // event handler for the debug button

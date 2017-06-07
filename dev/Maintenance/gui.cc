@@ -411,6 +411,7 @@ void MyFrame::OnExit(wxCommandEvent &event)
 void MyFrame::OnOpen(wxCommandEvent &event)
 // Event handler for the open menu item
 {
+	//Present Open file dialog
 	wxFileDialog* OpenDialog = new wxFileDialog(
 		this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
 		_("Text files (*.txt)|*.txt|C++ Source Files (*.cpp, *.cxx)|*.cpp;*.cxx"),
@@ -419,7 +420,6 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 	{
 		CurrentDocPath = OpenDialog->GetPath();
 		SetTitle(wxString("Circuit from - ") << OpenDialog->GetFilename());
-		
 		canvas->resetView();
 		canvas->text_to_print.Printf("File selected, press 'Run' to start simulation");
 		switchesList->Clear();
@@ -465,29 +465,14 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 		
 		for (size_t n = 0; n < selections.GetCount(); n++)//set selected switches to high
 		{
-			// msg += wxString::Format(wxT("\t%d: %d (%s)\n"),
-			// 	int(n), int(selections[n]),
-			// 	wxSwitchNameArray[selections[n]].c_str());
 			dmz->setswitch(SwitchIDArray[selections[n]], high, cmdok);
 			selectedSwitchArray.push_back(selections[n]);
 		}
-		//wxMessageBox(msg, wxT("Got selections"));
 		updateSwitchList();
 
 		devlink devicesList = firstDevice;
 		canvas->text_to_print.Printf("Switches set");
 		canvas->Render(canvas->text_to_print);
-
-		//THIS IS FOR CHECKING THE STATES OF THE SWITCHES
-		// int j = 0;
-		// while(devicesList->next != NULL){
-		//   if(devicesList->kind == aswitch){
-		//     asignal SwitchState = devicesList->swstate;
-		//     cout << "SWITCH STATE: " << SwitchState << endl;
-		//   }
-		//   devicesList = devicesList->next;
-		//   j++;
-		// }
 	}
 }
 
@@ -508,32 +493,25 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 		wxMonitorArray);
 
 	dialog.SetSelections(selectedArray);
-	
 	if (!isStopAnim) {
 		startstopAnim();
 	}
-
 	if (dialog.ShowModal() == wxID_OK)
 	{
-
 		selectedArray.clear();
 		bool cmdok = true;
 		wxArrayInt selections = dialog.GetSelections();
 		selectedArray = selections;
-		for(int i = 0; i < 1000; i++){
+		for(int i = 0; i < 1000; i++){//set monitor boolean array to all false
 			mmz->usedMonitors[i] = false;
 		}
-		for (size_t n = 0; n < selections.GetCount(); n++)
+		for (size_t n = 0; n < selections.GetCount(); n++)//set selected monitors to true
 		{
 			int value = selections[n];
 			mmz->usedMonitors[value] = true;
 		}
- 
-    //int ncycles = spin->GetValue()
     wxString text;
     text.Printf("Set monitor points.");
-    //mmz->resetmonitor();
-    //runnetwork(ncycles);/////////THIS CAUSES THE NEXT SET OF CYCLES TO RUN! BUT CANT REMOVE
     canvas->Render(text, cyclescompleted);
 	}
 }
@@ -554,15 +532,16 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		startstopAnim();
 	}
 
+	//Clear Device vectors
 	DeviceInArray.clear();
 	DeviceInIDArray.clear();
 	DeviceInInputIDArray.clear();
 	devlink devicesList = firstDevice;
+
+	/************CREATING/UPDATING CONNECTION VECTORS*************/
 	while (devicesList != NULL) {
 		inplink  i;
-		for (i = devicesList->ilist; i != NULL; i = i->next) {
-			//nmz->writename (i->id);
-			//if (i->connect != NULL) {
+		for (i = devicesList->ilist; i != NULL; i = i->next) {//Loop through device array
 				namestring DevInName = nmz->get_str(devicesList->id);
 				DeviceInIDArray.push_back(devicesList->id);
 				namestring DevInputName = nmz->get_str(i->id);
@@ -576,34 +555,32 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 					DevInputArrayString = DevInName + ": " + DevInputName + " (Currently connected to " + DevOutName + ")";
 				}
 				DeviceInArray.push_back(DevInputArrayString);
-			//}
 		}
 		devicesList = devicesList->next;
 	}
 
 	wxArrayString wxDeviceArray = wxMonitorArray;
 
+	//create first single choice dialog
 	wxSingleChoiceDialog dialog(this,
 		wxT("Select the device output you wish to connect to another device."),
 		wxT("Make connection: Select Output"),
 		wxDeviceArray);
 
-	if (dialog.ShowModal() == wxID_OK)
+	if (dialog.ShowModal() == wxID_OK)//When OK is pressed
 	{
 		bool cmdok = true;
 		int selectedOutDeviceIndex = dialog.GetSelection();
-		cout << "SELECTED CONNECTION OUTPUT: " << nmz->get_str(MonitorIDArray[selectedOutDeviceIndex]);
 		int selectedOutDeviceID = MonitorOutIDArray[selectedOutDeviceIndex];
-		cout << "Selected device ID for connection: " << selectedOutDeviceID << endl;
-		cout << "Selected device name for connection: " << nmz->get_str(selectedOutDeviceID) << endl;
-
+		//create second single choice dialog
 		wxSingleChoiceDialog dialog2(this,
 		wxT("Select the device input you wish to connect the previously selected output to."),
 		wxT("Make connection: Select Input"),
 		DeviceInArray);
-		if(dialog2.ShowModal() == wxID_OK){
+		if(dialog2.ShowModal() == wxID_OK){//when OK is pressed
 			int selectedInDeviceIndex = dialog2.GetSelection();
 			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
+			//Create connection
 			netz->makeconnection(DeviceInIDArray[selectedInDeviceIndex], selectedInDeviceID, MonitorIDArray[selectedOutDeviceIndex], selectedOutDeviceID, cmdok);
 		}
 	}
@@ -666,6 +643,7 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 	{
 		bool cmdok = true;
 		int selectedConnectionIndex = dialog.GetSelection();
+		//Delete connection
 		netz->deleteconnection (removeConnectionDevIDArray[selectedConnectionIndex], removeConnectionInputIDArray[selectedConnectionIndex]);
 	}
 }
@@ -686,7 +664,7 @@ void MyFrame::OnHelp(wxCommandEvent &event) //added by me
 	if (!isStopAnim) {
 		startstopAnim();
 	}
-	wxMessageDialog help(this, "Logic simulator \nUse 'OPEN' to select the desired definition file - see user manual for correct syntax \n \n'Run' - run the simulation for n cycles \n'Continue' - continue to run the simulation for another n cycles \n'Set Switch' - list of all switches and their current state (low/high), which can be modified \n'Set Monitor Point' - list of all outputs in the system that can be monitored \n'Cycles' - select the number of cycles to run/continue", "Help window", wxICON_INFORMATION | wxOK);
+	wxMessageDialog help(this, "Logic simulator \nUse 'OPEN' to select the desired definition file - see user manual for correct syntax \n \n'Run' - run the simulation animation at n cycles per second \n'Continue' - continue to run the simulation animation \n'Set Switch' - list of all switches and their current state (low/high), which can be modified \n'Set Monitor Point' - list of all outputs in the system that can be monitored \n 'Make Connection' - Create a connections between devices \n 'Remove Connection' - Remove a connection \n'Cycles' - select the number of cycles to run/continue", "Help window", wxICON_INFORMATION | wxOK);
 	help.ShowModal();
 }
 
