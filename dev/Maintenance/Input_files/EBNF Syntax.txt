@@ -1,3 +1,11 @@
+EBNFgrammar = {rule};
+
+rule = type, "=", expression, ";" ;
+
+type = "DEVICE"|"CONNECT"|"MONITOR";
+
+expression = connection | (device | monitor), "NAME", identifier;
+
 connection = identifier,[".", output] ,">", identifier, ".", input;
 
 output = "Q"|"QBAR";
@@ -7,7 +15,7 @@ input = "I1"|"I2"|"I3"|"I4"|"I5"|"I6"|"I7"|"I8"|"I9"|"I10"|"I11"|"I12"|"I13"|"I1
 
 device = "XOR" | gate | clock | switch | "DTYPE" | siggen;
 
-gate = "AND"|"OR"|"NAND"|"NOR", "INPUTS",number;
+gate = "AND"|"OR"|"NAND"|"NOR", "INPUTS", number;
 
 number = "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10"|"11"|"12"|"13"|"14"|"15"|"16";
 
@@ -15,9 +23,9 @@ clock = "CLOCK", "CYCLES", {non_zero_digit};
 
 non_zero_digit = "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
 
-bit = "0"|"1";
-
 switch = "SWITCH", "VALUE", bit;
+
+bit = "0"|"1";
 
 siggen = "SIGGEN", sig_signal;
 
@@ -27,10 +35,7 @@ monitor = "RECORDS", identifier, [".", output];
 
 identifier = letter, {letter|digit};
 
-expression = connection | (device | monitor), "NAME", identifier;
+->Comments starts with // and finish at the end of line
+->The input definition file should have DEVICE first, before CONNECT or MONITOR
 
-type = "DEVICE"|"CONNECT"|"MONITOR";
 
-rule = type, "=", expression, ";" ;
-
-EBNFgrammar = {rule};
