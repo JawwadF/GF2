@@ -435,6 +435,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 void MyFrame::OnSwitch(wxCommandEvent &event)
 // Event handler for the switch button
 {
+	//Check if input file has been chosen and read in
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
 		canvas->text_to_print.Printf("No file selected, please select input file");
@@ -493,7 +494,7 @@ void MyFrame::OnSwitch(wxCommandEvent &event)
 void MyFrame::OnSetMon(wxCommandEvent &event)
 // Event handler for the set monitor button
 {
-
+	//Check if input file has been chosen and read in
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
 		canvas->text_to_print.Printf("No file selected, please select input file");
@@ -541,7 +542,7 @@ void MyFrame::OnSetMon(wxCommandEvent &event)
 void MyFrame::OnMakeCon(wxCommandEvent &event)
 // Event handler for the make connection button
 {
-
+	//Check if input file has been chosen and read in
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
 		canvas->text_to_print.Printf("No file selected, please select input file");
@@ -553,7 +554,7 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		startstopAnim();
 	}
 
-	netz->writeconnections(firstDevice);
+	//netz->writeconnections(firstDevice);
 
 	DeviceInArray.clear();
 	DeviceInIDArray.clear();
@@ -605,44 +606,21 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		if(dialog2.ShowModal() == wxID_OK){
 			int selectedInDeviceIndex = dialog2.GetSelection();
 			int selectedInDeviceID = DeviceInInputIDArray[selectedInDeviceIndex];
-
-			// cout << "Selected input device name ID: " << DeviceInIDArray[selectedInDeviceIndex] << endl;
-			// cout << "Selected input name ID: " << selectedInDeviceID << endl;
-			// cout << "Selected output device name ID: " << MonitorIDArray[selectedOutDeviceIndex] << endl;
-			// cout << "Selected output name ID: " << selectedOutDeviceID << endl;
 			netz->makeconnection(DeviceInIDArray[selectedInDeviceIndex], selectedInDeviceID, MonitorIDArray[selectedOutDeviceIndex], selectedOutDeviceID, cmdok);
 		}
-
-		
-		
-	// for (devlink d = firstDevice; d != NULL; d = d->next){
- //    		for (inplink i = d->ilist; i != NULL; i = i->next){
- //      			namestring devicename = nmz->get_str(d->id);
- //      			namestring deviceinputname = nmz->get_str(i->id);
- //      			namestring deviceconnection = nmz->get_str(i->connect->devid);
- //      			cout << "Name of device: " << devicename << endl;
- //      			cout << "Name of input: " << deviceinputname << endl;
- //      			cout << "Output its connected to: " << deviceconnection << endl;
- //      		}
-	// 	}
-	
-      
-
 	}
 }
 
 void MyFrame::OnRemCon(wxCommandEvent &event)
 // Event handler for the remove connection button
 {
-
+	//Check if input file has been chosen and read in
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
 		canvas->text_to_print.Printf("No file selected, please select input file");
 		canvas->Render(canvas->text_to_print);
 		return;
 	}
-
-
 
 	if (!isStopAnim) {
 		startstopAnim();
@@ -651,79 +629,46 @@ void MyFrame::OnRemCon(wxCommandEvent &event)
 	wxConnectionArray.clear();
 	removeConnectionInputIDArray.clear();
 	removeConnectionDevIDArray.clear();
-	int i = 0;
-		for (devlink d = firstDevice; d != NULL; d = d->next){
-			cout << "Outer loop: " << i << endl;
-			i++;
-			int j = 0;
-    		for (inplink i = d->ilist; i != NULL; i = i->next){
-    			cout << "  Inner loop: " << j << endl;
-    			j++;
-    			if(i->connect != NULL){
-	      			namestring devicename = nmz->get_str(d->id);
-	      			removeConnectionInputIDArray.push_back(i->id);
-	      			removeConnectionDevIDArray.push_back(d->id);
-	      			if(i->connect != NULL){
 
-	      			}
-	      			namestring deviceinputname = nmz->get_str(i->id);
-	      			namestring deviceconnection = nmz->get_str(i->connect->devid);
-	       			namestring deviceoutputname = nmz->get_str(i->connect->id);
-
-	      			wxString connectionArrayEntry;
-	      			if(deviceoutputname == "Blankname"){
-	      				connectionArrayEntry = deviceconnection + " -> " + devicename + ":" + deviceinputname; 
-	      			}
-	      			else{
-	      				connectionArrayEntry = deviceconnection + ":" + deviceoutputname + " -> " + devicename + ":" + deviceinputname; 
-	      			}
-	      			wxConnectionArray.push_back(connectionArrayEntry);
-	      			// cout << "Name of device: " << devicename << endl;
-	      			// cout << "Name of input: " << deviceinputname << endl;
-	      			// cout << "Output its connected to: " << deviceconnection << endl;
-	      		}
+	/************CREATE CONNECTION VECTORS*************/
+	for (devlink d = firstDevice; d != NULL; d = d->next){
+		for (inplink i = d->ilist; i != NULL; i = i->next){
+			if(i->connect != NULL){//if connection exists
+      			namestring devicename = nmz->get_str(d->id);
+      			removeConnectionInputIDArray.push_back(i->id);
+      			removeConnectionDevIDArray.push_back(d->id);
+      			namestring deviceinputname = nmz->get_str(i->id);
+      			namestring deviceconnection = nmz->get_str(i->connect->devid);
+       			namestring deviceoutputname = nmz->get_str(i->connect->id);
+      			wxString connectionArrayEntry;
+      			if(deviceoutputname == "Blankname"){
+      				connectionArrayEntry = deviceconnection + " -> " + devicename + ":" + deviceinputname; 
+      			}
+      			else{
+      				connectionArrayEntry = deviceconnection + ":" + deviceoutputname + " -> " + devicename + ":" + deviceinputname; 
+      			}
+      			wxConnectionArray.push_back(connectionArrayEntry);
       		}
-		}
+  		}
+	}
 
-		if (removeConnectionDevIDArray.empty()) {
-			showError("No connections to remove");
-			return;
-		}
+	if (removeConnectionDevIDArray.empty()) {//check if any connections exist
+		showError("No connections to remove");
+		return;
+	}
 
+	//create single choice dialog
 	wxSingleChoiceDialog dialog(this,
 		wxT("Select the connection/s you wish to remove"),
 		wxT("Remove connections"),
 		wxConnectionArray);
 
 
-	if (dialog.ShowModal() == wxID_OK)
+	if (dialog.ShowModal() == wxID_OK)//When OK is pressed
 	{
 		bool cmdok = true;
-
 		int selectedConnectionIndex = dialog.GetSelection();
-		//cout << "SELECTED REMOVE CONNECTION device name: ";
-		//nmz->writename(removeConnectionDevIDArray[selectedConnectionIndex]);
-		//cout << endl;
-		//cout << "SELECTED REMOVE CONNECTION input name: ";
-		//nmz->writename(removeConnectionInputIDArray[selectedConnectionIndex]);
-		//cout << endl;
 		netz->deleteconnection (removeConnectionDevIDArray[selectedConnectionIndex], removeConnectionInputIDArray[selectedConnectionIndex]);
-		//int selectedInDeviceID = Monit
-		//netz->makeconnection(selectedInDeviceIndex, selectedInDeviceID, selectedOutDeviceIndex, selectedOutDeviceID, cmdok);
-		
-
-		// for (devlink d = firstDevice; d != NULL; d = d->next){
-  //   		for (inplink i = d->ilist; i != NULL; i = i->next){
-  //     			namestring devicename = nmz->get_str(d->id);
-  //     			namestring deviceinputname = nmz->get_str(i->id);
-  //     			namestring deviceconnection = nmz->get_str(i->connect->id);
-  //     			cout << "Name of device: " << devicename << endl;
-  //     			cout << "Name of input: " << deviceinputname << endl;
-  //     			cout << "Output its connected to: " << deviceconnection << endl;
-  //     		}
-		// }
-      
-
 	}
 }
 
@@ -740,11 +685,9 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 void MyFrame::OnHelp(wxCommandEvent &event) //added by me
   // Event handler for the help menu item
 {
-
 	if (!isStopAnim) {
 		startstopAnim();
 	}
-
 	wxMessageDialog help(this, "Logic simulator \nUse 'OPEN' to select the desired definition file - see user manual for correct syntax \n \n'Run' - run the simulation for n cycles \n'Continue' - continue to run the simulation for another n cycles \n'Set Switch' - list of all switches and their current state (low/high), which can be modified \n'Set Monitor Point' - list of all outputs in the system that can be monitored \n'Cycles' - select the number of cycles to run/continue", "Help window", wxICON_INFORMATION | wxOK);
 	help.ShowModal();
 }
@@ -764,12 +707,12 @@ void MyFrame::updateSwitchList(void) {
 	}
 	switchesList->Clear();
 	switchesList->InsertItems(switchListArray, 0);
-	
 }
 
 void MyFrame::OnButton(wxCommandEvent &event)
-// Event handler for the push button
+// Event handler for the Run button
 {
+	//Check if input file has been chosen and read in
 	if (CurrentDocPath == "") {
 		showError("Need to select the logic description file first.");
 		canvas->text_to_print.Printf("No file selected, please select input file");
@@ -778,67 +721,58 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	}
 	xpos = 10;
 	isStopAnim = true;
+
+	//Instantiate objects
 	nmz = new names();
 	netz = new network(nmz);
 	dmz = new devices(nmz, netz);
 	mmz = new monitor(nmz, netz);
-	smz = new scanner(nmz, CurrentDocPath.mb_str());
+	smz = new scanner(nmz, CurrentDocPath.mb_str());//File path of input file passed to constructor
 	pmz = new parser(netz, dmz, mmz, smz, nmz);
 	canvas->reset(mmz, nmz);
 	if (!pmz->readin()) return;
-	//bool ok = false;
-	firstDevice = netz->devicelist();
-	mmz->MonitorTable = mmz->getmontable();
+
+	firstDevice = netz->devicelist();//Store reference to first element in linked list
+	mmz->MonitorTable = mmz->getmontable();//Store monitor table
 	devlink devicesList = firstDevice;
 	bool cmdok = true;
 
-	// for (devlink d = firstDevice; d != NULL; d = d->next){
- //    		for (inplink i = d->ilist; i != NULL; i = i->next){
- //      			namestring devicename = nmz->get_str(d->id);
- //      			namestring deviceinputname = nmz->get_str(i->id);
- //      			namestring deviceconnection = nmz->get_str(i->connect->devid);
- //      			cout << "Name of device: " << devicename << endl;
- //      			cout << "Name of input: " << deviceinputname << endl;
- //      			cout << "Output its connected to: " << deviceconnection << endl;
- //      		}
-	// 	}
-	
-
-	for(int i = 0; i < 1000; i++){
+	/************CREATE MONITOR AND DEVICE VECTORS*************/
+	for(int i = 0; i < 1000; i++){//set Boolean array of monitors to display all to false
 		mmz->usedMonitors[i] = false;
 	}
+	//Clear arrays
 	wxMonitorArray.clear();//MonitorArray contains strings of Monitor name
 	MonitorIDArray.clear();//MonitorIDArray contains ID of device
 	MonitorOutIDArray.clear();//MonitorOutIDArray contains ID of device output
+
 	for(int i = 0; i < mmz->MonitorTable.used; i++){//populate arrays with existing monitors defined in config file
-	namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
-	namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
-	string MonListString;
-	if(MonOutput == "Blankname"){
-	  MonListString = MonName;
-	}
-	else{
-	  MonListString = MonName + ": " + MonOutput;
-	}
-	wxMonitorArray.push_back(wxString(MonListString));
-	MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
-	MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
+		namestring MonName = nmz->get_str(mmz->MonitorTable.sigs[i].devid);
+		namestring MonOutput = nmz->get_str(mmz->MonitorTable.sigs[i].op->id);
+		string MonListString;
+		if(MonOutput == "Blankname"){//if output has no name (i.e only one output)
+		  MonListString = MonName;
+		}
+		else{//if multiple outputs exist, append output name
+		  MonListString = MonName + ": " + MonOutput;
+		}
+		wxMonitorArray.push_back(wxString(MonListString));
+		MonitorIDArray.push_back(mmz->MonitorTable.sigs[i].devid);
+		MonitorOutIDArray.push_back(mmz->MonitorTable.sigs[i].op->id);
 	}
 	DeviceNameArray.clear();//contains namestrings of devices
 	DeviceOutArray.clear();//contains namesstrings of outputs of devices
 
-  	while (devicesList != NULL) {
+  	while (devicesList != NULL) {//Loop through devices list and populate devices vectors
 	    namestring DevName = nmz->get_str(devicesList->id);//get name string of device
 	    DeviceNameArray.push_back(DevName);
 	    namestring DevOutName = nmz->get_str(devicesList->olist->id);
-	    //namestring DevInName = nmz->get_str(devicesList->ilist->id);
-	    
-	   	    DeviceOutArray.push_back(wxString(DevOutName));
+	   	DeviceOutArray.push_back(wxString(DevOutName));
 	    string MonListString;
-	    if(DevOutName == "Blankname"){
+	    if(DevOutName == "Blankname"){//if only one output
 	      MonListString = DevName;
 	    }
-	    else{
+	    else{//if multiple outputs
 	      MonListString = DevName + ": " + DevOutName;
 	    }
 	    if(std::find(wxMonitorArray.begin(), wxMonitorArray.end(), MonListString) != wxMonitorArray.end()){//check if device is already in monitor array
@@ -848,29 +782,25 @@ void MyFrame::OnButton(wxCommandEvent &event)
 	      wxMonitorArray.push_back(wxString(MonListString));
 	      MonitorIDArray.push_back(devicesList->id);
 	      MonitorOutIDArray.push_back(devicesList->olist->id);
-	    	}
+	    }
   	}
 
   	for (int i = 0; i < mmz->MonitorTable.used; i++) {//remove all used monitors
 		mmz->remmonitor(mmz->MonitorTable.sigs[i].devid, mmz->MonitorTable.sigs[i].op->id, cmdok);
 		mmz->usedMonitors[i] = true;
 	}
-  	for (size_t n = 0; n < MonitorIDArray.size(); n++)
-	{
+  	for (size_t n = 0; n < MonitorIDArray.size(); n++){//create all monitors
 		mmz->makemonitor(MonitorIDArray[n], MonitorOutIDArray[n], cmdok);
 	}
 
-
-	devicesList = firstDevice;
-
-	//CREATE LIST OF SWITCHES
+	/************CREATE SWITCH VECTORS*************/
+	devicesList = firstDevice;//go back to start of linked list
 	wxSwitchNameArray.clear();
 	selectedSwitchArray.clear();
 	wxArrayString switchListArray;
-
 	int i = 0;
-	while (devicesList != NULL) {
-		if (devicesList->kind == aswitch) {
+	while (devicesList != NULL) {//loop through devices
+		if (devicesList->kind == aswitch) {//if device is a switch
 			int ID = devicesList->id;
 	    	asignal SwitchState = devicesList->swstate;
 	    	if(SwitchState == high){
@@ -882,22 +812,19 @@ void MyFrame::OnButton(wxCommandEvent &event)
 			i++;
 		}    
 		devicesList = devicesList->next;
-		
 	}
-
-
 
 	selectedArray.clear();
 	for (int i = 0; i < mmz->MonitorTable.used; i++) {
 		selectedArray.push_back(i);
 	}
-	updateSwitchList();
+	updateSwitchList();//update switch state box in GUI
 
-	//netz->checknetwork(ok);
 	int n, ncycles;
 	cyclescompleted = 0;
 	ncycles = 1;
 
+	/************DISPLAY SIGNAL TRACES*************/
 	int speed = spin->GetValue();
 	canvas->text_to_print.Printf("Run button pressed: Running for %d cycles per seconds", speed);
 	mmz->resetmonitor();
@@ -912,12 +839,9 @@ void MyFrame::OnButton(wxCommandEvent &event)
 		nmz->writename(i);
 		cout << endl;
 	}
-	
 	startstopAnim();
 	continueButton->Enable(true);
-
 	return;
-
 }
 
 void MyFrame::OnStop(wxCommandEvent &event)
