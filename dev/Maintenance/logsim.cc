@@ -17,7 +17,7 @@ bool MyApp::OnInit()
     // it some fake ASCII ones instead
     char **tmp1 = NULL; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, "Logic simulator", wxDefaultPosition,  wxSize(800, 600), NULL, NULL, NULL, NULL, NULL, NULL);
+    MyFrame *frame = new MyFrame(NULL, "Logic simulator", wxDefaultPosition,  wxSize(900, 700), NULL, NULL, NULL, NULL, NULL, NULL);
     frame->Show(true);
     return(true); // enter the GUI event loop
 #else
