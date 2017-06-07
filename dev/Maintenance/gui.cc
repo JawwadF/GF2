@@ -553,7 +553,7 @@ void MyFrame::OnMakeCon(wxCommandEvent &event)
 		startstopAnim();
 	}
 
-	netz->writeconnections(firstDevice);
+	//	netz->writeconnections(firstDevice);
 
 	DeviceInArray.clear();
 	DeviceInIDArray.clear();
