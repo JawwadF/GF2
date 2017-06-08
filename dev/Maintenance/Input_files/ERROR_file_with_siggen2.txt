@@ -1,3 +1,5 @@
+//Contains error: sgen does not have an outout waveform
+
 // Devices
 
 DEVICE = AND INPUTS 2 NAME U2;
@@ -25,8 +27,8 @@ CONNECT = U1.QBAR > U1.DATA;
 CONNECT = U1.QBAR > U3.I1;
 
 // Monitors
-MONITOR = RECORDS sgen NAME monitor1;
-MONITOR = RECORDS U1.Q NAME monitor2;
-MONITOR = RECORDS sgen2 NAME monitor3;
+MONITOR = RECORDS sgen NAME mon1;
+MONITOR = RECORDS U1.Q NAME mon2;
+MONITOR = RECORDS sgen2 NAME mon3;
 MONITOR = RECORDS U2 NAME mon4;
 

@@ -1,7 +1,6 @@
+//AND gate with 3 inputs
+
 // Devices
-
-
-
 
 DEVICE = SWITCH VALUE 1 NAME S1;
 DEVICE = SWITCH VALUE 1 NAME S2;

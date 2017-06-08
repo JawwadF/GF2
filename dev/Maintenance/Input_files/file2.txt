@@ -1,3 +1,5 @@
+//Circuit with no specific function
+
 // Devices
 
 DEVICE = AND INPUTS 2 NAME U2;
@@ -23,7 +25,7 @@ CONNECT = U1.QBAR > U1.DATA;
 CONNECT = U1.QBAR > U3.I1;
 
 // Monitors
-//MONITOR = RECORDS U1.Q NAME monitor1;
-MONITOR = RECORDS U3 NAME monitor1;
-MONITOR = RECORDS clock1 NAME monitor1;
+MONITOR = RECORDS U1.Q NAME mon1;
+MONITOR = RECORDS U3 NAME mon2;
+MONITOR = RECORDS clock1 NAME mon3;
 

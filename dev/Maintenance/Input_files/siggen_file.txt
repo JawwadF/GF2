@@ -1,3 +1,5 @@
+//File containing many signal generators, having no particular function
+
 // Devices
 
 DEVICE = SIGGEN #10100 NAME sgen1;
@@ -14,7 +16,7 @@ DEVICE = SWITCH VALUE 0 NAME S1;
 
 
 // Monitors
-MONITOR = RECORDS sgen1 NAME monitor1;
-MONITOR = RECORDS sgen2 NAME monitor1;
-MONITOR = RECORDS sgen3 NAME monitor1;
+MONITOR = RECORDS sgen1 NAME mon1;
+MONITOR = RECORDS sgen2 NAME mon2;
+MONITOR = RECORDS sgen3 NAME mon3;
 

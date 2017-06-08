@@ -1,14 +1,11 @@
+//Contains error: switch S4 does not exist but used in connection
+
 // Devices
-
-
-
-
 DEVICE = SWITCH VALUE 1 NAME S1;
 DEVICE = SWITCH VALUE 1 NAME S2;
 DEVICE = SWITCH VALUE 1 NAME S3;
 
 DEVICE = AND INPUTS 3 NAME U;
-
 
 // Connections
 CONNECT = S1 > U.I1;
@@ -16,6 +13,5 @@ CONNECT = S4 > U.I2;
 CONNECT = S3 > U.I3;
 
 // Monitors
-
 MONITOR = RECORDS U NAME monitor1;
 

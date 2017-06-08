@@ -1,3 +1,5 @@
+//File containing signal generators, having no particular function
+
 // Devices
 
 DEVICE = AND INPUTS 2 NAME AND1;
