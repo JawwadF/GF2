@@ -212,6 +212,7 @@ bool parser::connection(void) {
 		
 		devlink din = netz->finddevice(indev);
 		devlink dout = netz->finddevice(outdev);
+		inplink ii;
 		
 			if (din == NULL) {
 				errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Input device "+
@@ -238,6 +239,14 @@ bool parser::connection(void) {
 				noerror = false;
 			}
 			if (noerror) {
+				ii = netz->findinput (din, insig); 
+				if (ii->connect != NULL)
+				{
+					errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": Warning: Overwritting connection to input of device\n";
+					errorMessage = errorMessage + smz->geterror() + "\n";
+					showError(errorMessage.c_str());
+				}
+				
 				netz->makeconnection(indev, insig, outdev, outsig, noerror);
 				if (!noerror) {
 					errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR Cannot establish a " +
