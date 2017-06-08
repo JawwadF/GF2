@@ -390,9 +390,11 @@ void MyFrame::OnRestCav(wxCommandEvent &event) {
 }
 void MyFrame::startstopAnim(void) {
 	if (isStopAnim) {
+		if (spin->GetValue() != 0)
+		{
 		timer->Start(1000/spin->GetValue());
 		continueButton->SetLabel("Stop");
-
+		}
 	}
 	else {
 		timer->Stop();
@@ -832,7 +834,7 @@ void MyFrame::OnSpin(wxSpinEvent &event)
 // Event handler for the spin control
 {
 	canvas->text_to_print.Printf("Simulation Cycles: %d", event.GetPosition());
-	canvas->Render(canvas->text_to_print);
+	canvas->Render(canvas->text_to_print);	
 }
 
 
