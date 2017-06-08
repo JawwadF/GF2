@@ -26,6 +26,10 @@ bool parser::readin(void) {
 	bool noMonitor = true;
 	errorMessage = "";
 	smz->getsymbol(cursym, id, num, signalstr);
+	if (cursym == eofsym) {
+		noerrors = false;
+		errorMessage = "ERROR: received an empty file\n";
+	}
 	while (cursym != eofsym) {
 		noerror = true;
 		tempsym = cursym;
