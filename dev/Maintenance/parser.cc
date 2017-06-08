@@ -277,6 +277,8 @@ bool parser::readname(void) {
 		return false;
 	}
 	
+	
+	int prevlength = nmz->length_of_table;
 	smz->getsymbol(cursym, id, num, signalstr);
 	if (cursym != namesym) {
 		cout << "SYNTATIC ERROR: expecting name" << cursym << endl;
@@ -284,6 +286,22 @@ bool parser::readname(void) {
 		errorMessage = errorMessage + smz->geterror() + "\n";
 		return false;
 	}
+	
+	if (id != nmz->length_of_table-1)
+	{
+		cout << "ERROR: reassignment of variable" << id << endl;
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR: reassignment of variable " +nmz->get_str(id)+" \n";
+		errorMessage = errorMessage + smz->geterror() + "\n";
+		return false;
+	}
+	if (prevlength == nmz->length_of_table)
+	{
+		cout << "ERROR: reassignment of variable" << id << endl;
+		errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR: reassignment of variable " +nmz->get_str(id)+" \n";
+		errorMessage = errorMessage + smz->geterror() + "\n";
+		return false;
+	}
+	
 	cout << "assigned to a variable " << id << endl;
 
 	return true;
@@ -341,7 +359,6 @@ bool parser::xor_(void) {
 	dmz->makedevice(xorgate, id, 2, noerror, "");
 	return noerror;
 }
-
 
 
 /***********************************************************************
