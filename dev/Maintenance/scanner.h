@@ -4,8 +4,8 @@
 #include <string>
 #include <fstream>
 #include "names.h"
-
-//using namespace std;
+void showError(const char* mess);
+using namespace std;
 
 typedef enum {
 	namesym, numsym, devsym, xorsym, siggensym, gatesym, bitsersym, keysym, clksym, swisym,
