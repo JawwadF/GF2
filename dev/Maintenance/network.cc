@@ -233,6 +233,7 @@ void network::checknetwork (bool& ok, string& mess)
 	nmz->writename (d->id);
 	if (i->id != blankname) {
 	  cout << ".";
+	  mess = mess + nmz->get_str(d->id);
 	  mess = mess + "." + nmz->get_str(i->id);
 	  nmz->writename (i->id);
 	}
