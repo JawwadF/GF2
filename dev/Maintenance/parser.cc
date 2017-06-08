@@ -242,7 +242,7 @@ bool parser::connection(void) {
 				ii = netz->findinput (din, insig); 
 				if (ii->connect != NULL)
 				{
-					errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": Warning: Overwritting connection to input of device\n";
+					errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": Warning: Overwriting connection to input of device\n";
 					errorMessage = errorMessage + smz->geterror() + "\n";
 					showError(errorMessage.c_str());
 				}
