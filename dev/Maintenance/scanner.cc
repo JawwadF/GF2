@@ -165,9 +165,13 @@ void scanner:: getname(name &id)
   if (vari.length() > maxlength)
     {
       str.resize(maxlength);
-      cout<<"Warning: the name '"<<vari<<"' was truncated to "<<str <<endl;
-      string err = "Warning: the name '" + vari + "' was truncated to '" + str+"'";
-      showError(err.c_str());
+      
+      string errorMessage = "";
+	  errorMessage = errorMessage + "Line " + to_string(counter) + ": Warning: " + 
+		"the name '" + vari + "' was truncated to '" + str+"'\n";
+	  errorMessage = errorMessage + geterror() + "\n";
+      cout<<"Warning: the name '"<<vari<<"' was truncated to "<<str <<endl;      
+      showError(errorMessage.c_str());
     }
   id = nmz->lookup(str); 
 }

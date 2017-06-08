@@ -87,7 +87,7 @@ bool parser::readin(void) {
 		}
 		else if (noMonitor) {
 			errorMessage = errorMessage + "Line " + to_string(smz->counter) + ": ERROR " + 
-				"The circuit must have at lease one monitor";
+				"The circuit must have at least one monitor";
 			errorMessage = errorMessage + smz->geterror() + "\n";
 			noerrors = false;
 		}
